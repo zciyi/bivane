@@ -1,0 +1,529 @@
+/**
+ * Bivane · 风格一：Vant 复刻
+ * 取值来源：Vant 4 源码 packages/vant/src/style/css-variables.less
+ *          以及各组件 index.less 的 :root 段
+ *          （button / cell / cell-group / tag / badge / popup / dialog / toast / overlay）
+ * 校准日期：2026-09-21（P0 静态件）、2026-09-21（P1 弹层件）
+ *
+ * 规则一：组件只允许引用本文件的语义 token，禁止硬编码色值。
+ *
+ * 规则二（内边距 token 必须拆分量）：
+ *   Vant 原始写法是 padding 简写（如 `--van-button-normal-padding: 0 15px`）。
+ *   但 Tailwind 的 `[padding:var(--x)]` 任意属性语法不参与 tailwind-merge 的冲突消解，
+ *   会被同元素上的 `p-0` / 其它 padding 工具类反向覆盖（实测按钮左右内边距归零）。
+ *   因此需要区分方向的内边距一律拆成 `-padding-x` / `-padding-y` 分量，
+ *   组件侧只用 `px-[...]` / `py-[...]` 消费——这两个前缀在 tailwind-merge 里有独立分组，
+ *   既能正确覆盖自身默认值，也能被外部 className 覆盖。
+ *   注：仅单值（上下左右同值）且不与其它 padding 工具类共存的场景才可保留简写。
+ */
+
+:root,
+:host {
+  /* ---------- 色板（Color Palette）---------- */
+  --bv-black: #000;
+  --bv-white: #fff;
+  --bv-gray-1: #f7f8fa;
+  --bv-gray-2: #f2f3f5;
+  --bv-gray-3: #ebedf0;
+  --bv-gray-4: #dcdee0;
+  --bv-gray-5: #c8c9cc;
+  --bv-gray-6: #969799;
+  --bv-gray-7: #646566;
+  --bv-gray-8: #323233;
+  --bv-red: #ee0a24;
+  --bv-blue: #1989fa;
+  --bv-orange: #ff976a;
+  --bv-orange-dark: #ed6a0c;
+  --bv-orange-light: #fffbe8;
+  --bv-green: #07c160;
+
+  /* ---------- 渐变（Gradient）---------- */
+  --bv-gradient-red: linear-gradient(to right, #ff6034, #ee0a24);
+  --bv-gradient-orange: linear-gradient(to right, #ffd01e, #ff8917);
+
+  /* ---------- 语义色（Component Colors）---------- */
+  --bv-primary: var(--bv-blue);
+  --bv-success: var(--bv-green);
+  --bv-danger: var(--bv-red);
+  --bv-warning: var(--bv-orange);
+  --bv-text: var(--bv-gray-8);
+  --bv-text-2: var(--bv-gray-6);
+  --bv-text-3: var(--bv-gray-5);
+  --bv-active-color: var(--bv-gray-2);
+  --bv-active-opacity: 0.6;
+  --bv-disabled-opacity: 0.5;
+  --bv-background: var(--bv-gray-1);
+  --bv-background-2: var(--bv-white);
+  --bv-background-3: var(--bv-white);
+
+  /* 语义别名（Bivane 扩展，便于组件书写，不改变 Vant 语义） */
+  --bv-border: var(--bv-gray-3);
+  --bv-surface: var(--bv-background-2);
+  --bv-muted: var(--bv-background);
+
+  /* ---------- 间距（Padding）---------- */
+  --bv-padding-base: 4px;
+  --bv-padding-xs: 8px;
+  --bv-padding-sm: 12px;
+  --bv-padding-md: 16px;
+  --bv-padding-lg: 24px;
+  --bv-padding-xl: 32px;
+
+  /* ---------- 字体（Font）---------- */
+  --bv-font-bold: 600;
+  --bv-font-xs: 10px;
+  --bv-font-sm: 12px;
+  --bv-font-md: 14px;
+  --bv-font-lg: 16px;
+  --bv-line-xs: 14px;
+  --bv-line-sm: 18px;
+  --bv-line-md: 20px;
+  --bv-line-lg: 22px;
+  --bv-base-font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    'Segoe UI', Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB',
+    'Microsoft Yahei', sans-serif;
+
+  /* ---------- 动画（Animation）---------- */
+  --bv-duration-base: 0.3s;
+  --bv-duration-fast: 0.2s;
+  --bv-ease-out: ease-out;
+  --bv-ease-in: ease-in;
+
+  /* ---------- 边框（Border）---------- */
+  --bv-border-width: 1px;
+  --bv-radius-sm: 2px;
+  --bv-radius-md: 4px;
+  --bv-radius-lg: 8px;
+  --bv-radius-max: 999px;
+
+  /* ---------- 层级（Z-index，Vant 惯例）---------- */
+  --bv-z-index-1: 1;
+  --bv-z-popup: 2000;
+  --bv-z-overlay: 1999;
+  --bv-z-toast: 3000;
+
+  /* ---------- 断点（仅文档用，JS 侧读 ResponsiveProvider 配置）---------- */
+  --bv-breakpoint: 768px;
+}
+
+/* ---------- 组件级 token：Button ---------- */
+:root,
+:host {
+  --bv-button-mini-height: 24px;
+  --bv-button-mini-padding-x: var(--bv-padding-base); /* Vant: 0 4px */
+  --bv-button-mini-font: var(--bv-font-xs);
+  --bv-button-small-height: 32px;
+  --bv-button-small-padding-x: var(--bv-padding-xs); /* Vant: 0 8px */
+  --bv-button-small-font: var(--bv-font-sm);
+  --bv-button-normal-padding-x: 15px; /* Vant: 0 15px */
+  --bv-button-normal-font: var(--bv-font-md);
+  --bv-button-large-height: 50px;
+  --bv-button-default-height: 44px;
+  --bv-button-default-line-height: 1.2;
+  --bv-button-default-font: var(--bv-font-lg);
+  --bv-button-default-color: var(--bv-text);
+  --bv-button-default-background: var(--bv-background-2);
+  --bv-button-default-border: var(--bv-gray-4);
+  --bv-button-border-width: var(--bv-border-width);
+  --bv-button-radius: var(--bv-radius-md);
+  --bv-button-plain-background: var(--bv-white);
+  --bv-button-icon-size: 1.2em;
+  --bv-button-loading-icon-size: 20px;
+  --bv-button-press-overlay: 0.1; /* 按压态黑色蒙层透明度（Vant 用 ::before） */
+}
+
+/* ---------- 组件级 token：Cell / CellGroup ---------- */
+:root,
+:host {
+  --bv-cell-font: var(--bv-font-md);
+  --bv-cell-line-height: 24px;
+  --bv-cell-vertical-padding: 10px;
+  --bv-cell-horizontal-padding: var(--bv-padding-md);
+  --bv-cell-text-color: var(--bv-text);
+  --bv-cell-background: var(--bv-background-2);
+  --bv-cell-border-color: var(--bv-border);
+  --bv-cell-active-color: var(--bv-active-color);
+  --bv-cell-required-color: var(--bv-danger);
+  --bv-cell-label-color: var(--bv-text-2);
+  --bv-cell-label-font: var(--bv-font-sm);
+  --bv-cell-label-line-height: var(--bv-line-sm);
+  --bv-cell-label-margin-top: var(--bv-padding-base);
+  --bv-cell-value-color: var(--bv-text-2);
+  --bv-cell-icon-size: 16px;
+  --bv-cell-right-icon-color: var(--bv-gray-6);
+  --bv-cell-large-vertical-padding: var(--bv-padding-sm);
+  --bv-cell-large-title-font: var(--bv-font-lg);
+  --bv-cell-large-label-font: var(--bv-font-md);
+
+  --bv-cell-group-background: var(--bv-background-2);
+  --bv-cell-group-title-color: var(--bv-text-2);
+  --bv-cell-group-title-padding: var(--bv-padding-md) var(--bv-padding-md);
+  --bv-cell-group-title-font: var(--bv-font-md);
+  --bv-cell-group-title-line-height: 16px;
+  --bv-cell-group-inset-margin: 0 var(--bv-padding-md);
+  --bv-cell-group-inset-radius: var(--bv-radius-lg);
+}
+
+/* ---------- 组件级 token：Tag ---------- */
+:root,
+:host {
+  --bv-tag-padding-x: var(--bv-padding-base); /* Vant: 0 4px */
+  --bv-tag-padding-y: 0px;
+  --bv-tag-text-color: var(--bv-white);
+  --bv-tag-font: var(--bv-font-sm);
+  --bv-tag-radius: 2px;
+  --bv-tag-line-height: 16px;
+  --bv-tag-medium-padding-x: 6px; /* Vant: 2px 6px */
+  --bv-tag-medium-padding-y: 2px;
+  --bv-tag-large-padding-x: var(--bv-padding-xs); /* Vant: 4px 8px */
+  --bv-tag-large-padding-y: var(--bv-padding-base);
+  --bv-tag-large-radius: var(--bv-radius-md);
+  --bv-tag-large-font: var(--bv-font-md);
+  --bv-tag-round-radius: var(--bv-radius-max);
+  --bv-tag-default-color: var(--bv-gray-6);
+  --bv-tag-plain-background: var(--bv-background-2);
+}
+
+/* ---------- 组件级 token：Overlay 遮罩 ---------- */
+:root,
+:host {
+  --bv-overlay-background: rgba(0, 0, 0, 0.7); /* Vant: rgba(0,0,0,.7) */
+  --bv-overlay-z-index: var(--bv-z-overlay); /* Vant 内部为 1（相对值），这里用绝对层级 */
+  /* PC 端蒙层更浅：宽屏下 0.7 的蒙层压迫感过强（Bivane 扩展，见 modes.css 的模式覆盖） */
+  --bv-overlay-pc-background: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 组件级 token：Popup 弹层 ---------- */
+:root,
+:host {
+  --bv-popup-background: var(--bv-background-2);
+  --bv-popup-round-radius: 16px; /* Vant: --van-popup-round-radius */
+  --bv-popup-close-icon-size: 22px;
+  --bv-popup-close-icon-color: var(--bv-gray-5);
+  --bv-popup-close-icon-margin: var(--bv-padding-md);
+  --bv-popup-close-icon-z-index: 1;
+  --bv-popup-z-index: var(--bv-z-popup);
+  /* 进出场时长，与 --bv-duration-base 同源；H5 用 300ms，PC 收敛到 200ms（见 modes.css） */
+  --bv-popup-duration: 300ms;
+  /* 底部弹层最大高度：留出顶部安全区，超出内部滚动 */
+  --bv-popup-max-height: 90vh;
+  /* H5 居中模态的最大宽度：两侧各留一个 padding-md（=16px）。
+     逐字对齐 Vant `.van-popup--center { max-width: calc(100vw - var(--van-padding-md) * 2) }`。
+     不要用 90vw —— 大屏下留白比例会失控，且与 Vant 的「固定留白」语义不同。 */
+  --bv-popup-center-max-width: calc(100vw - var(--bv-padding-md) * 2);
+  /* 下拉关闭的判定阈值 */
+  --bv-popup-drag-close-distance: 80px; /* 拖拽超过该距离即关闭 */
+  --bv-popup-drag-close-velocity: 0.5; /* 或速度超过该值（px/ms）即关闭 */
+  /* PC 居中模态（Bivane 扩展：Vant Popup 无 PC 形态） */
+  --bv-popup-pc-width: 480px;
+  --bv-popup-pc-max-height: 80vh;
+  --bv-popup-pc-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  --bv-popup-pc-radius: var(--bv-radius-lg);
+}
+
+/* ---------- 组件级 token：Dialog 对话框 ---------- */
+:root,
+:host {
+  --bv-dialog-font: var(--bv-font-lg);
+  --bv-dialog-radius: 16px;
+  --bv-dialog-background: var(--bv-background-2);
+  --bv-dialog-header-font-weight: var(--bv-font-bold);
+  --bv-dialog-header-line-height: 24px;
+  --bv-dialog-header-padding-top: 26px;
+  --bv-dialog-header-padding-bottom: 0px;
+  --bv-dialog-header-isolated-padding-y: var(--bv-padding-lg); /* Vant: 24px 0 */
+  --bv-dialog-message-padding-x: var(--bv-padding-lg); /* Vant: 24px 24px */
+  --bv-dialog-message-padding-y: var(--bv-padding-lg);
+  --bv-dialog-message-font: var(--bv-font-md);
+  --bv-dialog-message-line-height: var(--bv-line-md);
+  --bv-dialog-message-max-height: 60vh;
+  --bv-dialog-has-title-message-color: var(--bv-gray-7);
+  --bv-dialog-has-title-message-padding-top: var(--bv-padding-xs);
+  --bv-dialog-button-height: 48px;
+  --bv-dialog-round-button-height: 36px;
+  --bv-dialog-confirm-button-color: var(--bv-primary);
+  /* PC 居中模态宽度区间：480 ~ 560px（架构矩阵 §2.1 定义），取中值 520 */
+  --bv-dialog-pc-width: 520px;
+}
+
+/* ---------- 组件级 token：Toast 轻提示 ---------- */
+:root,
+:host {
+  --bv-toast-max-width: 70%;
+  --bv-toast-font: var(--bv-font-md);
+  --bv-toast-text-color: var(--bv-white);
+  --bv-toast-line-height: var(--bv-line-md);
+  --bv-toast-radius: var(--bv-radius-lg);
+  --bv-toast-background: rgba(0, 0, 0, 0.7);
+  --bv-toast-icon-size: 36px;
+  --bv-toast-text-min-width: 96px;
+  --bv-toast-text-padding-x: var(--bv-padding-sm); /* Vant: 8px 12px */
+  --bv-toast-text-padding-y: var(--bv-padding-xs);
+  --bv-toast-default-padding: var(--bv-padding-md);
+  --bv-toast-default-width: 88px;
+  --bv-toast-default-min-height: 88px;
+  --bv-toast-position-top-distance: 20%;
+  --bv-toast-position-bottom-distance: 20%;
+  --bv-toast-z-index: var(--bv-z-toast);
+  /* PC 右上角通知卡片（Bivane 扩展：Vant Toast 无 PC 形态） */
+  --bv-toast-pc-width: 340px;
+  --bv-toast-pc-gutter: var(--bv-padding-lg);
+  --bv-toast-pc-gap: var(--bv-padding-xs);
+  --bv-toast-pc-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --bv-toast-pc-close-size: 16px;
+}
+
+/* ---------- 组件级 token：Badge ---------- */
+:root,
+:host {
+  --bv-badge-size: 16px;
+  --bv-badge-color: var(--bv-white);
+  --bv-badge-padding-x: 3px; /* Vant: 0 3px */
+  --bv-badge-padding-y: 0px;
+  --bv-badge-font: var(--bv-font-sm);
+  --bv-badge-font-weight: var(--bv-font-bold);
+  --bv-badge-border-width: var(--bv-border-width);
+  --bv-badge-background: var(--bv-danger);
+  --bv-badge-dot-size: 8px;
+}
+
+/* ---------- 公共 token：面板工具栏（H5 弹层头部） ----------
+ * 「取消 · 标题 · 确定」这一条是 H5 选择类面板的通用头部：Select / DropdownMenu 在用，
+ * 后续的 DatePicker / TimePicker / Picker 也会复用同一组（Vant 的 Picker 工具栏
+ * 即此形态：高度 44px、左右文字按钮、居中标题）。
+ * 多层下钻时头部多一行「层级行」（--bv-panel-header-breadcrumb-height），
+ * 面包屑独占该行、左对齐，工具栏行不受影响（见 panel-header.tsx）。
+ *
+ * PC 不渲染工具栏（鼠标点选即生效，见 panel-header.tsx 头注），
+ * 因此这组没有 *-pc 变体，也不需要进 modes.css。
+ *
+ * 不新增颜色语义：取消/标题/确定分别复用 --bv-text-2 / --bv-text / --bv-primary，
+ * 禁用态复用全局 --bv-disabled-opacity。
+ */
+:root,
+:host {
+  --bv-panel-header-height: 44px;
+  --bv-panel-header-breadcrumb-height: 32px; /* 层级行高度：只装一行面包屑，比工具栏行矮 */
+  --bv-panel-header-padding-x: var(--bv-padding-md);
+  --bv-panel-header-line-height: var(--bv-line-md);
+  --bv-panel-header-title-inset: 56px; /* 标题两侧各给「取消/确定」文字按钮留的让位宽度 */
+  --bv-panel-header-color: var(--bv-text);
+  --bv-panel-header-cancel-color: var(--bv-text-2);
+  --bv-panel-header-confirm-color: var(--bv-primary);
+  --bv-panel-header-disabled-opacity: var(--bv-disabled-opacity);
+  --bv-panel-header-icon-size: 16px; /* 返回箭头等图标按钮的尺寸 */
+  --bv-panel-header-icon-color: var(--bv-gray-6);
+}
+
+/* ---------- 组件级 token：Select 选择器 ----------
+ * Vant 没有 Select 组件（它用 Picker / DropdownMenu / Cascader 覆盖不同场景），
+ * 因此这一组是 Bivane 扩展，取值基准是 Vant 的 Field + Cell：
+ * 触发器沿用 Cell 的纵向节奏（10px + 24px 行高 = 44px 触控热区），
+ * H5 选项行沿用矩阵 §2.2 规定的 48px 项高。
+ *
+ * 注意：本组**不新增任何颜色 token**，颜色一律复用既有语义 token。
+ * 原因见架构 §3.7 —— 新增颜色 token 必须在 vant.css / theme.css / lib/utils.ts
+ * 三处同时补齐，漏掉第 2 处会静默导致工具类不生成。颜色复用可以把风险面收敛为零。
+ *
+ * H5 与 PC 是两份独立实现（模式 C），因此两套密度 token 各写各的、
+ * 无需进 modes.css 做模式覆盖：h5/select.tsx 只读不带后缀的，pc/select.tsx 只读 *-pc 的。
+ */
+:root,
+:host {
+  /* 触发器（两模式共用一套语义 token；外壳形态差异在组件里由 JS 分支给出） */
+  --bv-select-font: var(--bv-font-md);
+  --bv-select-line-height: var(--bv-line-md);
+  --bv-select-padding-x: var(--bv-padding-md);
+  --bv-select-padding-y: 10px; /* 与 Cell 纵向内边距一致：10 + 24 + 10 = 44px */
+  --bv-select-text-color: var(--bv-text);
+  --bv-select-placeholder-color: var(--bv-text-3);
+  --bv-select-icon-size: 16px;
+  --bv-select-icon-color: var(--bv-gray-6);
+  --bv-select-gap: var(--bv-padding-base);
+  --bv-select-disabled-opacity: var(--bv-disabled-opacity);
+  /* PC 触发器的固定高度（桌面密度；H5 靠 padding 撑出 44px 热区） */
+  --bv-select-pc-trigger-height: 32px;
+  --bv-select-pc-trigger-border-color: var(--bv-gray-4);
+  --bv-select-pc-trigger-radius: var(--bv-radius-md);
+
+  /* 选项行：H5 项高 48px（矩阵 §2.2 规定，同时是触控热区下限） */
+  --bv-select-option-height: 48px;
+  --bv-select-option-padding-x: var(--bv-padding-md);
+  --bv-select-option-line-height: var(--bv-line-md);
+  --bv-select-option-check-size: 16px;
+  --bv-select-option-check-color: var(--bv-primary);
+  --bv-select-option-active-background: var(--bv-active-color);
+  --bv-select-option-hover-background: var(--bv-muted);
+  --bv-select-option-disabled-color: var(--bv-text-3);
+
+  /* 面板（H5：由 Popup 承载底部弹层形态，这里只定内部密度） */
+  --bv-select-panel-max-height: 60vh;
+  --bv-select-search-height: 44px;
+  --bv-select-empty-font: var(--bv-font-md);
+  --bv-select-empty-line-height: var(--bv-line-md);
+  --bv-select-empty-padding-y: var(--bv-padding-xl);
+  --bv-select-group-title-font: var(--bv-font-sm);
+  --bv-select-group-title-line-height: var(--bv-line-sm);
+  --bv-select-group-title-padding-x: var(--bv-padding-md);
+  --bv-select-group-title-padding-y: var(--bv-padding-xs);
+  --bv-select-group-title-color: var(--bv-text-2);
+  --bv-select-group-title-background: var(--bv-background-3);
+
+  /* PC 锚定下拉浮层（矩阵 §2.2：桌面用桌面密度，与 H5 的 48px 项高刻意不同） */
+  --bv-select-pc-option-height: 36px;
+  --bv-select-pc-panel-min-width: 160px;
+  --bv-select-pc-panel-max-height: 280px;
+  --bv-select-pc-offset: var(--bv-padding-base);
+  --bv-select-pc-radius: var(--bv-radius-md);
+  --bv-select-pc-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --bv-select-pc-duration: 120ms;
+  --bv-select-pc-z-index: var(--bv-z-popup);
+  --bv-select-pc-padding-y: var(--bv-padding-base);
+}
+
+/* ---------- 组件级 token：DropdownMenu 下拉菜单 ----------
+ * 与 Vant 的 DropdownMenu 不是同一件东西：Vant 那个是「菜单栏 + 多项下拉」
+ * （v-model 管的是当前激活的菜单项），而矩阵 §2.2 定义的是**触发器 + 菜单树**
+ * 的通用下拉菜单（二级菜单、快捷键提示、分隔线）。因此本组是 Bivane 扩展，
+ * 触发器的纵向节奏与 Select 对齐（沿用 Cell 的 10 + 24 + 10 = 44px 热区）。
+ *
+ * 不新增任何颜色 token（架构 §3.7 的三处补齐规则），危险项/悬停/按压
+ * 一律复用既有语义 token：--bv-danger / --bv-muted / --bv-active-color。
+ *
+ * H5 与 PC 是两份独立实现（模式 C），两套密度各写各的，
+ * 不需要进 modes.css 做模式覆盖（架构 §6.5 ②）。
+ */
+:root,
+:host {
+  /* 触发器（两模式共用；外壳形态差异在 menu-parts 里由 JS 分支给出） */
+  --bv-menu-font: var(--bv-font-md);
+  --bv-menu-line-height: var(--bv-line-md);
+  --bv-menu-padding-x: var(--bv-padding-md);
+  --bv-menu-padding-y: 10px;
+  --bv-menu-text-color: var(--bv-text);
+  --bv-menu-icon-size: 16px;
+  --bv-menu-icon-color: var(--bv-gray-6);
+  --bv-menu-gap: var(--bv-padding-base);
+  --bv-menu-disabled-opacity: var(--bv-disabled-opacity);
+  --bv-menu-pc-trigger-height: 32px;
+  --bv-menu-pc-trigger-border-color: var(--bv-gray-4);
+  --bv-menu-pc-trigger-radius: var(--bv-radius-md);
+
+  /* 行（H5：48px，触控热区下限，与 Select 的项高同一节奏） */
+  --bv-menu-row-height: 48px;
+  --bv-menu-row-padding-x: var(--bv-padding-md);
+  --bv-menu-row-line-height: var(--bv-line-md);
+  --bv-menu-row-active-background: var(--bv-active-color);
+  --bv-menu-row-hover-background: var(--bv-muted);
+  --bv-menu-row-disabled-color: var(--bv-text-3);
+  --bv-menu-row-danger-color: var(--bv-danger);
+  --bv-menu-row-icon-size: 16px;
+  --bv-menu-shortcut-font: var(--bv-font-sm);
+  --bv-menu-shortcut-line-height: var(--bv-line-sm);
+  --bv-menu-shortcut-color: var(--bv-text-3);
+
+  /* 面板（H5 侧由 Popup 承载容器，这里只定内部密度）
+     注：标题栏与返回箭头的尺寸不在这里 —— 它们是 h5/menu.tsx 复用的
+     公共面板工具栏，token 收在 `--bv-panel-header-*` 那一组（Select 同样在用）。 */
+  --bv-menu-panel-max-height: 60vh;
+  /* 二级面板推入的时长：与 Popup 的 --bv-popup-duration 保持同一量级，
+     否则「抽屉滑上来」与「面板横向推入」会看出两段不同的节奏 */
+  --bv-menu-push-duration: 300ms;
+  --bv-menu-empty-font: var(--bv-font-md);
+  --bv-menu-empty-line-height: var(--bv-line-md);
+  --bv-menu-empty-padding-y: var(--bv-padding-xl);
+  --bv-menu-divider-color: var(--bv-border);
+  --bv-menu-divider-margin-y: var(--bv-padding-xs);
+
+  /* PC 锚定浮层（桌面密度；与 H5 的 48px 行高刻意不同，属两种交互的定义差异） */
+  --bv-menu-pc-row-height: 36px;
+  --bv-menu-pc-panel-min-width: 160px;
+  --bv-menu-pc-panel-max-height: 280px;
+  --bv-menu-pc-offset: var(--bv-padding-base);
+  --bv-menu-pc-sub-offset: 2px;
+  --bv-menu-pc-radius: var(--bv-radius-md);
+  --bv-menu-pc-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --bv-menu-pc-duration: 120ms;
+  --bv-menu-pc-z-index: var(--bv-z-popup);
+  --bv-menu-pc-padding-y: var(--bv-padding-base);
+}
+
+/* ---------- 组件级 token：DatePicker 日期选择 ----------
+ * 触发器的纵向节奏与 Select / DropdownMenu 对齐（沿用 Cell 的 10 + 24 + 10 = 44px 热区）。
+ * PC 是月历而非滚轮，两套密度各写各的；H5 与 PC 是两份独立实现（模式 C），
+ * 因此不需要进 modes.css 做模式覆盖（架构 §6.5 ②）。
+ *
+ * 不新增任何颜色 token（架构 §3.7 的三处补齐规则）：
+ * 文字/端点/区间/悬停一律复用既有语义 token
+ * （--bv-text / --bv-text-2 / --bv-text-3 / --bv-primary / --bv-muted / --bv-active-color），
+ * 全部以 `[var(--bv-*)]` 任意值消费，绕开「漏了 theme.css 就静默不生成」那一面。
+ *
+ * `--bv-date-picker-wheel-item-height` 必须与 hooks/use-picker-column.ts 的
+ * WHEEL_ITEM_HEIGHT 保持一致：组件实测行高并优先用实测值，常量只在无布局环境（jsdom）兜底。
+ */
+:root,
+:host {
+  /* 触发器（两模式共用；外壳形态差异在 date-parts 里由 JS 分支给出） */
+  --bv-date-picker-font: var(--bv-font-md);
+  --bv-date-picker-line-height: var(--bv-line-md);
+  --bv-date-picker-padding-x: var(--bv-padding-md);
+  --bv-date-picker-padding-y: 10px;
+  --bv-date-picker-text-color: var(--bv-text);
+  --bv-date-picker-text-2-color: var(--bv-text-2);
+  --bv-date-picker-text-3-color: var(--bv-text-3);
+  --bv-date-picker-placeholder-color: var(--bv-text-3);
+  --bv-date-picker-icon-size: 16px;
+  --bv-date-picker-icon-color: var(--bv-gray-6);
+  --bv-date-picker-gap: var(--bv-padding-base);
+  --bv-date-picker-disabled-opacity: var(--bv-disabled-opacity);
+
+  --bv-date-picker-pc-trigger-height: 32px;
+  --bv-date-picker-pc-trigger-border-color: var(--bv-gray-4);
+  --bv-date-picker-pc-trigger-radius: var(--bv-radius-md);
+
+  /* H5 滚轮：5 行制，行高与 Cell 同为 44px（触控热区下限） */
+  --bv-date-picker-wheel-item-height: 44px;
+  --bv-date-picker-wheel-item-line-height: var(--bv-line-md);
+  --bv-date-picker-wheel-color: var(--bv-text-3);
+  --bv-date-picker-wheel-selected-color: var(--bv-text);
+  --bv-date-picker-wheel-line-color: var(--bv-border);
+  /* 上下渐隐遮罩的起点色 = 弹层底色，否则遮罩会在面板上显出一条色带 */
+  --bv-date-picker-wheel-mask-color: var(--bv-popup-background);
+
+  /* H5 区间端点切换条（三列滚轮一次只表达一个日期，端点要显式标出来） */
+  --bv-date-picker-range-tabs-gap: var(--bv-padding-base);
+  --bv-date-picker-range-tabs-padding-y: var(--bv-padding-xs);
+  --bv-date-picker-range-tab-radius: var(--bv-radius-sm);
+  --bv-date-picker-range-tab-padding-x: var(--bv-padding-sm);
+  --bv-date-picker-range-tab-padding-y: var(--bv-padding-xs);
+  --bv-date-picker-range-tab-line-height: var(--bv-line-md);
+  --bv-date-picker-range-tab-hint-line-height: var(--bv-line-xs);
+  --bv-date-picker-range-tab-active-background: var(--bv-active-color);
+  --bv-date-picker-range-tab-active-color: var(--bv-primary);
+
+  /* PC 月历（桌面密度：格高 32px，比 H5 的 44px 行高更紧） */
+  --bv-date-picker-pc-panel-width: 252px;
+  --bv-date-picker-pc-padding-x: var(--bv-padding-sm);
+  --bv-date-picker-pc-padding-y: var(--bv-padding-sm);
+  --bv-date-picker-pc-nav-height: 32px;
+  --bv-date-picker-pc-nav-color: var(--bv-gray-6);
+  --bv-date-picker-pc-weekday-height: 24px;
+  --bv-date-picker-pc-weekday-line-height: var(--bv-line-xs);
+  --bv-date-picker-pc-weekday-color: var(--bv-text-3);
+  --bv-date-picker-pc-cell-height: 32px;
+  --bv-date-picker-pc-cell-line-height: var(--bv-line-xs);
+  --bv-date-picker-pc-cell-radius: var(--bv-radius-sm);
+  --bv-date-picker-pc-cell-selected-background: var(--bv-primary);
+  --bv-date-picker-pc-cell-selected-color: var(--bv-white);
+  /* 区间内是「带」不是「点」：背景用按压色，端点的实心色才跳得出来 */
+  --bv-date-picker-pc-cell-in-range-background: var(--bv-active-color);
+  --bv-date-picker-pc-cell-hover-background: var(--bv-muted);
+  --bv-date-picker-pc-cell-disabled-opacity: var(--bv-disabled-opacity);
+  /* 双月之间不额外留缝：两个面板各自的横向内边距已经构成分隔 */
+  --bv-date-picker-pc-dual-gap: 0px;
+  --bv-date-picker-pc-radius: var(--bv-radius-md);
+  --bv-date-picker-pc-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --bv-date-picker-pc-duration: 160ms;
+  --bv-date-picker-pc-z-index: var(--bv-z-popup);
+}
+

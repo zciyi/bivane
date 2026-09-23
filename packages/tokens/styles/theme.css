@@ -1,0 +1,118 @@
+/**
+ * Bivane · Tailwind v4 主题映射（分发文件）
+ *
+ * 本文件是 token 链路的第 ② 环，缺了它整套组件样式会静默失效：
+ *   `--bv-*` 只是普通 CSS 变量，Tailwind 并不知道它们存在。
+ *   只有在 `@theme inline` 里声明 `--color-bv-<name>`，
+ *   工具类 `bg-bv-<name>` / `text-bv-<name>` 才会被生成。
+ *
+ * 漏掉的后果（P1 真实缺陷）：`bg-bv-overlay` 从不生成任何规则，
+ * 但 `cn()` 因为 lib/utils.ts 的 BV_COLORS 已注册该命名空间，会**原样保留类名** ——
+ * DOM 里查得到、toHaveClass 也过，浏览器却当普通类忽略，表现为遮罩静默全透明。
+ * 更隐蔽的是产物里搜不到 `--color-bv-*`（`inline` 会把 var() 内联进声明），
+ * 必须搜工具类名本身：`grep -o 'bg-bv-overlay{[^}]*}' dist/assets/*.css`
+ *
+ * 使用方式（消费者在 globals.css 里，顺序不可调换）：
+ *   @import 'tailwindcss';
+ *   @import './styles/bivane/vant.css';      // ① 变量定义
+ *   @import './styles/bivane/vant-dark.css'; //    深色覆盖（可选）
+ *   @import './styles/bivane/modes.css';     //    随模式变化的变量
+ *   @import './styles/bivane/utilities.css'; //    安全区 / 动画原子层
+ *   @import './styles/bivane/theme.css';     // ② 本文件：映射 + 变体 + 基础层
+ */
+
+/**
+ * 必须使用 `inline`：工具类会把 `var(--bv-*)` 直接内联进声明，
+ * 使 token 能在**任意容器级**被覆盖（深色主题 .bv-theme-dark、
+ * 页面级 gutter、后续的紧凑/宽松密度模式都依赖这一点）。
+ * 若不加 inline，Tailwind 会生成 `--color-bv-x: var(--bv-x)` 并在 :root 处提前求值，
+ * 容器级覆盖将完全失效。
+ *
+ * 生成示例：bg-bv-primary / text-bv-text / border-bv-border / rounded-bv-md /
+ *          text-bv-md / p-bv-md / gap-bv-gutter / py-bv-block / mb-bv-section
+ */
+@theme inline {
+  /* 颜色 */
+  --color-bv-primary: var(--bv-primary);
+  --color-bv-success: var(--bv-success);
+  --color-bv-danger: var(--bv-danger);
+  --color-bv-warning: var(--bv-warning);
+  --color-bv-text: var(--bv-text);
+  --color-bv-text-2: var(--bv-text-2);
+  --color-bv-text-3: var(--bv-text-3);
+  --color-bv-border: var(--bv-border);
+  --color-bv-background: var(--bv-background);
+  --color-bv-surface: var(--bv-surface);
+  --color-bv-muted: var(--bv-muted);
+  --color-bv-active: var(--bv-active-color);
+  --color-bv-white: var(--bv-white);
+  --color-bv-black: var(--bv-black);
+  --color-bv-gray-4: var(--bv-gray-4);
+  --color-bv-gray-6: var(--bv-gray-6);
+  /* 遮罩浓度：随模式变化（H5 .7 / PC .45），定义在 modes.css。
+     漏了这行会让 bg-bv-overlay 生成不出来，而 cn() 仍保留类名 —— 表现为遮罩静默全透明。 */
+  --color-bv-overlay: var(--bv-overlay-background);
+
+  /* 圆角 */
+  --radius-bv-sm: var(--bv-radius-sm);
+  --radius-bv-md: var(--bv-radius-md);
+  --radius-bv-lg: var(--bv-radius-lg);
+  --radius-bv-max: var(--bv-radius-max);
+
+  /* 字阶（含行高） */
+  --text-bv-xs: var(--bv-font-xs);
+  --text-bv-xs--line-height: var(--bv-line-xs);
+  --text-bv-sm: var(--bv-font-sm);
+  --text-bv-sm--line-height: var(--bv-line-sm);
+  --text-bv-md: var(--bv-font-md);
+  --text-bv-md--line-height: var(--bv-line-md);
+  --text-bv-lg: var(--bv-font-lg);
+  --text-bv-lg--line-height: var(--bv-line-lg);
+
+  /* 间距（组件内间距，严格等于 Vant token） */
+  --spacing-bv-base: var(--bv-padding-base);
+  --spacing-bv-xs: var(--bv-padding-xs);
+  --spacing-bv-sm: var(--bv-padding-sm);
+  --spacing-bv-md: var(--bv-padding-md);
+  --spacing-bv-lg: var(--bv-padding-lg);
+  --spacing-bv-xl: var(--bv-padding-xl);
+
+  /* 间距（页面级节奏，随模式变化；只用于页面骨架，不进组件内部） */
+  --spacing-bv-gutter: var(--bv-gutter);
+  --spacing-bv-block: var(--bv-block-padding);
+  --spacing-bv-section: var(--bv-section-gap);
+
+  /* 字重与字体 */
+  --font-weight-bv-bold: var(--bv-font-bold);
+  --font-bv: var(--bv-base-font);
+}
+
+/**
+ * 双模式 CSS 变体（模式 A 组件书写用，见架构文档 §6.1）
+ *
+ * 走 data-mode 属性而非 media query —— 因为断点由 ResponsiveProvider 配置，
+ * 媒体查询写死 768px 会在自定义断点下判定错误。
+ * 用法：`className="bv-h5:py-bv-md bv-pc:py-bv-lg"`
+ */
+@custom-variant bv-h5 ([data-mode='h5'] &);
+@custom-variant bv-pc ([data-mode='pc'] &);
+
+/* 全局基础设定（对齐 Vant base.less） */
+@layer base {
+  html {
+    font-family: var(--bv-base-font);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    color: var(--bv-text);
+    background: var(--bv-background);
+  }
+
+  /* PC 模式的指针约定：可点击元素统一 pointer */
+  [data-slot='button']:not(:disabled),
+  [data-slot='cell'][data-clickable='true'] {
+    cursor: pointer;
+  }
+}

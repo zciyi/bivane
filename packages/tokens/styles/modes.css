@@ -1,0 +1,59 @@
+/**
+ * Bivane · 模式相关 token（H5 / PC）
+ *
+ * 这里放的是**唯一允许随模式变化的 token**，分两类，边界必须守住：
+ *
+ *  A. 页面骨架节奏（--bv-gutter / --bv-block-padding / --bv-section-gap）
+ *     只用于页面与文档层。H5 沿用 Vant 原生紧凑节奏，PC 放宽，
+ *     解决「手机栅格被拉到 1200px 后发挤」的问题。
+ *
+ *  B. 容器形态（遮罩浓度、弹层圆角/宽度/阴影/动画时长）
+ *     弹层在两端本就是不同物理形态（底部抽屉 vs 居中模态），
+ *     形态参数随模式变化是定义使然，不属于「内部间距随模式漂移」。
+ *
+ * 禁止：把组件内部间距（--bv-padding-*、--bv-<组件>-padding-*）写进本文件。
+ *      组件内部间距在任何模式下都严格等于 Vant 原值，这是视觉保真的底线。
+ *      （见 bivane-architecture.md §3.3 与 §3.6）
+ *
+ * 横向 gutter 不随模式变化（恒为 16px），否则页面标题会与 Vant 定宽 16px 的
+ * 组件内边距错位。
+ */
+
+/* ---------- A. 页面骨架默认值（H5 节奏 = Vant 原生） ---------- */
+:root {
+  --bv-gutter: var(--bv-padding-xs); /* 相邻组件行内间距：H5 8px */
+  --bv-block-padding: var(--bv-padding-md); /* 区块纵向内边距：H5 16px */
+  --bv-section-gap: var(--bv-padding-lg); /* 区块之间间距：H5 24px */
+}
+
+/* ---------- PC：骨架放宽 ---------- */
+[data-mode='pc'] {
+  --bv-gutter: var(--bv-padding-sm); /* PC 行内间距 12px */
+  --bv-block-padding: var(--bv-padding-lg); /* PC 区块内边距 24px */
+  --bv-section-gap: var(--bv-padding-xl); /* PC 区块间距 32px */
+}
+
+/* ---------- B. 容器形态：遮罩 ---------- */
+[data-mode='pc'] {
+  /* 宽屏下 0.7 的蒙层压迫感过强，PC 降到 0.45 */
+  --bv-overlay-background: var(--bv-overlay-pc-background);
+}
+
+/* ---------- B. 容器形态：弹层（Popup / Dialog） ---------- */
+[data-mode='pc'] {
+  /* 进出场动画：H5 300ms（Vant --duration-base）→ PC 200ms 更利落 */
+  --bv-popup-duration: 200ms;
+  /* 形态切换：底部抽屉的 16px 大圆角 → 居中模态的 8px 常规圆角 */
+  --bv-popup-round-radius: var(--bv-popup-pc-radius);
+}
+
+/* ---------- B. 容器形态：PC 端文字与按钮密度 ---------- */
+[data-mode='pc'] {
+  /* 居中模态的按钮沿用 48px 高（Vant 值），横向右对齐，不做压缩 */
+  --bv-dialog-button-min-width: 88px;
+}
+
+/* PC 缺省值兜底：H5 下不需要该 token，但显式声明避免引用未定义变量 */
+:root {
+  --bv-dialog-button-min-width: 0px;
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-lock-scroll",
+  "type": "registry:hook",
+  "title": "滚动锁定",
+  "description": "双策略滚动锁：H5 用 fixed 定位防 iOS 橡皮筋，PC 用 overflow + 滚动条补偿，支持嵌套计数。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-device-mode"
+  ],
+  "files": [
+    {
+      "path": "hooks/use-lock-scroll.ts",
+      "content": "import * as React from 'react';\nimport { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';\n\n/**\n * Bivane 滚动锁定\n *\n * 双端策略不同，因为「不能滚」在两端的正确实现并不一样：\n *\n *  - mobile（fixed）：iOS Safari 上单纯 `overflow: hidden` 挡不住橡皮筋效果，\n *    Vant / vaul 的做法是把 body 改成 `position: fixed` 并用负 top 抵消当前滚动位置。\n *  - desktop（overflow）：PC 没有橡皮筋问题，但直接 `hidden` 会让滚动条消失、\n *    页面整体右移（布局抖动），因此需要补偿滚动条宽度。\n *\n * 支持计数：多层弹层嵌套时，只有全部关闭才真正解锁。\n */\n\nexport type ScrollLockStrategy = 'fixed' | 'overflow';\n\ninterface BodySnapshot {\n  overflow: string;\n  position: string;\n  top: string;\n  width: string;\n  paddingRight: string;\n  scrollY: number;\n}\n\nlet locks = 0;\nlet snapshot: BodySnapshot | null = null;\n\nfunction scrollbarGap(): number {\n  if (typeof window === 'undefined') return 0;\n  return Math.max(0, window.innerWidth - document.documentElement.clientWidth);\n}\n\nexport function lockScroll(strategy: ScrollLockStrategy): void {\n  if (typeof document === 'undefined') return;\n\n  locks += 1;\n  if (locks > 1) return; // 已锁，复用第一层的快照\n\n  const { body } = document;\n  snapshot = {\n    overflow: body.style.overflow,\n    position: body.style.position,\n    top: body.style.top,\n    width: body.style.width,\n    paddingRight: body.style.paddingRight,\n    scrollY: window.scrollY ?? 0,\n  };\n\n  if (strategy === 'fixed') {\n    body.style.position = 'fixed';\n    body.style.top = `-${snapshot.scrollY}px`;\n    body.style.width = '100%';\n    body.style.overflow = 'hidden';\n  } else {\n    body.style.overflow = 'hidden';\n    const gap = scrollbarGap();\n    if (gap > 0) body.style.paddingRight = `${gap}px`;\n  }\n\n  body.setAttribute('data-bv-scroll-locked', strategy);\n}\n\nexport function unlockScroll(): void {\n  if (typeof document === 'undefined') return;\n\n  locks = Math.max(0, locks - 1);\n  if (locks > 0) return;\n\n  const { body } = document;\n  const saved = snapshot;\n  snapshot = null;\n  body.removeAttribute('data-bv-scroll-locked');\n\n  if (!saved) return;\n\n  body.style.overflow = saved.overflow;\n  body.style.position = saved.position;\n  body.style.top = saved.top;\n  body.style.width = saved.width;\n  body.style.paddingRight = saved.paddingRight;\n\n  // fixed 策略把页面顶到了 top 0，解锁后要滚回原位\n  if (saved.scrollY > 0 && typeof window.scrollTo === 'function') {\n    try {\n      window.scrollTo(0, saved.scrollY);\n    } catch {\n      /* jsdom / 无滚动环境，忽略 */\n    }\n  }\n}\n\n/** 当前是否处于锁定状态（测试与调试用） */\nexport function isScrollLocked(): boolean {\n  return locks > 0;\n}\n\nexport interface UseLockScrollOptions {\n  /** 是否锁定，默认由调用方按 open 状态传入 */\n  active: boolean;\n  /**\n   * 组件已解析好的设备模式（含 forceMode 逃生舱）。\n   * 必须由调用方传入：本 hook 内部的 useDeviceMode() 拿不到组件的 forceMode，\n   * 否则强制 H5 的弹层会错误地使用 PC 的锁策略。\n   */\n  mode?: DeviceMode;\n  /** 强制策略，优先级高于 mode */\n  strategy?: ScrollLockStrategy;\n}\n\nexport function useLockScroll({ active, mode, strategy }: UseLockScrollOptions): void {\n  const detected: DeviceMode = useDeviceMode();\n  const resolved: ScrollLockStrategy =\n    strategy ?? ((mode ?? detected) === 'mobile' ? 'fixed' : 'overflow');\n\n  React.useEffect(() => {\n    if (!active) return undefined;\n    lockScroll(resolved);\n    return () => unlockScroll();\n  }, [active, resolved]);\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-lock-scroll.ts"
+    }
+  ]
+}

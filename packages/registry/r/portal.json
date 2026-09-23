@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "portal",
+  "type": "registry:lib",
+  "title": "Portal 容器",
+  "description": "弹层统一挂载点。注意：portal 内容脱离 data-mode 作用域，弹层根元素必须自带 data-mode。",
+  "dependencies": [
+    "react-dom"
+  ],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/portal.tsx",
+      "content": "import type * as React from 'react';\nimport { createPortal } from 'react-dom';\n\n/**\n * Bivane 统一 portal 容器\n *\n * 为什么不自接挂到 document.body：\n * 1. 后续需要插入自定义容器（如限定的弹层根、测试容器）时只改这一处；\n * 2. 便于卸载清理，避免 body 上散落匿名节点。\n *\n * ⚠️ 关键约束：portal 内容脱离了页面里 `[data-mode]` 的作用域。\n * 因此**每个弹层根元素都必须自带 `data-mode=\"h5|pc\"`**（契约第 2 条），\n * 否则 tokens/styles/modes.css 里的 `[data-mode='pc']` 覆盖不会生效\n * （遮罩浓度、弹层圆角、动画时长会全部停在 H5 取值）。\n */\n\nconst PORTAL_ATTR = 'data-bivane-portal';\n\nlet cached: HTMLElement | null = null;\n\nexport function getPortalContainer(): HTMLElement | null {\n  if (typeof document === 'undefined') return null;\n  if (cached && cached.isConnected) return cached;\n\n  const existing = document.querySelector<HTMLElement>(`[${PORTAL_ATTR}]`);\n  if (existing) {\n    cached = existing;\n    return cached;\n  }\n\n  const el = document.createElement('div');\n  el.setAttribute(PORTAL_ATTR, '');\n  document.body.appendChild(el);\n  cached = el;\n  return cached;\n}\n\nexport interface PortalProps {\n  children: React.ReactNode;\n}\n\nexport function Portal({ children }: PortalProps) {\n  const target = getPortalContainer();\n  if (!target) return null;\n  return createPortal(children, target);\n}\n",
+      "type": "registry:lib",
+      "target": "lib/portal.tsx"
+    }
+  ]
+}

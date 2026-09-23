@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "overlay",
+  "type": "registry:component",
+  "title": "Overlay 遮罩",
+  "description": "弹层遮罩：H5 rgba(0,0,0,.7) → PC rgba(0,0,0,.45)（模式 A，走 modes.css）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/ui/overlay.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { useDeviceModeAttrs, type DeviceMode } from '@/hooks/use-device-mode';\n\n/**\n * Bivane Overlay 遮罩\n *\n * 只负责视觉层：浓度、淡入淡出、层级。\n * 滚动锁、关闭时机、键盘交互由上层弹层组件负责（见 Popup / Dialog）。\n *\n * 视觉差异走 token（模式 A）：\n *   H5  rgba(0,0,0,.7)（Vant 原值）→ PC rgba(0,0,0,.45)\n *   —— 宽屏下 0.7 的蒙层压迫感过强，且居中模态本身已有足够视觉锚点。\n *   覆盖定义在 packages/tokens/styles/modes.css 的 [data-mode='pc'] 段。\n *\n * ⚠️ 本组件必须**自带 data-mode**：它渲染在 Portal 里，已逃出宿主组件的\n * `[data-mode]` 作用域，而遮罩浓度（--bv-overlay-background）与动画时长\n * （--bv-popup-duration）都靠 `[data-mode='pc']` 覆盖来生效。\n * 不自带就会出现「PC 端仍用 H5 的 .7 浓度 + 300ms 时长」的静默降级。\n */\n\nexport interface OverlayProps extends React.HTMLAttributes<HTMLDivElement> {\n  /** 可见状态，驱动淡入淡出 */\n  open?: boolean;\n  /**\n   * 已解析的模式。不传则自行判定（Provider / 媒体查询）。\n   * 上层弹层应把**已解析**的结果传进来，否则 forceMode 逃生舱不会作用于遮罩。\n   */\n  mode?: DeviceMode;\n  /** 层级，默认用 --bv-overlay-z-index */\n  zIndex?: number;\n  /** 点击回调；不传则不响应点击（PC 居中模态默认不点关） */\n  onClick?: React.MouseEventHandler<HTMLDivElement>;\n}\n\nexport const Overlay = React.forwardRef<HTMLDivElement, OverlayProps>(function Overlay(\n  { open = true, mode, zIndex, className, style, ...props },\n  ref,\n) {\n  const modeAttrs = useDeviceModeAttrs(mode);\n\n  return (\n    // data-slot 由本组件持有，必须在 {...props} 之后（见 button.tsx 同处注释）\n    <div\n      ref={ref}\n      data-state={open ? 'open' : 'closed'}\n      aria-hidden=\"true\"\n      className={cn(\n        'fixed inset-0 bg-bv-overlay',\n        'transition-opacity duration-[var(--bv-popup-duration)] ease-out',\n        'motion-reduce:transition-none',\n        open ? 'opacity-100' : 'opacity-0',\n        className,\n      )}\n      {...props}\n      {...modeAttrs}\n      // style 必须放在 {...props} 之后：props 里带着原始 style，\n      // 若在其之前展开会把下面合并好的 zIndex / pointerEvents 整个覆盖掉。\n      style={{\n        zIndex: zIndex ?? 'var(--bv-overlay-z-index)',\n        // 关闭时立即让出指针事件，避免退出动画期间挡住下方操作\n        pointerEvents: open ? undefined : 'none',\n        ...style,\n      }}\n      data-slot=\"overlay\"\n    />\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/ui/overlay.tsx"
+    }
+  ]
+}

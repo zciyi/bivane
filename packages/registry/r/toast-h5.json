@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toast-h5",
+  "type": "registry:component",
+  "title": "Toast（H5 实现）",
+  "description": "顶部居中胶囊、白字深底、单例覆盖。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/toast-parts",
+    "@bivane/use-toast-store",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/toast.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { ToastIcon } from '@/components/ui/toast-parts';\nimport type { ToastEntry, ToastPosition } from '@/hooks/use-toast-store';\n\n/**\n * Bivane Toast · H5 形态\n * 定义见 bivane-responsive-matrix.md §2.1：\n *   顶部居中胶囊（默认 top）、白字深底 rgba(0,0,0,.7)、2s 自动消失、单例\n *\n * 单例语义：同一时刻只呈现最新一条（新的覆盖旧的），\n * 与 PC 的堆叠形态形成对照 —— 这正是 Toast 被归为模式 C 的原因。\n */\n\nconst positionClass: Record<ToastPosition, string> = {\n  top: 'top-[var(--bv-toast-position-top-distance)]',\n  middle: 'top-1/2 -translate-y-1/2',\n  bottom: 'bottom-[var(--bv-toast-position-bottom-distance)]',\n};\n\nexport interface H5ToastPresenterProps {\n  /** 当前要展示的一条；null 表示无 */\n  item: ToastEntry | null;\n}\n\nexport function H5ToastPresenter({ item }: H5ToastPresenterProps) {\n  if (!item) return null;\n\n  const type = item.type ?? 'text';\n  const position = item.position ?? 'top';\n  const isTextOnly = type === 'text';\n\n  return (\n    <>\n      {item.forbidClick ? (\n        <div\n          data-slot=\"toast-blocker\"\n          aria-hidden=\"true\"\n          className=\"fixed inset-0 z-[var(--bv-toast-z-index)]\"\n        />\n      ) : null}\n\n      <div\n        data-slot=\"toast\"\n        data-mode=\"h5\"\n        data-type={type}\n        data-position={position}\n        role=\"status\"\n        aria-live=\"polite\"\n        className={cn(\n          'pointer-events-none fixed inset-x-0 z-[var(--bv-toast-z-index)] flex justify-center px-bv-md',\n          positionClass[position],\n        )}\n      >\n        <div\n          className={cn(\n            'flex max-w-[var(--bv-toast-max-width)] items-center justify-center text-center',\n            'rounded-[var(--bv-toast-radius)] bg-[var(--bv-toast-background)] text-[var(--bv-toast-text-color)]',\n            'text-bv-md leading-[var(--bv-toast-line-height)]',\n            isTextOnly\n              ? 'min-w-[var(--bv-toast-text-min-width)] px-[var(--bv-toast-text-padding-x)] py-[var(--bv-toast-text-padding-y)]'\n              : cn(\n                  'w-[var(--bv-toast-default-width)] min-h-[var(--bv-toast-default-min-height)]',\n                  'flex-col p-[var(--bv-toast-default-padding)]',\n                ),\n            item.className,\n          )}\n        >\n          {item.content ?? (\n            <>\n              <ToastIcon type={type} />\n              <span className={cn(!isTextOnly && 'mt-bv-xs')}>{item.message}</span>\n            </>\n          )}\n        </div>\n      </div>\n    </>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/h5/toast.tsx"
+    }
+  ]
+}

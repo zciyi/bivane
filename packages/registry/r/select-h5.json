@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "select-h5",
+  "type": "registry:component",
+  "title": "Select（H5 实现）",
+  "description": "底部弹层列表，项高 48px，选项 > 10 才出现搜索框，单选即关。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/select-parts",
+    "@bivane/popup",
+    "@bivane/use-select-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/select.tsx",
+      "content": "import * as React from 'react';\nimport { Popup } from '@/components/responsive/popup';\nimport { PanelHeader } from '@/components/ui/panel-header';\nimport {\n  SelectEmptyState,\n  SelectSearchField,\n  SelectTrigger,\n  renderSelectItems,\n  type SelectPanelProps,\n} from '@/components/ui/select-parts';\nimport { H5_SEARCH_VISIBLE_THRESHOLD } from '@/hooks/use-select-state';\n\n/**\n * Bivane Select · H5 实现（模式 C）\n * 交互定义见 bivane-responsive-matrix.md §2.2\n *\n * 形态：底部弹层列表，项高 48px（触控热区下限），\n *       选项数 > 10 时才出现内置搜索框。\n *\n * 两种选择节奏（由分发层的 `staged` 决定，本组件只负责渲染）：\n *   - 点选即生效（默认）：点选项立刻回填并关闭，没有工具栏；\n *   - 暂存确认（staged）：面板顶部渲染「取消 · 标题 · 确定」工具栏，\n *     点选项只打勾，点「确定」才提交 —— 触屏上「误点有退路」。\n * PC 恒为前者，因此工具栏只出现在这里。\n *\n * 搜索框放在 Popup 的滚动容器之外：\n * Popup 默认 scrollable=true 会把 children 包进一个 overflow-y-auto 容器，\n * 那样搜索框会跟着列表一起滚走。这里传 scrollable={false}，自己接管\n * 「搜索框固定 + 列表独立滚动」的结构，也让列表能吃到 --bv-select-panel-max-height。\n *\n * 拖拽关闭：Popup 只在标了 DRAG_REGION_ATTR 的区域内起拖（顶部指示条），\n * 列表里的滑动因此不会被误判成下拉关闭。\n */\n\nexport const H5Select = React.forwardRef<HTMLDivElement, SelectPanelProps>(function H5Select(\n  {\n    mode,\n    open,\n    onOpenChange,\n    items,\n    options,\n    optionCount,\n    selected,\n    onSelect,\n    multiple,\n    searchable,\n    keyword,\n    onKeywordChange,\n    searchPlaceholder,\n    placeholder,\n    emptyText,\n    clearable,\n    onClear,\n    disabled,\n    triggerContent,\n    filled,\n    title,\n    staged,\n    confirmText,\n    cancelText,\n    onConfirm,\n    onCancel,\n    className,\n    ariaLabel,\n    id,\n  },\n  ref,\n) {\n  // 矩阵 §2.2：「选项 > 10 时显示内置搜索框」。\n  // 必须按**过滤前**的总数判定 —— 按过滤后的数会边打字边把搜索框藏掉，无法输入第二个字。\n  const showSearch = searchable && optionCount > H5_SEARCH_VISIBLE_THRESHOLD;\n  const listId = id ? `${id}-listbox` : undefined;\n\n  return (\n    <>\n      <SelectTrigger\n        ref={ref}\n        id={id}\n        mode={mode}\n        placeholder={placeholder}\n        filled={filled}\n        clearable={clearable}\n        onClear={onClear}\n        disabled={disabled}\n        open={open}\n        aria-label={ariaLabel}\n        aria-controls={listId}\n        onActivate={() => onOpenChange(!open)}\n        // H5 只要求「方向键能唤起面板」；完整的键盘巡航是 PC 的契约（§4 第 5 条）选择\n        onArrowKey={() => onOpenChange(true)}\n      >\n        {triggerContent}\n      </SelectTrigger>\n\n      <Popup\n        open={open}\n        onOpenChange={onOpenChange}\n        position=\"bottom\"\n        scrollable={false}\n        // 传已解析的 mode，让 forceMode 逃生舱对 Popup 的形态与滚动锁策略同样生效\n        forceMode={mode}\n        aria-label={ariaLabel}\n        className={className}\n      >\n        {staged ? (\n          <PanelHeader\n            mode={mode}\n            title={title}\n            onCancel={onCancel}\n            cancelText={cancelText}\n            onConfirm={onConfirm}\n            confirmText={confirmText}\n          />\n        ) : null}\n\n        {showSearch ? (\n          <SelectSearchField\n            mode={mode}\n            value={keyword}\n            onValueChange={onKeywordChange}\n            placeholder={searchPlaceholder}\n            aria-label=\"搜索选项\"\n            aria-controls={listId}\n          />\n        ) : null}\n\n        {options.length === 0 ? (\n          <SelectEmptyState mode={mode}>{emptyText}</SelectEmptyState>\n        ) : (\n          <div\n            id={listId}\n            role=\"listbox\"\n            aria-multiselectable={multiple || undefined}\n            aria-label={ariaLabel}\n            data-bv-scroll-container=\"\"\n            className=\"max-h-[var(--bv-select-panel-max-height)] min-h-0 overflow-y-auto overscroll-contain\"\n            data-slot=\"select-list\"\n          >\n            {renderSelectItems({ mode, items, selected, onSelect })}\n          </div>\n        )}\n      </Popup>\n    </>\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/h5/select.tsx"
+    }
+  ]
+}

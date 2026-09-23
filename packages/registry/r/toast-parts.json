@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toast-parts",
+  "type": "registry:component",
+  "title": "Toast 共用零件",
+  "description": "类型 → 图标的跨模式映射，保证两端提示语义一致。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/icon",
+    "@bivane/use-toast-store"
+  ],
+  "files": [
+    {
+      "path": "components/ui/toast-parts.tsx",
+      "content": "import { Icon } from '@/components/ui/icon';\nimport type { ToastType } from '@/hooks/use-toast-store';\n\n/**\n * Toast 的跨模式共用零件\n * 两种形态的容器与排布不同，但「类型 → 图标」的映射必须一致，\n * 抽出来避免两端各写一份后跑偏。\n */\n\nconst ICON_BY_TYPE: Record<Exclude<ToastType, 'text'>, 'loading' | 'success' | 'fail'> = {\n  loading: 'loading',\n  success: 'success',\n  fail: 'fail',\n};\n\nexport interface ToastIconProps {\n  type: ToastType;\n  size?: string;\n  className?: string;\n}\n\nexport function ToastIcon({ type, size = 'var(--bv-toast-icon-size)', className }: ToastIconProps) {\n  if (type === 'text') return null;\n  return <Icon name={ICON_BY_TYPE[type]} size={size} className={className} />;\n}\n",
+      "type": "registry:component",
+      "target": "components/ui/toast-parts.tsx"
+    }
+  ]
+}

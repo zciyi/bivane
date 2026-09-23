@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+@import './packages/tokens/styles/vant.css';
+@import './packages/tokens/styles/vant-dark.css';
+@import './packages/tokens/styles/modes.css';
+@import './packages/tokens/styles/utilities.css';
+@import './packages/tokens/styles/theme.css';
+
+/**
+ * 本文件是 demo（P0/P1 验证台）的入口 CSS。
+ *
+ * 内容已按「是否随 registry 分发」拆干净，避免出现
+ * 「demo 能跑、装到消费者项目里样式全白」的分叉：
+ *
+ *   --bv-* 变量定义              -> tokens/styles/vant.css · vant-dark.css · modes.css
+ *   样式原子层（安全区、动画）    -> tokens/styles/utilities.css
+ *   主题映射 + 双模式变体 + 基础层 -> tokens/styles/theme.css
+ *
+ * 上面 6 行 @import 就是消费者在 globals.css 里需要写的全部内容
+ * （把 './packages/tokens/styles/' 换成 shadcn 落盘的 './styles/bivane/'）。
+ *
+ * 注：Tailwind 的 @import 必须集中在文件顶部 —— 中间插 @import 会被 CSS 规范忽略，
+ * 症状同样是「token 全在、工具类全无」。
+ */
+
+/**
+ * 把「文档 / 笔记」排除出 Tailwind 的类名扫描范围。
+ *
+ * 为什么需要：Tailwind v4 默认扫描整个项目里所有文本文件，把形如
+ * `leading-[var(--bv-<组件>-line-height)]` 的**文档示例**也当成候选类编译 ——
+ * 它含 `<` `>`，产出一条非法规则，构建期报两条 CSS warning；语法的其它变体
+ * （占位符换成真名）不会报错，但同样会把一堆**没人用的垃圾规则打进 dist**，
+ * 消费者装包时一起拿走。类名只可能出现在源码里，文档与记忆目录直接排除。
+ */
+@source not "./docs";
+@source not "./.workbuddy";

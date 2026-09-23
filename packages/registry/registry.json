@@ -1,0 +1,711 @@
+{
+    "$schema": "https://ui.shadcn.com/schema/registry.json",
+    "name": "bivane",
+    "homepage": "https://bivane.dev",
+    "items": [
+        {
+            "name": "utils",
+            "type": "registry:lib",
+            "title": "cn 工具",
+            "description": "clsx + tailwind-merge 的类名合并工具（已注册 --bv-* 命名空间），所有 Bivane 组件的公共依赖。",
+            "files": [
+                {
+                    "path": "lib/utils.ts",
+                    "type": "registry:lib",
+                    "target": "lib/utils.ts"
+                }
+            ],
+            "dependencies": ["clsx", "tailwind-merge"]
+        },
+        {
+            "name": "portal",
+            "type": "registry:lib",
+            "title": "Portal 容器",
+            "description": "弹层统一挂载点。注意：portal 内容脱离 data-mode 作用域，弹层根元素必须自带 data-mode。",
+            "files": [
+                {
+                    "path": "lib/portal.tsx",
+                    "type": "registry:lib",
+                    "target": "lib/portal.tsx"
+                }
+            ],
+            "dependencies": ["react-dom"]
+        },
+        {
+            "name": "imperative-host",
+            "type": "registry:lib",
+            "title": "命令式宿主管理",
+            "description": "命令式弹层的宿主注册与自动创建（手动挂载优先，避免两份渲染）。",
+            "files": [
+                {
+                    "path": "lib/imperative-host.tsx",
+                    "type": "registry:lib",
+                    "target": "lib/imperative-host.tsx"
+                }
+            ],
+            "dependencies": ["react-dom"]
+        },
+        {
+            "name": "tokens",
+            "type": "registry:style",
+            "title": "Vant 风格 token",
+            "description": "Vant 4 视觉基准的 --bv-* 语义 token，含深色主题、模式相关 token（modes.css）、样式原子层，以及 Tailwind @theme 映射（theme.css，缺了它任何 bg-bv-* 工具类都不会生成）。安装后在 globals.css 按 vant → vant-dark → modes → utilities → theme 的顺序 @import。",
+            "files": [
+                {
+                    "path": "packages/tokens/styles/vant.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/vant.css"
+                },
+                {
+                    "path": "packages/tokens/styles/vant-dark.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/vant-dark.css"
+                },
+                {
+                    "path": "packages/tokens/styles/modes.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/modes.css"
+                },
+                {
+                    "path": "packages/tokens/styles/utilities.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/utilities.css"
+                },
+                {
+                    "path": "packages/tokens/styles/theme.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/theme.css"
+                }
+            ]
+        },
+        {
+            "name": "use-device-mode",
+            "type": "registry:hook",
+            "title": "设备模式判定",
+            "description": "宽度 + 指针能力双重判定，返回 'mobile' | 'desktop'；SSR 默认 desktop。",
+            "files": [
+                {
+                    "path": "hooks/use-device-mode.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-device-mode.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "use-lock-scroll",
+            "type": "registry:hook",
+            "title": "滚动锁定",
+            "description": "双策略滚动锁：H5 用 fixed 定位防 iOS 橡皮筋，PC 用 overflow + 滚动条补偿，支持嵌套计数。",
+            "files": [
+                {
+                    "path": "hooks/use-lock-scroll.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-lock-scroll.ts"
+                }
+            ],
+            "registryDependencies": ["use-device-mode"]
+        },
+        {
+            "name": "use-drag-to-dismiss",
+            "type": "registry:hook",
+            "title": "下拉关闭手势",
+            "description": "底部弹层的 pointer 拖拽关闭，含纯函数判定（距离/速度/比例 + 抖动护栏）。",
+            "files": [
+                {
+                    "path": "hooks/use-drag-to-dismiss.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-drag-to-dismiss.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "responsive-provider",
+            "type": "registry:component",
+            "title": "ResponsiveProvider",
+            "description": "响应式上下文：可配置断点与强制模式。",
+            "files": [
+                {
+                    "path": "components/providers/responsive-provider.tsx",
+                    "type": "registry:component",
+                    "target": "components/providers/responsive-provider.tsx"
+                }
+            ],
+            "registryDependencies": ["use-device-mode"]
+        },
+        {
+            "name": "icon",
+            "type": "registry:component",
+            "title": "Icon",
+            "description": "自研 SVG 图标集，1em 尺寸、currentColor 着色。",
+            "files": [
+                {
+                    "path": "components/ui/icon.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/icon.tsx"
+                }
+            ],
+            "registryDependencies": ["utils"]
+        },
+        {
+            "name": "panel-header",
+            "type": "registry:component",
+            "title": "面板工具栏（H5 弹层头部）",
+            "description": "「取消 · 标题 · 确定」的 H5 弹层头部：左侧取消/返回、中间标题（多层下钻时可换成可点的层级面包屑）、右侧确定（暂存确认）。Select / DropdownMenu 共用，后续 DatePicker / TimePicker / Picker 复用。PC 不渲染工具栏（点选即生效）。",
+            "files": [
+                {
+                    "path": "components/ui/panel-header.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/panel-header.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "tokens"
+            ]
+        },
+        {
+            "name": "overlay",
+            "type": "registry:component",
+            "title": "Overlay 遮罩",
+            "description": "弹层遮罩：H5 rgba(0,0,0,.7) → PC rgba(0,0,0,.45)（模式 A，走 modes.css）。",
+            "files": [
+                {
+                    "path": "components/ui/overlay.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/overlay.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "tokens"]
+        },
+        {
+            "name": "button",
+            "type": "registry:component",
+            "title": "Button",
+            "description": "对齐 Vant Button：type/size/plain/round/square/block/hairline/loading。",
+            "files": [
+                {
+                    "path": "components/ui/button.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/button.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"],
+            "dependencies": ["class-variance-authority"]
+        },
+        {
+            "name": "cell",
+            "type": "registry:component",
+            "title": "Cell / CellGroup",
+            "description": "对齐 Vant Cell：title/value/label/isLink/border/large，含分组与卡片模式。",
+            "files": [
+                {
+                    "path": "components/ui/cell.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/cell.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"]
+        },
+        {
+            "name": "tag",
+            "type": "registry:component",
+            "title": "Tag",
+            "description": "对齐 Vant Tag：type/size/plain/round/mark/closeable。",
+            "files": [
+                {
+                    "path": "components/ui/tag.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/tag.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"],
+            "dependencies": ["class-variance-authority"]
+        },
+        {
+            "name": "badge",
+            "type": "registry:component",
+            "title": "Badge",
+            "description": "对齐 Vant Badge：content/max/showZero/dot/position。",
+            "files": [
+                {
+                    "path": "components/ui/badge.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/badge.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "tokens"]
+        },
+        {
+            "name": "popup",
+            "type": "registry:component",
+            "title": "Popup 弹层",
+            "description": "弹层地基（模式 B）：H5 四向滑入 + 下拉关闭；PC 一律居中模态、ESC 关闭、遮罩默认不关。",
+            "files": [
+                {
+                    "path": "components/responsive/popup.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/popup.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "overlay",
+                "portal",
+                "use-device-mode",
+                "responsive-provider",
+                "use-lock-scroll",
+                "use-drag-to-dismiss",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-dialog-store",
+            "type": "registry:hook",
+            "title": "Dialog 命令式 store",
+            "description": "命令式对话框的队列状态（纯逻辑，不含 React 组件，避免与 dialog.tsx 循环依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-dialog-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-dialog-store.ts"
+                }
+            ],
+            "registryDependencies": ["use-device-mode"]
+        },
+        {
+            "name": "dialog",
+            "type": "registry:component",
+            "title": "Dialog 对话框",
+            "description": "模式 B + 双轨 API：H5 底部抽屉 / PC Radix 居中模态；同时导出 DialogHost、showDialog、showConfirmDialog。",
+            "files": [
+                {
+                    "path": "components/responsive/dialog.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/dialog.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "button",
+                "popup",
+                "portal",
+                "imperative-host",
+                "use-dialog-store",
+                "use-device-mode",
+                "responsive-provider",
+                "use-drag-to-dismiss",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-dialog"]
+        },
+        {
+            "name": "use-toast-store",
+            "type": "registry:hook",
+            "title": "Toast 状态存储",
+            "description": "跨模式共用的 Toast 生命周期：自动关闭计时、loading 常驻、closeToast(id?) 语义。",
+            "files": [
+                {
+                    "path": "hooks/use-toast-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-toast-store.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "toast-parts",
+            "type": "registry:component",
+            "title": "Toast 共用零件",
+            "description": "类型 → 图标的跨模式映射，保证两端提示语义一致。",
+            "files": [
+                {
+                    "path": "components/ui/toast-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/toast-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["icon", "use-toast-store"]
+        },
+        {
+            "name": "toast-h5",
+            "type": "registry:component",
+            "title": "Toast（H5 实现）",
+            "description": "顶部居中胶囊、白字深底、单例覆盖。",
+            "files": [
+                {
+                    "path": "components/h5/toast.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/toast.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "toast-parts",
+                "use-toast-store",
+                "tokens"
+            ]
+        },
+        {
+            "name": "toast-pc",
+            "type": "registry:component",
+            "title": "Toast（PC 实现）",
+            "description": "右上角卡片栈、彩色图标、可多条并存、带关闭按钮。",
+            "files": [
+                {
+                    "path": "components/pc/toast.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/toast.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "toast-parts",
+                "use-toast-store",
+                "tokens"
+            ]
+        },
+        {
+            "name": "toast",
+            "type": "registry:component",
+            "title": "Toast 轻提示",
+            "description": "模式 C 分发层 + 双轨 API：showToast / showSuccessToast / showFailToast / showLoadingToast / closeToast。",
+            "files": [
+                {
+                    "path": "components/responsive/toast.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/toast.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "portal",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "use-toast-store",
+                "toast-h5",
+                "toast-pc"
+            ]
+        },
+        {
+            "name": "use-select-state",
+            "type": "registry:hook",
+            "title": "Select 状态逻辑",
+            "description": "跨模式共用的值管理、过滤、分组与键盘索引计算，全部为纯函数（不 import 任何组件，避免环形依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-select-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-select-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "use-virtual-window",
+            "type": "registry:hook",
+            "title": "虚拟滚动窗口",
+            "description": "固定项高的窗口化计算：computeVirtualWindow 纯函数 + 滚动容器订阅。超过 100 项才启用。",
+            "files": [
+                {
+                    "path": "hooks/use-virtual-window.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-virtual-window.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "select-parts",
+            "type": "registry:component",
+            "title": "Select 共用零件",
+            "description": "两模式共用的触发器、选项行、搜索框、分组标题与空态，以及面板 props 契约与渲染器。外壳形态走 JS 分支（模式 A），不依赖祖先是否带 data-mode。",
+            "files": [
+                {
+                    "path": "components/ui/select-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/select-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-select-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "select-h5",
+            "type": "registry:component",
+            "title": "Select（H5 实现）",
+            "description": "底部弹层列表，项高 48px，选项 > 10 才出现搜索框，单选即关。",
+            "files": [
+                {
+                    "path": "components/h5/select.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/select.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "select-parts",
+                "popup",
+                "use-select-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "select-pc",
+            "type": "registry:component",
+            "title": "Select（PC 实现）",
+            "description": "Radix Popover 锚定浮层：键盘巡航、输入过滤、翻转防溢出、长列表虚拟滚动，多选保持展开。",
+            "files": [
+                {
+                    "path": "components/pc/select.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/select.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "select-parts",
+                "use-select-state",
+                "use-virtual-window",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-popover"]
+        },
+        {
+            "name": "select",
+            "type": "registry:component",
+            "title": "Select 选择器",
+            "description": "模式 C 分发层：H5 底部弹层列表 / PC 锚定下拉浮层。支持单选、多选、分组、过滤、清除。",
+            "files": [
+                {
+                    "path": "components/responsive/select.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/select.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-select-state",
+                "select-parts",
+                "select-h5",
+                "select-pc"
+            ]
+        },
+        {
+            "name": "use-menu-state",
+            "type": "registry:hook",
+            "title": "菜单树模型",
+            "description": "跨模式共用的菜单树遍历与路径解析，全部为纯函数（不含任何组件，避免环形依赖）。两端只共享「树长什么样」，不共享「怎么走这棵树」。",
+            "files": [
+                {
+                    "path": "hooks/use-menu-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-menu-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "menu-parts",
+            "type": "registry:component",
+            "title": "菜单共用零件",
+            "description": "两模式共用的触发器外壳、行外观（menuRowClass）、行内容、分隔线与空态。外壳形态走 JS 分支，不依赖祖先是否带 data-mode。",
+            "files": [
+                {
+                    "path": "components/ui/menu-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/menu-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-menu-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "dropdown-menu-h5",
+            "type": "registry:component",
+            "title": "DropdownMenu（H5 实现）",
+            "description": "底部抽屉 + 二级面板推入：点带子菜单的行把下一层推进视野，标题栏换成该层名字并出现返回箭头；行高 48px，不渲染快捷键提示。",
+            "files": [
+                {
+                    "path": "components/h5/menu.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/menu.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "menu-parts",
+                "popup",
+                "panel-header",
+                "use-menu-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "dropdown-menu-pc",
+            "type": "registry:component",
+            "title": "DropdownMenu（PC 实现）",
+            "description": "Radix 锚定浮层：子菜单向右展开、父层保持高亮，↑↓ 巡航 / Enter 执行 / →← 进出子菜单 / 字母 typeahead，行尾显示快捷键提示；行高 36px。",
+            "files": [
+                {
+                    "path": "components/pc/menu.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/menu.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "menu-parts",
+                "use-menu-state",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-dropdown-menu"]
+        },
+        {
+            "name": "dropdown-menu",
+            "type": "registry:component",
+            "title": "DropdownMenu 下拉菜单",
+            "description": "模式 C 分发层：H5 底部抽屉（二级面板推入）/ PC 锚定浮层（子菜单右展 + 快捷键提示）。支持分隔线、禁用项、危险项、多级菜单。",
+            "files": [
+                {
+                    "path": "components/responsive/dropdown-menu.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/dropdown-menu.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-menu-state",
+                "menu-parts",
+                "dropdown-menu-h5",
+                "dropdown-menu-pc"
+            ]
+        },
+        {
+            "name": "use-date-value",
+            "type": "registry:hook",
+            "title": "日期值模型",
+            "description": "跨模式共用的日期值逻辑：解析/格式化、min-max 逐字段夹紧、列裁剪、区间排序、月历网格，全部为纯函数（不含任何组件，避免环形依赖）。两端只共享「日期怎么算」，不共享「怎么选」。",
+            "files": [
+                {
+                    "path": "hooks/use-date-value.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-date-value.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "use-picker-column",
+            "type": "registry:hook",
+            "title": "滚轮列模型",
+            "description": "H5 滚轮的「算索引 + 兜底对齐」：惯性交给原生动量滚动、吸附交给 scroll-snap，本 hook 只负责滚动停止后回写值。纯函数单独导出，便于在无布局环境（jsdom）下单测。",
+            "files": [
+                {
+                    "path": "hooks/use-picker-column.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-picker-column.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "date-parts",
+            "type": "registry:component",
+            "title": "DatePicker 共用零件",
+            "description": "两模式共用的触发器（含 PC 直接输入形态）、H5 区间端点切换条与滚轮列、PC 月历面板，以及面板 props 契约。外壳形态走 JS 分支（模式 A），不依赖祖先是否带 data-mode。",
+            "files": [
+                {
+                    "path": "components/ui/date-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/date-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-date-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "date-picker-h5",
+            "type": "registry:component",
+            "title": "DatePicker（H5 实现）",
+            "description": "底部弹层 + 三列滚轮（年/月/日），惯性滚动 + 吸附对齐，顶部工具条（取消 · 标题 · 确定）+ 底部安全区；区间模式用「开始/结束」两段式。",
+            "files": [
+                {
+                    "path": "components/h5/date-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/date-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "date-parts",
+                "popup",
+                "panel-header",
+                "use-date-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "date-picker-pc",
+            "type": "registry:component",
+            "title": "DatePicker（PC 实现）",
+            "description": "Radix Popover 锚定浮层 + react-day-picker 月历引擎：上下月按钮、键盘方向键巡航、直接输入日期、Esc 关闭，区间模式并排双月 + 悬停预览。",
+            "files": [
+                {
+                    "path": "components/pc/date-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/date-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "date-parts",
+                "use-date-value",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-popover", "react-day-picker"]
+        },
+        {
+            "name": "date-picker",
+            "type": "registry:component",
+            "title": "DatePicker 日期选择",
+            "description": "模式 C 分发层：H5 三列滚轮弹层 / PC 锚定月历浮层。支持单值、区间、min/max 约束、格式化、清除、直接输入。",
+            "files": [
+                {
+                    "path": "components/responsive/date-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/date-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-date-value",
+                "date-parts",
+                "date-picker-h5",
+                "date-picker-pc"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-device-mode",
+  "type": "registry:hook",
+  "title": "设备模式判定",
+  "description": "宽度 + 指针能力双重判定，返回 'mobile' | 'desktop'；SSR 默认 desktop。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-device-mode.ts",
+      "content": "import * as React from 'react';\n\n/**\n * Bivane 设备模式判定\n * 详见 bivane-architecture.md §6.2\n *\n * 判定规则（优先级从高到低）：\n *   1. 组件 forceMode prop（逃生舱）\n *   2. <ResponsiveProvider mode>（文档站 / 测试用）\n *   3. 自动判定：宽度 < breakpoint 或 (pointer: coarse && hover: none)\n *\n * SSR / 首屏默认返回 'desktop'（保守），避免 hydration mismatch。\n */\n\nexport type DeviceMode = 'mobile' | 'desktop';\nexport type ResponsiveModeOption = 'auto' | DeviceMode;\n\nexport const DEFAULT_BREAKPOINT = 768;\n\nexport interface ResponsiveConfig {\n  breakpoint: number;\n  mode: ResponsiveModeOption;\n}\n\nexport const ResponsiveContext = React.createContext<ResponsiveConfig | null>(null);\n\nexport function useResponsiveConfig(): ResponsiveConfig | null {\n  return React.useContext(ResponsiveContext);\n}\n\nconst narrowQuery = (breakpoint: number) => `(max-width: ${breakpoint - 1}px)`;\n/** 触屏平板、大屏手机横屏：宽度够大但没有精确指针能力 */\nconst TOUCH_QUERY = '(pointer: coarse) and (hover: none)';\n\n/** matchMedia 缓存 + SSR 兜底（jsdom / Node 环境无 matchMedia） */\nconst mqlCache = new Map<string, MediaQueryList | null>();\n\nfunction getMql(query: string): MediaQueryList | null {\n  const cached = mqlCache.get(query);\n  if (cached !== undefined) return cached;\n\n  let mql: MediaQueryList | null = null;\n  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {\n    try {\n      mql = window.matchMedia(query);\n    } catch {\n      mql = null;\n    }\n  }\n  mqlCache.set(query, mql);\n  return mql;\n}\n\n/** 供测试环境重置缓存（切换 viewport mock 后调用） */\nexport function resetMediaQueryCache(): void {\n  mqlCache.clear();\n}\n\nfunction detectMode(breakpoint: number): DeviceMode {\n  const isNarrow = getMql(narrowQuery(breakpoint))?.matches ?? false;\n  const isTouch = getMql(TOUCH_QUERY)?.matches ?? false;\n  return isNarrow || isTouch ? 'mobile' : 'desktop';\n}\n\nexport function useDeviceMode(forceMode?: DeviceMode): DeviceMode {\n  const config = useResponsiveConfig();\n  const breakpoint = config?.breakpoint ?? DEFAULT_BREAKPOINT;\n  const providerMode = config?.mode ?? 'auto';\n\n  const subscribe = React.useCallback(\n    (onStoreChange: () => void) => {\n      const queries = [narrowQuery(breakpoint), TOUCH_QUERY];\n      const mqls = queries\n        .map(getMql)\n        .filter((mql): mql is MediaQueryList => mql !== null);\n\n      if (mqls.length === 0) return () => undefined;\n\n      mqls.forEach((mql) => mql.addEventListener('change', onStoreChange));\n      return () => mqls.forEach((mql) => mql.removeEventListener('change', onStoreChange));\n    },\n    [breakpoint],\n  );\n\n  const getSnapshot = React.useCallback(() => detectMode(breakpoint), [breakpoint]);\n  const getServerSnapshot = React.useCallback((): DeviceMode => 'desktop', []);\n\n  const detected = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n\n  if (forceMode) return forceMode;\n  return providerMode === 'auto' ? detected : providerMode;\n}\n\n/** 契约要求根元素带 data-mode=\"h5|pc\"，此 hook 直接产出可展开的属性对象 */\nexport type DeviceModeAttr = { 'data-mode': 'h5' | 'pc' };\n\nexport function useDeviceModeAttrs(forceMode?: DeviceMode): DeviceModeAttr {\n  const mode = useDeviceMode(forceMode);\n  return { 'data-mode': mode === 'mobile' ? 'h5' : 'pc' };\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-device-mode.ts"
+    }
+  ]
+}

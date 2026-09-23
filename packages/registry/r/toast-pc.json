@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toast-pc",
+  "type": "registry:component",
+  "title": "Toast（PC 实现）",
+  "description": "右上角卡片栈、彩色图标、可多条并存、带关闭按钮。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/icon",
+    "@bivane/toast-parts",
+    "@bivane/use-toast-store",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/pc/toast.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Icon } from '@/components/ui/icon';\nimport { ToastIcon } from '@/components/ui/toast-parts';\nimport type { ToastEntry, ToastType } from '@/hooks/use-toast-store';\n\n/**\n * Bivane Toast · PC 形态\n * 定义见 bivane-responsive-matrix.md §2.1：\n *   右上角堆叠通知、带关闭按钮、可多条并存\n *\n * 与 H5 的差异不只是位置：宽屏下没有「顶部胶囊 2s 闪一下」的语境，\n * 用户可能正在别处操作，因此 PC 用可手动关闭的卡片栈 —— 这是能力增强而非功能缺失，\n * 符合矩阵总则 2 的能力等价原则（两端都能看到提示、都能提前关掉）。\n */\n\n/** 类型 → 图标着色：H5 是深底白字，PC 是白底彩色图标 */\nconst iconColorClass: Record<Exclude<ToastType, 'text'>, string> = {\n  loading: 'text-bv-primary',\n  success: 'text-bv-success',\n  fail: 'text-bv-danger',\n};\n\nexport interface PcToastStackProps {\n  items: readonly ToastEntry[];\n  onClose: (id: number) => void;\n}\n\nexport function PcToastStack({ items, onClose }: PcToastStackProps) {\n  if (items.length === 0) return null;\n\n  return (\n    <div\n      data-slot=\"toast-stack\"\n      data-mode=\"pc\"\n      role=\"region\"\n      aria-label=\"通知\"\n      className={cn(\n        'pointer-events-none fixed right-[var(--bv-toast-pc-gutter)] top-[var(--bv-toast-pc-gutter)]',\n        'z-[var(--bv-toast-z-index)] flex w-[var(--bv-toast-pc-width)] flex-col gap-[var(--bv-toast-pc-gap)]',\n      )}\n    >\n      {items.map((item) => (\n        <PcToastItem key={item.id} item={item} onClose={onClose} />\n      ))}\n    </div>\n  );\n}\n\ninterface PcToastItemProps {\n  item: ToastEntry;\n  onClose: (id: number) => void;\n}\n\nfunction PcToastItem({ item, onClose }: PcToastItemProps) {\n  const type = item.type ?? 'text';\n\n  return (\n    <div\n      data-slot=\"toast\"\n      data-mode=\"pc\"\n      data-type={type}\n      data-toast-id={item.id}\n      role=\"status\"\n      aria-live=\"polite\"\n      className={cn(\n        'pointer-events-auto flex items-start gap-bv-xs',\n        'rounded-bv-lg border border-bv-border bg-bv-surface px-bv-md py-bv-sm',\n        'shadow-[var(--bv-toast-pc-shadow)]',\n        item.className,\n      )}\n    >\n      {type === 'text' ? null : (\n        <span\n          className={cn(\n            'mt-[2px] shrink-0 text-bv-lg leading-[var(--bv-toast-line-height)]',\n            iconColorClass[type],\n          )}\n        >\n          <ToastIcon type={type} size=\"1em\" />\n        </span>\n      )}\n\n      <div className=\"min-w-0 flex-1 text-bv-md leading-[var(--bv-toast-line-height)] text-bv-text\">\n        {item.content ?? <span className=\"break-words\">{item.message}</span>}\n      </div>\n\n      <button\n        type=\"button\"\n        data-slot=\"toast-close\"\n        aria-label=\"关闭通知\"\n        onClick={() => onClose(item.id)}\n        className={cn(\n          'mt-[2px] shrink-0 cursor-pointer border-0 bg-transparent p-0',\n          'text-bv-gray-6 hover:text-bv-text-2',\n          'text-[var(--bv-toast-pc-close-size)] leading-[var(--bv-toast-line-height)]',\n        )}\n      >\n        <Icon name=\"cross\" />\n      </button>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/pc/toast.tsx"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+/**
+ * Bivane · Vant 复刻风格 · 深色主题
+ * 取值来源：Vant 4 源码 packages/vant/src/style/css-variables.less（.van-theme-dark）
+ * 用法：在根元素或任意容器上加 class="bv-theme-dark"
+ */
+
+.bv-theme-dark {
+  --bv-text: #f5f5f5;
+  --bv-text-2: #707070;
+  --bv-text-3: #4d4d4d;
+  --bv-border: #3a3a3c;
+  --bv-active-color: #3a3a3c;
+  --bv-background: #000;
+  --bv-background-2: #1c1c1e;
+  --bv-background-3: #37363b;
+
+  /* 语义别名跟随重算 */
+  --bv-surface: var(--bv-background-2);
+  --bv-muted: var(--bv-background);
+
+  /* Vant 深色下 plain 按钮背景改为透明 */
+  --bv-button-plain-background: transparent;
+}

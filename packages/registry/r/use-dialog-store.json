@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-dialog-store",
+  "type": "registry:hook",
+  "title": "Dialog 命令式 store",
+  "description": "命令式对话框的队列状态（纯逻辑，不含 React 组件，避免与 dialog.tsx 循环依赖）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-device-mode"
+  ],
+  "files": [
+    {
+      "path": "hooks/use-dialog-store.ts",
+      "content": "import type * as React from 'react';\nimport type { DeviceMode } from '@/hooks/use-device-mode';\n\n/**\n * Bivane 命令式 Dialog 状态存储（纯逻辑，不含 React 组件）\n *\n * 与组件分离的原因：`components/responsive/dialog.tsx` 既要用 store，\n * 又要为命令式 API 提供宿主组件。若 store 反过来引用组件就会形成循环依赖。\n * 这里只做「存 + 通知」，渲染完全交给 dialog.tsx。\n */\n\nexport type DialogAction = 'confirm' | 'cancel';\n\nexport interface DialogOptions {\n  title?: React.ReactNode;\n  /** 主体文案（Vant 命名） */\n  message?: React.ReactNode;\n  /** 主体文案（矩阵命名，与 message 同义且优先） */\n  description?: React.ReactNode;\n  /** 自定义主体，优先于 message / description */\n  content?: React.ReactNode;\n  /** 自定义底部，覆盖默认按钮区 */\n  footer?: React.ReactNode;\n  showConfirmButton?: boolean;\n  confirmText?: string;\n  showCancelButton?: boolean;\n  cancelText?: string;\n  /** 返回 false 可阻止关闭（支持异步） */\n  beforeClose?: (action: DialogAction) => boolean | Promise<boolean>;\n  onConfirm?: () => void;\n  onCancel?: () => void;\n  onClosed?: () => void;\n  closeOnClickOverlay?: boolean;\n  closeOnPressEscape?: boolean;\n  overlay?: boolean;\n  lockScroll?: boolean;\n  duration?: number;\n  zIndex?: number;\n  forceMode?: DeviceMode;\n  className?: string;\n}\n\nexport interface DialogEntry {\n  id: number;\n  options: DialogOptions;\n}\n\nexport interface DialogHandle {\n  id: number;\n  /** 关闭该弹窗 */\n  close: () => void;\n  /** 局部更新配置（如按钮 loading、文案变化） */\n  update: (next: Partial<DialogOptions>) => void;\n}\n\nconst EMPTY: DialogEntry[] = [];\n\nlet entries: DialogEntry[] = EMPTY;\nlet nextId = 1;\nconst listeners = new Set<() => void>();\n\nfunction emit(): void {\n  listeners.forEach((listener) => listener());\n}\n\nexport function subscribeDialogStore(listener: () => void): () => void {\n  listeners.add(listener);\n  return () => listeners.delete(listener);\n}\n\nexport function getDialogEntries(): readonly DialogEntry[] {\n  return entries;\n}\n\nexport function getDialogServerEntries(): readonly DialogEntry[] {\n  return EMPTY;\n}\n\n/** 测试 / 热重载用：清空全部弹窗 */\nexport function resetDialogStore(): void {\n  entries = EMPTY;\n  nextId = 1;\n  emit();\n}\n\nexport function showDialog(options: DialogOptions): DialogHandle {\n  const id = nextId;\n  nextId += 1;\n\n  entries = [...entries, { id, options }];\n  emit();\n\n  return {\n    id,\n    close: () => closeDialog(id),\n    update: (next) => updateDialog(id, next),\n  };\n}\n\n/** 确认式弹窗：Vant 的 showConfirmDialog 等价物 */\nexport function showConfirmDialog(\n  options: DialogOptions & { message?: React.ReactNode },\n): DialogHandle {\n  return showDialog({ showCancelButton: true, ...options });\n}\n\n/** 关闭指定弹窗；不传 id 时关闭全部（Vant closeDialog 语义） */\nexport function closeDialog(id?: number): void {\n  const next = id === undefined ? EMPTY : entries.filter((entry) => entry.id !== id);\n  if (next === entries) return;\n  entries = next;\n  emit();\n}\n\nexport function updateDialog(id: number, next: Partial<DialogOptions>): void {\n  let changed = false;\n  const merged = entries.map((entry) => {\n    if (entry.id !== id) return entry;\n    changed = true;\n    return { ...entry, options: { ...entry.options, ...next } };\n  });\n\n  if (!changed) return;\n  entries = merged;\n  emit();\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-dialog-store.ts"
+    }
+  ]
+}

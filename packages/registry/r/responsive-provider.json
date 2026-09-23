@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "responsive-provider",
+  "type": "registry:component",
+  "title": "ResponsiveProvider",
+  "description": "响应式上下文：可配置断点与强制模式。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-device-mode"
+  ],
+  "files": [
+    {
+      "path": "components/providers/responsive-provider.tsx",
+      "content": "import * as React from 'react';\nimport {\n  DEFAULT_BREAKPOINT,\n  ResponsiveContext,\n  type ResponsiveModeOption,\n} from '@/hooks/use-device-mode';\n\nexport interface ResponsiveProviderProps {\n  /** 模式判定断点，默认 768（< 768px 视为移动端） */\n  breakpoint?: number;\n  /** 'auto' 走自动判定；显式传 'mobile' | 'desktop' 则全局强制（文档站、测试用） */\n  mode?: ResponsiveModeOption;\n  children: React.ReactNode;\n}\n\n/**\n * Bivane 响应式上下文\n * 置于应用根部；组件侧的 forceMode prop 优先级高于这里的 mode。\n */\nexport function ResponsiveProvider({\n  breakpoint = DEFAULT_BREAKPOINT,\n  mode = 'auto',\n  children,\n}: ResponsiveProviderProps) {\n  const value = React.useMemo(() => ({ breakpoint, mode }), [breakpoint, mode]);\n\n  return <ResponsiveContext.Provider value={value}>{children}</ResponsiveContext.Provider>;\n}\n",
+      "type": "registry:component",
+      "target": "components/providers/responsive-provider.tsx"
+    }
+  ]
+}
