@@ -251,8 +251,8 @@ function formatColumnValue(key: DateTimeColumnKey, value: number): string {
 
 /**
  * 选中态观感：
- *  - band：滚轮居中高亮带（H5 与旧 PC 的 5 行制滚轮）；
- *  - solid：当前值独立实心色块（PC 月历旁的时间列，对齐 Element/原生 datetime 面板）。
+ *  - band：滚轮居中上下双线指示，不填充背景（H5 与 PC 时间列当前样式）；
+ *  - solid：当前值独立实心色块（保留实现，当前无消费者使用）。
  */
 export type WheelSelectionStyle = "band" | "solid";
 
@@ -265,7 +265,7 @@ export interface DateTimeWheelColumnProps {
     value: number;
     columnKey: DateTimeColumnKey;
     disabled?: boolean;
-    /** 键盘光标所在列（仅 PC 传）：中央高亮带点亮 */
+    /** 键盘光标所在列（仅 PC 传）：原点亮高亮带，现统一只用上下双线指示 */
     active?: boolean;
     selectionStyle?: WheelSelectionStyle;
     /** solid 下列左侧的发丝分隔线（由行按「非首列」传入，首列左边贴着月历边框） */
@@ -411,10 +411,9 @@ export const DateTimeWheelColumn = React.forwardRef<
                     aria-hidden="true"
                     data-slot="datetime-picker-wheel-indicator"
                     className={cn(
-                        // z-0：高亮带画在数字下面，否则键盘所在列的底色会盖住居中数字
+                        // z-0：选中指示线画在数字下面，保持居中两条线、不填充背景
                         "pointer-events-none absolute inset-x-0 z-0",
                         "border-y border-[var(--bv-datetime-picker-wheel-line-color)]",
-                        active && "bg-[var(--bv-active-color)]",
                     )}
                     style={{
                         top: alignOffset(2, itemHeight),

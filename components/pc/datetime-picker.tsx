@@ -12,6 +12,8 @@ import {
     addDays,
     addMonths,
     compareParts as compareDateParts,
+    isDayWithinBounds,
+    monthHasSelectableDay,
     todayParts,
     type DateParts,
 } from "@/hooks/use-date-value";
@@ -30,11 +32,11 @@ import {
  *
  * 形态（对齐 Element / 原生 datetime 面板）：
  *   左侧月历 —— « < 年-月 > » 导航 + 星期头 + 6×7 日期网格；
- *   右侧时间列 —— 时/分/秒按精度 1~3 列，当前值实心主色块（顶对齐滚动列表）；
+ *   右侧时间列 —— 时/分/秒按精度 1~3 列，与 H5 同款的居中上下双线指示，不填充高亮背景；
  *   顶部右侧回显草稿时间；底部「此刻 / 确定」。
  *
  * 因此日期段与 H5 的「年/月/日滚轮」是**不同交互范式**（同 DatePicker 的 C 判据），
- * 但时间段两端仍共用同一个滚轮 primitive（只切了 solid 选中观感）。
+ * 但时间段两端仍共用同一个滚轮 primitive（只切了选中观感，PC 时间列现为 band 样式）。
  *
  * 恒走「暂存 → 确定」：点日 / 滚时间 / 此刻都只写草稿，确定才提交；
  * Esc / 点浮层外部 = 取消。
@@ -75,26 +77,6 @@ function buildMonthGrid(year: number, month: number): MonthCell[] {
 }
 
 /** 日期格是否越过「日期粒度」的硬边界（只比年月日，当天时刻约束归时间列裁剪） */
-function isDayDisabled(
-    day: DateParts,
-    min: DateTimeParts,
-    max: DateTimeParts,
-): boolean {
-    const minDay: DateParts = {
-        year: min.year,
-        month: min.month,
-        day: min.day,
-    };
-    const maxDay: DateParts = {
-        year: max.year,
-        month: max.month,
-        day: max.day,
-    };
-    return (
-        compareDateParts(day, minDay) < 0 || compareDateParts(day, maxDay) > 0
-    );
-}
-
 function sameDay(a: DateParts, b: DateParts): boolean {
     return compareDateParts(a, b) === 0;
 }
@@ -191,12 +173,48 @@ export const PcDateTimePicker = React.forwardRef<
         day: today.getDate(),
     };
 
-    const canPrevYear = view.year > minParts.year;
-    const canPrevMonth =
-        view.year > minParts.year || view.month > minParts.month;
-    const canNextYear = view.year < maxParts.year;
-    const canNextMonth =
-        view.year < maxParts.year || view.month < maxParts.month;
+    // 上一月/下一年…的目标月：翻页按钮能否点，由两个日历共用的 monthHasSelectableDay 决定，
+    // 翻到整月无可选日的空月一律禁用（与 PC DatePicker 的 rdp 导航收口同一口径）。
+    const prevMonthTarget = addMonths(
+        { year: view.year, month: view.month, day: 1 },
+        -1,
+    );
+    const nextMonthTarget = addMonths(
+        { year: view.year, month: view.month, day: 1 },
+        1,
+    );
+    const prevYearTarget = addMonths(
+        { year: view.year, month: view.month, day: 1 },
+        -12,
+    );
+    const nextYearTarget = addMonths(
+        { year: view.year, month: view.month, day: 1 },
+        12,
+    );
+    const canPrevYear = monthHasSelectableDay(
+        prevYearTarget.year,
+        prevYearTarget.month,
+        minParts,
+        maxParts,
+    );
+    const canPrevMonth = monthHasSelectableDay(
+        prevMonthTarget.year,
+        prevMonthTarget.month,
+        minParts,
+        maxParts,
+    );
+    const canNextYear = monthHasSelectableDay(
+        nextYearTarget.year,
+        nextYearTarget.month,
+        minParts,
+        maxParts,
+    );
+    const canNextMonth = monthHasSelectableDay(
+        nextMonthTarget.year,
+        nextMonthTarget.month,
+        minParts,
+        maxParts,
+    );
 
     const shiftView = React.useCallback((monthDelta: number) => {
         setView((prev) => {
@@ -224,7 +242,7 @@ export const PcDateTimePicker = React.forwardRef<
 
     /** 点月历里的某一天（含前后月补位格 —— 点补位格顺带翻月） */
     const handleDayClick = (day: DateParts) => {
-        if (isDayDisabled(day, minParts, maxParts)) return;
+        if (!isDayWithinBounds(day, minParts, maxParts)) return;
         setZone("date");
         changeDate(day);
     };
@@ -600,7 +618,7 @@ export const PcDateTimePicker = React.forwardRef<
                                         cell.parts,
                                         cursor,
                                     );
-                                    const disabledDay = isDayDisabled(
+                                    const disabledDay = !isDayWithinBounds(
                                         cell.parts,
                                         minParts,
                                         maxParts,
@@ -678,7 +696,7 @@ export const PcDateTimePicker = React.forwardRef<
                                 minParts={minParts}
                                 maxParts={maxParts}
                                 disabled={disabled}
-                                selectionStyle="solid"
+                                selectionStyle="band"
                                 activeColumnIndex={
                                     typeof zone === "number" ? zone : undefined
                                 }

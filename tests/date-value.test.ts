@@ -9,6 +9,8 @@ import {
   daysInMonth,
   formatParts,
   isPartsInRange,
+  isDayWithinBounds,
+  monthHasSelectableDay,
   orderDateTexts,
   parseDateText,
   parseDateTextForColumns,
@@ -187,6 +189,37 @@ describe('可选范围', () => {
     });
     expect(min).toEqual(D(2026, 1, 1));
     expect(max).toEqual(D(2026, 12, 31));
+  });
+});
+
+describe('min/max 统一校验（PC 两套月历共用 isDayWithinBounds / monthHasSelectableDay）', () => {
+  const min = D(2026, 9, 24);
+  const max = D(2026, 10, 5);
+
+  it('isDayWithinBounds：闭区间含端点，与 rdp before/after 同粒度（只比年月日）', () => {
+    expect(isDayWithinBounds(D(2026, 9, 23), min, max)).toBe(false);
+    expect(isDayWithinBounds(D(2026, 9, 24), min, max)).toBe(true);
+    expect(isDayWithinBounds(D(2026, 10, 5), min, max)).toBe(true);
+    expect(isDayWithinBounds(D(2026, 10, 6), min, max)).toBe(false);
+  });
+
+  it('monthHasSelectableDay：整月无可选日时为 false（翻页收口依据）', () => {
+    // 2026-08 整月早于 min（9/24）→ 不能翻到
+    expect(monthHasSelectableDay(2026, 8, min, max)).toBe(false);
+    // 2026-09 含 24~30 可选 → 可翻到
+    expect(monthHasSelectableDay(2026, 9, min, max)).toBe(true);
+    // 2026-10 含 1~5 可选 → 可翻到
+    expect(monthHasSelectableDay(2026, 10, min, max)).toBe(true);
+    // 2026-11 整月晚于 max（10/5）→ 不能翻到
+    expect(monthHasSelectableDay(2026, 11, min, max)).toBe(false);
+  });
+
+  it('monthHasSelectableDay：min/max 同月时只有那个月可选，前后月都收口', () => {
+    const sameMonthMin = D(2026, 9, 24);
+    const sameMonthMax = D(2026, 9, 26);
+    expect(monthHasSelectableDay(2026, 8, sameMonthMin, sameMonthMax)).toBe(false);
+    expect(monthHasSelectableDay(2026, 9, sameMonthMin, sameMonthMax)).toBe(true);
+    expect(monthHasSelectableDay(2026, 10, sameMonthMin, sameMonthMax)).toBe(false);
   });
 });
 

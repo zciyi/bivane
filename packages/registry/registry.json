@@ -822,7 +822,7 @@
             "name": "datetime-parts",
             "type": "registry:component",
             "title": "DateTimePicker 共用零件",
-            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）与时间滚轮行（时/分/秒，补零两位，支持 band 居中高亮带 / solid 实心选中两种观感与键盘高亮列），以及面板 props 契约。H5 也用它渲染年/月/日列；PC 日期段是独立月历，滚轮行只承担时间列。外壳形态走 JS 分支（契约 17），不依赖祖先是否带 data-mode。",
+            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）与时间滚轮行（时/分/秒，补零两位，支持 band 居中上下双线 / solid 实心选中两种观感），以及面板 props 契约。H5 也用它渲染年/月/日列；PC 日期段是独立月历，滚轮行只承担时间列。外壳形态走 JS 分支（契约 17），不依赖祖先是否带 data-mode。",
             "files": [
                 {
                     "path": "components/ui/datetime-parts.tsx",

@@ -116,6 +116,35 @@ export function isWithinBounds(parts: DateParts, min: DateParts, max: DateParts)
   return compareParts(parts, min) >= 0 && compareParts(parts, max) <= 0;
 }
 
+/**
+ * 单日是否落在闭区间 [min, max]（只比年/月/日）。
+ *
+ * 与 PC DatePicker 交给 react-day-picker 的 `disabled: [{ before: minDate }, { after: maxDate }]`
+ * **完全等价**：rdp 的 before/after 是「按日历日」匹配（忽略时分），含端点，
+ * 即 `day >= minDay && day <= maxDay`，正是这条。两处共用，避免两套口径漂移。
+ */
+export function isDayWithinBounds(day: DateParts, min: DateParts, max: DateParts): boolean {
+  return compareParts(day, min) >= 0 && compareParts(day, max) <= 0;
+}
+
+/**
+ * 某个月份是否包含至少一个可选日（即与闭区间 [min, max] 有交集）。
+ *
+ * PC 两套月历（rdp 网格 + 自研网格）都用它决定「上一月/下一月」按钮能否点：
+ * 翻到整月无可选日的空月是 UX 瑕疵（非正确性 bug），由这里统一收口，
+ * 这样两套日历的「翻页边界」判定不会各写一份。
+ */
+export function monthHasSelectableDay(
+  year: number,
+  month: number,
+  min: DateParts,
+  max: DateParts,
+): boolean {
+  const monthStart: DateParts = { year, month, day: 1 };
+  const monthEnd: DateParts = { year, month, day: daysInMonth(year, month) };
+  return compareParts(monthEnd, min) >= 0 && compareParts(monthStart, max) <= 0;
+}
+
 /* ------------------------------------------------------------------ *
  * 格式化与解析
  * ------------------------------------------------------------------ */

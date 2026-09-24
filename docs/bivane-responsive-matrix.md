@@ -80,7 +80,7 @@
 | DropdownMenu   | C    | 导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地                                                                                             |
 | DatePicker     | C    | 交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航                                                                                                     |
 | TimePicker     | B    | 同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）               |
-| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一滚轮列（PC 用 solid 实心选中观感，`DateTimeWheelRow`）；单值字符串 |
+| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一滚轮列（PC 时间列也走 band 居中上下双线，不填充高亮背景，`DateTimeWheelRow`）；单值字符串 |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -232,7 +232,7 @@ H5 = Popup 底部弹层 + 顶部 `PanelHeader` 工具条 + 安全区；PC = Radi
 | --------- | ------------------------------------------------------------------------------------------------------- |
 | 精度      | 三档：`年月日时` / `年月日时分` / `年月日时分秒`（默认）。H5 = 4/5/6 列滚轮；PC = 月历 + 1/2/3 条时间列 |
 | 月历      | 恒 6 行 × 7 列定高，周日为首；格子复用 date-picker PC 尺寸 token（32px / 圆角 / 主色选中 / 今天 ring）  |
-| 时间列    | 列宽 `--bv-datetime-picker-column-width` 56px，行高 44px；solid 选中用独立主色块 token                  |
+| 时间列    | 列宽 `--bv-datetime-picker-column-width` 56px，行高 44px；band 居中上下双线指示选中项，不填充高亮背景 token |
 | PC 浮层宽 | `calc(var(--bv-date-picker-pc-panel-width) + 列宽 * 时间列数)`，不写死三档三个 token                    |
 | 值        | 恒为字符串 `'YYYY-MM-DD HH[:mm[:ss]]'`，不用 Date（UTC 解析会差一天）                                   |
 

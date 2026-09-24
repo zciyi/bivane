@@ -358,8 +358,7 @@ export interface TimeWheelColumnProps {
     disabled?: boolean;
     /**
      * 是否键盘光标所在列。只有 PC 传 —— 触屏没有「方向键正在驾驶哪一列」这回事。
-     * 生效方式是给中央高亮带叠一层 `--bv-active-color`：**不新增 token、也不新增 CSS 规则**，
-     * 复用区间端点条的同一个底色，视觉上就是「这一列在等着接收方向键」。
+     * 现统一只用居中上下双线指示当前值，不再叠底色。
      */
     active?: boolean;
     onValueChange: (value: number) => void;
@@ -435,12 +434,9 @@ export const TimeWheelColumn = React.forwardRef<
                 aria-hidden="true"
                 data-slot="time-picker-wheel-indicator"
                 className={cn(
-                    // z-0：高亮带必须**画在数字下面**。键盘所在列会叠一层不透明底色，
-                    // 若把这条带子放在数字之上（z-1），那一列的居中数字会被整块盖住 ——
-                    // DOM/单测都看不出来，只有真机截图能发现。
+                    // z-0：选中指示线必须**画在数字下面**，保持居中两条线、不填充背景。
                     "pointer-events-none absolute inset-x-0 z-0",
                     "border-y border-[var(--bv-time-picker-wheel-line-color)]",
-                    active && "bg-[var(--bv-active-color)]",
                 )}
                 style={{ top: alignOffset(2, itemHeight), height: itemHeight }}
             />

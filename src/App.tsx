@@ -238,6 +238,11 @@ function Playground() {
     const [rangeStart, setRangeStart] = React.useState<string | undefined>();
     const [rangeEnd, setRangeEnd] = React.useState<string | undefined>();
 
+    // P2 min/max 边界约束演示：受控值 + 实时回显，方便直接看「选不出去 / 被夹回」
+    const [demoDate, setDemoDate] = React.useState<string | undefined>();
+    const [demoTime, setDemoTime] = React.useState<string | undefined>();
+    const [demoDateTime, setDemoDateTime] = React.useState<string | undefined>();
+
     const openPopup = (position: PopupPosition, long = false) =>
         setPopup({ open: true, position, long });
 
@@ -1098,6 +1103,114 @@ function Playground() {
                             （H5 滚轮 / PC
                             月历），时间段共用同一滚轮列，归属模式 C。
                         </p>
+                    </Block>
+                </Section>
+
+                <Section title="P2 · min/max 边界约束（Date / Time / DateTime）">
+                    <Block className="flex flex-col gap-bv-gutter">
+                        <p className="text-bv-sm text-bv-text-2">
+                            闭区间（含端点）。滚轮列按边界「逐字段级联收窄」：只有压在边界的那一级才裁剪；
+                            PC 月历禁用越界日；越界输入/选中会被夹回范围内。拖动窗口跨过 768px
+                            可对比 H5 滚轮 / PC 月历两种拦截形态。
+                        </p>
+                        <Row>
+                            <div className="flex items-center gap-bv-sm">
+                                <div className="w-[240px]">
+                                    <DatePicker
+                                        ariaLabel="日期 min/max"
+                                        title="日期范围约束"
+                                        placeholder="09-20 ~ 10-05"
+                                        min="2026-09-20"
+                                        max="2026-10-05"
+                                        value={demoDate}
+                                        onChange={(value) =>
+                                            setDemoDate(
+                                                typeof value === "string"
+                                                    ? value
+                                                    : undefined,
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <span className="text-bv-sm text-bv-text-3">
+                                    选中：{demoDate ?? "未选"}
+                                </span>
+                            </div>
+                        </Row>
+                        <Row>
+                            <div className="flex items-center gap-bv-sm">
+                                <div className="w-[240px]">
+                                    <TimePicker
+                                        ariaLabel="时间 min/max"
+                                        title="时间范围约束"
+                                        placeholder="09:30 ~ 18:00"
+                                        min="09:30:00"
+                                        max="18:00:00"
+                                        value={demoTime}
+                                        onChange={(value) =>
+                                            setDemoTime(
+                                                typeof value === "string"
+                                                    ? value
+                                                    : undefined,
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <span className="text-bv-sm text-bv-text-3">
+                                    小时列从 9 起、仅 9 点时分钟从 30 起；选中：
+                                    {demoTime ?? "未选"}
+                                </span>
+                            </div>
+                        </Row>
+                        <Row>
+                            <div className="flex items-center gap-bv-sm">
+                                <div className="w-[280px]">
+                                    <DateTimePicker
+                                        ariaLabel="日期时间 min/max"
+                                        title="日期时间范围约束"
+                                        placeholder="09-24 09:00 ~ 17:30"
+                                        min="2026-09-24 09:00:00"
+                                        max="2026-09-24 17:30:00"
+                                        value={demoDateTime}
+                                        onChange={(value) =>
+                                            setDemoDateTime(
+                                                typeof value === "string"
+                                                    ? value
+                                                    : undefined,
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <span className="text-bv-sm text-bv-text-3">
+                                    锁在 09-24 当天、时间窗 09:00~17:30；选中：
+                                    {demoDateTime ?? "未选"}
+                                </span>
+                            </div>
+                        </Row>
+                        <Row>
+                            <div className="flex items-center gap-bv-sm">
+                                <div className="w-[300px]">
+                                    <DateTimePicker
+                                        ariaLabel="min 带时间截断"
+                                        title="min 带时间 → 跨天截断"
+                                        placeholder="09-24 14:00 起 ~ 09-25 09:00"
+                                        min="2026-09-24 14:00:00"
+                                        max="2026-09-25 09:00:00"
+                                        columnsType={[
+                                            "year",
+                                            "month",
+                                            "day",
+                                            "hour",
+                                            "minute",
+                                        ]}
+                                        clearable
+                                    />
+                                </div>
+                                <span className="text-bv-sm text-bv-text-3">
+                                    24 号时列从 14 起、25 号时列到 09 止（逐字段级联）
+                                </span>
+                            </div>
+                        </Row>
                     </Block>
                 </Section>
 
