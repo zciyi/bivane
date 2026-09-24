@@ -54,6 +54,11 @@ const EXPECTED = [
   'src/components/h5/select.tsx',
   'src/components/pc/select.tsx',
   'src/components/responsive/select.tsx',
+  'src/hooks/use-time-value.ts',
+  'src/components/ui/time-parts.tsx',
+  'src/components/h5/time-picker.tsx',
+  'src/components/pc/time-picker.tsx',
+  'src/components/responsive/time-picker.tsx',
 ];
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
@@ -197,6 +202,7 @@ import { Cell, CellGroup } from '@/components/ui/cell';
 import { Icon } from '@/components/ui/icon';
 import { Tag } from '@/components/ui/tag';
 import { DatePicker } from '@/components/responsive/date-picker';
+import { TimePicker } from '@/components/responsive/time-picker';
 import { Dialog, showConfirmDialog } from '@/components/responsive/dialog';
 import { DropdownMenu } from '@/components/responsive/dropdown-menu';
 import { Popup } from '@/components/responsive/popup';
@@ -329,6 +335,30 @@ export default function App() {
         <Cell title="禁用" value={<DatePicker ariaLabel="禁用日期" disabled />} />
       </CellGroup>
 
+      <CellGroup title="TimePicker">
+        <Cell
+          title="单值"
+          value={
+            <TimePicker
+              ariaLabel="时间"
+              placeholder="请选择时间"
+              onChange={(value) => showToast('时间：' + String(value))}
+            />
+          }
+        />
+        <Cell
+          title="区间"
+          value={
+            <TimePicker ariaLabel="时间区间" placeholder="请选择区间" type="range" clearable />
+          }
+        />
+        <Cell
+          title="列裁剪"
+          value={<TimePicker ariaLabel="时分" columnsType={['hour', 'minute']} />}
+        />
+        <Cell title="禁用" value={<TimePicker ariaLabel="禁用时间" disabled />} />
+      </CellGroup>
+
       <Popup open={popupOpen} position="bottom" onOpenChange={setPopupOpen} closeable aria-label="示例弹层">
         <div className="p-bv-md">任意内容</div>
       </Popup>
@@ -457,6 +487,7 @@ async function main() {
       '@bivane/select',
       '@bivane/dropdown-menu',
       '@bivane/date-picker',
+      '@bivane/time-picker',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -505,6 +536,9 @@ async function main() {
           'data-slot=date-picker-panel',
           '--bv-date-picker-wheel-item-height',
           '--bv-date-picker-pc-cell-height',
+          'data-slot=time-picker-panel',
+          '--bv-time-picker-wheel-item-height',
+          '--bv-time-picker-pc-panel-width',
           'bv-fade-in',
         ];
         for (const probe of probes) {

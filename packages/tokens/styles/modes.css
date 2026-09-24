@@ -13,7 +13,7 @@
  *
  * 禁止：把组件内部间距（--bv-padding-*、--bv-<组件>-padding-*）写进本文件。
  *      组件内部间距在任何模式下都严格等于 Vant 原值，这是视觉保真的底线。
- *      （见 bivane-architecture.md §3.3 与 §3.6）
+ *      （见 bivane-architecture.md §3.2 间距分层）
  *
  * 横向 gutter 不随模式变化（恒为 16px），否则页面标题会与 Vant 定宽 16px 的
  * 组件内边距错位。

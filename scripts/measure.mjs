@@ -161,6 +161,22 @@ const PROBE = `(() => {
     };
   }
 
+  // TimePicker：触发器高（H5 44 / PC 32）与字号行高必须来自 token 而不是偶然值
+  out.timePicker = [...document.querySelectorAll('[data-slot="time-picker-trigger"]')].map((t) => {
+    const cs = getComputedStyle(t);
+    return {
+      ariaLabel: t.getAttribute('aria-label'),
+      mode: t.dataset.mode,
+      w: px(cs.width),
+      h: px(cs.height),
+      fontSize: cs.fontSize,
+      lineHeight: cs.lineHeight,
+      radius: cs.borderTopLeftRadius,
+      // H5 的下边线走 bv-hairline 伪元素，元素自身 border 恒为 0
+      hairlineBottom: getComputedStyle(t, '::after').borderBottomWidth,
+    };
+  });
+
   const root = getComputedStyle(document.documentElement);
   out.tokens = {
     'padding-md': root.getPropertyValue('--bv-padding-md').trim(),
@@ -170,6 +186,9 @@ const PROBE = `(() => {
     'date-picker-pc-cell-height': root.getPropertyValue('--bv-date-picker-pc-cell-height').trim(),
     'date-picker-pc-trigger-height': root.getPropertyValue('--bv-date-picker-pc-trigger-height').trim(),
     'panel-header-breadcrumb-height': root.getPropertyValue('--bv-panel-header-breadcrumb-height').trim(),
+    'time-picker-wheel-item-height': root.getPropertyValue('--bv-time-picker-wheel-item-height').trim(),
+    'time-picker-pc-panel-width': root.getPropertyValue('--bv-time-picker-pc-panel-width').trim(),
+    'time-picker-pc-trigger-height': root.getPropertyValue('--bv-time-picker-pc-trigger-height').trim(),
   };
   return JSON.stringify(out);
 })()`;

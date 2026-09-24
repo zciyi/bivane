@@ -14,7 +14,7 @@ import type { MenuItem, MenuOption, MenuValue } from "@/hooks/use-menu-state";
  * 这类差异属模式 A（纯 CSS），用 `mode` 分支给出两串 class 即可。
  *
  * 因此本文件里**没有** bv-h5: / bv-pc: 变体：那两个变体编译成后代选择器
- * `[data-mode='x'] &`，而触发器渲染在用户页面里、未必有 data-mode 祖先（架构 §6.5 ①）。
+ * `[data-mode='x'] &`，而触发器渲染在用户页面里、未必有 data-mode 祖先（架构 §6.5 规则 1）。
  *
  * 为什么行只给出 class 与内容、不给出成品组件：
  * PC 的行必须由 Radix 的 Item / SubTrigger 元素承担（键盘巡航、子菜单状态都在它身上），

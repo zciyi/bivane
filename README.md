@@ -19,7 +19,7 @@
 | P0 | token 层 / 模式判定 / Button · Cell · CellGroup · Tag · Badge · Icon | ✅ 已完成 |
 | P1 | 弹层地基（portal · imperative-host · overlay · 滚动锁 · 手势）+ **Popup · Dialog · Toast** | ✅ 已完成 |
 | P1′ | ActionSheet · Alert/Confirm · Notify · Loading | ⬜ 待做 |
-| P2 | **Select** ✅ · **DropdownMenu** ✅ · **DatePicker** ✅ · TimePicker · Picker · Calendar · Tooltip · Popover | 🔄 进行中（3/8） |
+| P2 | **Select** ✅ · **DropdownMenu** ✅ · **DatePicker** ✅ · **TimePicker** ✅ · Picker · Calendar · Tooltip · Popover | 🔄 进行中（4/8） |
 | P3 | 表单类 · Uploader · Search · Tabs · List/Table | ⬜ 待开始 |
 | P4 | 多风格 · tweakcn 适配 · 文档站 · registry 发布 | ⬜ 待开始 |
 
@@ -145,7 +145,7 @@ npm run registry:build
 npm run consumer:check
 ```
 
-运行时依赖只有 9 个：`react` · `react-dom` · `clsx` · `tailwind-merge` · `class-variance-authority` · `@radix-ui/react-dialog`（仅 PC 模态用） · `@radix-ui/react-popover`（仅 PC 浮层用） · `@radix-ui/react-dropdown-menu`（仅 PC 菜单用） · `react-day-picker`（仅 PC 月历引擎用）。手势、滚动锁、虚拟滚动均为自研，不引第三方。
+运行时依赖只有 9 个：`react` · `react-dom` · `clsx` · `tailwind-merge` · `class-variance-authority` · `@radix-ui/react-dialog`（仅 PC 模态用） · `@radix-ui/react-popover`（PC 浮层 / 锚定用，DatePicker 与 TimePicker 共用） · `@radix-ui/react-dropdown-menu`（仅 PC 菜单用） · `react-day-picker`（仅 PC 月历引擎用）。手势、滚动锁、虚拟滚动均为自研，不引第三方。
 
 > 组件的可复制用法、prop 说明与两端差异见 [USAGE.md](./USAGE.md)。
 

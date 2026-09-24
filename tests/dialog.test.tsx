@@ -13,7 +13,7 @@ import { resetDialogStore } from '@/hooks/use-dialog-store';
 import { resetImperativeHosts } from '@/lib/imperative-host';
 
 /**
- * Dialog 双模式行为测试（矩阵 §3.2 要求：两模式各 1 个行为测试，开放式/关闭/确认）
+ * Dialog 双模式行为测试（矩阵 §4 要求：两模式各 1 个行为测试，开放式/关闭/确认）
  *
  * 模式 B 的验证重点：**同一份 props 与内容，两种壳的交互不同**。
  *   - H5：底部抽屉（data-variant="sheet"）、按钮纵向、遮罩点击关闭

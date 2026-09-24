@@ -238,6 +238,31 @@ async function clickMenuRow(value) {
 }
 
 /**
+ * 在时间面板里按文案点一个滚轮项（真实鼠标点击）。
+ * 优先在当前被键盘驾驶的列（`data-active`）里找，找不到再全局找 ——
+ * 避免「时列」的 20 与「分/秒列」的 20 串味。
+ * H5 没有 data-active（触屏没有「哪一列在接收方向键」这回事），直接全局找。
+ */
+async function realClickTimeOption(text) {
+  const raw = await evaluate(`(() => {
+    const want = ${JSON.stringify(text)};
+    const active = document.querySelector('[data-slot="time-picker-wheel"][data-active="true"]');
+    const scope = active || document;
+    const el = [...scope.querySelectorAll('[data-slot="time-picker-wheel-item"]')].find(o => o.textContent.trim() === want);
+    if (!el) return JSON.stringify({ error: 'OPT_NOT_FOUND:' + want });
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({ x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) });
+  })()`);
+  const info = JSON.parse(raw);
+  if (info.error) return info.error;
+  const base = { x: info.x, y: info.y, button: 'left', clickCount: 1 };
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', ...base });
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...base });
+  return 'OK';
+}
+
+/**
  * 按选择器真实点击（CDP Input）。用于没有 aria-label 的元素（如面包屑的祖先层）：
  * 返回 NOT_FOUND 而不抛错，好让「某一端没有这个元素」的场景（PC 没有抽屉头部）照常跑完。
  */
@@ -292,7 +317,7 @@ async function wheelScroll(selector, rows) {
   const raw = await evaluate(`(() => {
     const el = document.querySelector(${JSON.stringify(selector)});
     if (!el) return JSON.stringify({ error: 'NOT_FOUND:' + ${JSON.stringify(selector)} });
-    const item = el.querySelector('[data-slot="date-picker-wheel-item"]');
+    const item = el.querySelector('[data-slot$="wheel-item"]');
     const h = item ? item.getBoundingClientRect().height : 0;
     if (!(h > 0)) return JSON.stringify({ error: 'ITEM_HEIGHT_ZERO' });
     el.scrollIntoView({ block: 'center' });
@@ -938,6 +963,151 @@ function probeDate(label) {
 }
 
 /**
+ * TimePicker 探针（与 DatePicker 同族）：验证「两端同一套滚轮交互、只换外壳」这件事真的成立。
+ *
+ * 五组指标，全部取**症状级**指标而不是原始尺寸：
+ *   1. 容器：H5 出现 popup（底部弹层，贴底）、滚轮行嵌在它里面；PC 出现 time-picker-panel（锚定浮层，与视口底有明显余量）
+ *   2. 触发器：两端都有 time-picker-trigger（data-mode/clear/indicator）；H5 触发器下边线走 bv-hairline（::after），元素自身 border 恒为 0
+ *   3. 选择器：**两端都是 time-picker-wheel**（role=listbox，含 scroller + snap + 中央高亮带 + 上下渐隐遮罩）——
+ *      这条是「同范式」的判据；2026-09-23 之前 PC 侧是 time-picker-list，探针会在这里报出 0 个滚轮
+ *   4. 区间入口：两端都复用 time-picker-range-tab 两段式（开始/结束）—— 与 DatePicker 不同，不靠并排双列
+ *   5. 键盘面：PC 有「方向键正在驾驶哪一列」的 data-active（该列高亮带叠底色），H5 没有这个概念；
+ *      且滚轮项 tabIndex=-1（Tab 不去逐个走 60 个数字，键盘面归浮层）
+ *   6. 高亮带的 z 序必须低于滚动容器：那一列的底气是不透明的，压在上面会把居中数字整块盖住
+ *      （`bandUnderDigits`）—— 这条 DOM 结构正确、单测全绿，只有真机截图才看得出来
+ *
+ * 行高一律用**实测最小值自校准**（不要写死 44/32）：token 改了值之后，探针如果还按旧值断言就会退化成永远通过。
+ */
+function probeTime(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const q = s => document.querySelector(s);
+    const all = s => [...document.querySelectorAll(s)];
+    const out = {
+      label: ${JSON.stringify(label)},
+      viewport: window.innerWidth + 'x' + window.innerHeight,
+    };
+
+    // 取「已展开」的那个触发器：页面上有多个 TimePicker，按第一份量会串味
+    const trg =
+      q('[data-slot="time-picker-trigger"][aria-expanded="true"]') || q('[data-slot="time-picker-trigger"]');
+    if (!trg) { out.trigger = null; return JSON.stringify(out); }
+
+    const tr = trg.getBoundingClientRect();
+    const tcs = getComputedStyle(trg);
+    const indicator = trg.querySelector('[data-slot="time-picker-trigger-indicator"]');
+    out.trigger = {
+      mode: trg.dataset.mode,
+      expanded: trg.getAttribute('aria-expanded'),
+      ariaLabel: trg.getAttribute('aria-label'),
+      text: trg.textContent,
+      w: px(tr.width), h: px(tr.height),
+      radius: tcs.borderTopLeftRadius,
+      borderWidth: tcs.borderTopWidth,
+      hairlineBottom: getComputedStyle(trg, '::after').borderBottomWidth,
+      clearBtn: !!trg.querySelector('[data-slot="time-picker-trigger-clear"]'),
+      // 展开时翻转 180°，断言的是 transform 里出现了旋转矩阵（rotate-180）
+      indicatorTransform: indicator ? getComputedStyle(indicator).transform : null,
+    };
+
+    // 容器分野：H5 的滚轮行嵌在 popup 里（底部弹层），PC 的浮层自己就是容器
+    const rowEl = q('[data-slot="time-picker-wheels"]');
+    const popupEl = rowEl ? rowEl.closest('[data-slot="popup"]') : null;
+    const panelEl = q('[data-slot="time-picker-panel"]');
+    const shell = popupEl || panelEl || rowEl;
+    if (shell) {
+      const r = shell.getBoundingClientRect();
+      const cs = getComputedStyle(shell);
+      out.shell = {
+        slot: popupEl ? 'popup' : 'time-picker-panel',
+        mode: shell.dataset.mode,
+        x: px(r.x), y: px(r.y), w: px(r.width), h: px(r.height),
+        radius: cs.borderTopLeftRadius,
+        // 「贴底」是 H5 底部弹层的判据；PC 应当有明显余量
+        gapToViewportBottom: px(window.innerHeight - r.bottom),
+        leftGap: px(r.left),
+        rightGap: px(window.innerWidth - r.right),
+        centered: Math.abs(r.left - (window.innerWidth - r.right)) <= 1,
+        animation: cs.animationName + ' ' + cs.animationDuration,
+        gapBelowTrigger: px(r.top - tr.bottom),
+      };
+      const names = [
+        '--bv-time-picker-wheel-item-height',
+        '--bv-time-picker-pc-trigger-height',
+        '--bv-time-picker-pc-panel-width',
+      ];
+      out.tokens = Object.fromEntries(names.map(n => [n, cs.getPropertyValue(n).trim()]));
+    }
+
+    // ---- 两端的滚轮列（同范式判据）----
+    out.wheels = all('[data-slot="time-picker-wheel"]').map(w => {
+      const scroller = w.querySelector('[data-slot="time-picker-wheel-scroller"]');
+      const items = [...w.querySelectorAll('[data-slot="time-picker-wheel-item"]')];
+      const heights = items.map(i => i.getBoundingClientRect().height).filter(h => h > 0);
+      // 最小值自校准：不写死行高，token 改了这里跟着变
+      const itemH = heights.length ? Math.min(...heights) : 0;
+      const wh = w.getBoundingClientRect().height;
+      const sel = items.find(i => i.dataset.selected === 'true');
+      const other = items.find(i => i.dataset.selected !== 'true');
+      const ind = w.querySelector('[data-slot="time-picker-wheel-indicator"]');
+      const mask = w.querySelector('[data-slot="time-picker-wheel-mask"]');
+      const ics = ind ? getComputedStyle(ind) : null;
+      return {
+        mode: w.dataset.mode,
+        label: w.getAttribute('aria-label'),
+        keyboardColumn: w.dataset.active === 'true',
+        h: px(wh),
+        itemH: px(itemH),
+        // 5 行制：容器高应当正好是行高的 5 倍
+        visibleRows: itemH > 0 ? px(wh / itemH) : null,
+        count: items.length,
+        selected: sel ? sel.textContent : null,
+        selectedBold: sel ? getComputedStyle(sel).fontWeight : null,
+        selectedColor: sel ? getComputedStyle(sel).color : null,
+        otherColor: other ? getComputedStyle(other).color : null,
+        // 吸附三件套：类名丢了不会报错，只会「滚到哪停哪」，只能这样验
+        snapType: scroller ? getComputedStyle(scroller).scrollSnapType : null,
+        itemSnapAlign: items[0] ? getComputedStyle(items[0]).scrollSnapAlign : null,
+        padTop: scroller ? getComputedStyle(scroller).paddingTop : null,
+        scrollTop: scroller ? px(scroller.scrollTop) : null,
+        // 兜底对齐的判据：非 0 说明停在两行之间
+        snapRemainder: scroller && itemH > 0 ? px(scroller.scrollTop % itemH) : null,
+        indicatorH: ind ? px(ind.getBoundingClientRect().height) : null,
+        indicatorHairline: ics ? ics.borderTopWidth : null,
+        // 键盘所在列的高亮带会叠一层底色（PC 的「方向键在驾驶这一列」提示）
+        indicatorBg: ics ? ics.backgroundColor : null,
+        // 带子必须画在数字**下面**：键盘所在列的底气是不透明的，一旦压在上面，
+        // 该列居中的数字会被整块盖住 —— 这条只看 z 序，是唯一能用 DOM 抓到的判据
+        bandZ: ics ? ics.zIndex : null,
+        scrollerZ: scroller ? getComputedStyle(scroller).zIndex : null,
+        bandUnderDigits: !!ics && !!scroller && Number(ics.zIndex) < Number(getComputedStyle(scroller).zIndex),
+        // 上下渐隐遮罩：渐变没生成时拿到的是 none
+        maskGradient: mask ? getComputedStyle(mask).backgroundImage.slice(0, 56) : null,
+        // 键盘面归浮层：滚轮项不进 Tab 流
+        firstItemTabIndex: items[0] ? items[0].tabIndex : null,
+      };
+    });
+
+    out.rangeTabs = all('[data-slot="time-picker-range-tab"]').map(t => ({
+      label: t.getAttribute('aria-label'),
+      active: t.dataset.active === 'true',
+      text: t.querySelector('[data-slot="time-picker-range-tab-value"]').textContent,
+    }));
+
+    // PC 底部「取消 / 确定」条：确定的存在性与可点性（单值恒可点；区间要两端都选且开始 < 结束）
+    const confirmBtn = q('[data-slot="time-picker-confirm"]');
+    if (confirmBtn) {
+      out.confirm = {
+        disabled: confirmBtn.disabled,
+        hint: !!q('[data-slot="time-picker-range-hint"]'),
+      };
+    }
+
+    return JSON.stringify(out);
+  })()`);
+}
+
+/**
  * 在**第一个月历面板**里点/悬停第 k 个「本月可用」格子（真实鼠标事件）。
  *
  * 用序号而不是日期文本：日期取决于「今天」在哪个月，脚本跑在任何月份都要能用；
@@ -1246,6 +1416,80 @@ async function run() {
     await sleep(600);
     await shot(`${cfg.name}-8d-date-picker-committed`);
     reports.push(await probeDate(`${cfg.name} / date 提交后`));
+
+    // --- 9. TimePicker 单值展开（两端同一套滚轮，只换外壳） ---
+    await reload();
+    console.log('  scroll:', await scrollToSection('P2 · TimePicker'));
+    // 按 aria-label 精确匹配触发器：同类组件有 4 个，按文本匹配会静默落到第一个
+    console.log('  click :', await realClickByLabel('time-picker-trigger', '时间'));
+    await sleep(700);
+    await shot(`${cfg.name}-9-time-picker`);
+    reports.push(await probeTime(`${cfg.name} / time 单值展开`));
+
+    // --- 9b. 一步真实交互：真滚轮滚 3 行（两端都该吸附对齐），PC 再叠一次键盘驾驶 ---
+    // 判据：scrollTop 落在行高整数倍上（吸附真的生效）+ 选中行文字变了（滚动回写了草稿）；
+    // PC 追加：data-active 的列随 ←→ 移动、该列高亮带叠底色 —— H5 根本没有「键盘在驾驶哪一列」这个概念。
+    console.log('  wheel :', await wheelScroll('[data-slot="time-picker-wheel-scroller"]', 3));
+    await sleep(700);
+    await shot(`${cfg.name}-9b-time-picker-wheel`);
+    reports.push(await probeTime(`${cfg.name} / time 滚轮 Δ3 行`));
+    if (!cfg.mobile) {
+      await pressKey(KEYS.ArrowRight);
+      await sleep(150);
+      console.log('  key   :', await pressKey(KEYS.ArrowDown));
+      await sleep(300);
+      await shot(`${cfg.name}-9b2-time-picker-keyboard`);
+      reports.push(await probeTime(`${cfg.name} / time →↓ 键盘驾驶列`));
+    }
+
+    // --- 9c. 区间展开（两端都复用「开始时间 / 结束时间」两段式入口） ---
+    await reload();
+    console.log('  scroll:', await scrollToSection('P2 · TimePicker'));
+    console.log('  click :', await realClickByLabel('time-picker-trigger', '时间区间'));
+    await sleep(700);
+    await shot(`${cfg.name}-9c-time-picker-range`);
+    reports.push(await probeTime(`${cfg.name} / time 区间展开`));
+
+    // 两端统一：滚轮有多列（时/分/秒），不自动切端；由用户点「开始时间 / 结束时间」tab 切换。
+    if (cfg.mobile) {
+      console.log('  click :', await realClickByLabel('time-picker-range-tab', '结束时间'));
+      await sleep(400);
+      await shot(`${cfg.name}-9c2-time-picker-range-end`);
+      reports.push(await probeTime(`${cfg.name} / time 区间切结束端`));
+    } else {
+      console.log('  click :', await realClickTimeOption('12'));
+      await sleep(400);
+      await shot(`${cfg.name}-9c2-time-picker-range-pc-start`);
+      reports.push(await probeTime(`${cfg.name} / time 区间点起点`));
+      // 选完起点手动切到「结束时间」端，再补一个结束值
+      console.log('  click :', await realClickByLabel('time-picker-range-tab', '结束时间'));
+      await sleep(300);
+      console.log('  click :', await realClickTimeOption('20'));
+      await sleep(400);
+      await shot(`${cfg.name}-9c3-time-picker-range-pc-end`);
+      reports.push(await probeTime(`${cfg.name} / time 区间点终点`));
+      // PC 区间不「选满即关」，必须点底部「确定」才提交
+      console.log('  click :', await realClickSelector('[data-slot="time-picker-confirm"]'));
+      await sleep(600);
+      await shot(`${cfg.name}-9d-time-picker-range-pc-committed`);
+      reports.push(await probeTime(`${cfg.name} / time 区间确定后`));
+    }
+
+    // --- 9d. 提交（H5 点工具条「确定」/ PC 点底部「确定」或按 Enter）→ 浮层关闭 + 触发器回填 ---
+    // 判据用「aria-expanded 由 true 变 false + 触发器文本不再是 placeholder」，
+    // 而不是「面板 DOM 不存在」—— Radix 的 Presence 有退场动画，节点会晚一两次提交才卸。
+    await reload();
+    await scrollToSection('P2 · TimePicker');
+    console.log('  click :', await realClickByLabel('time-picker-trigger', '时间'));
+    await sleep(600);
+    if (cfg.mobile) {
+      console.log('  click :', await realClickSelector('[data-slot="panel-header-confirm"]'));
+    } else {
+      console.log('  key   :', await pressKey(KEYS.Enter));
+    }
+    await sleep(600);
+    await shot(`${cfg.name}-9d-time-picker-committed`);
+    reports.push(await probeTime(`${cfg.name} / time 提交后`));
   }
 
   fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(reports, null, 2), 'utf8');

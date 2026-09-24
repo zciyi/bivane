@@ -7,97 +7,97 @@
 /* ---------- 细边线（对应 Vant mixins/hairline.less）---------- */
 /* 原理：伪元素放大到 200% 后用 scale(0.5) 缩回，1px 边框渲染为 0.5px 物理像素 */
 .bv-hairline {
-  position: relative;
+    position: relative;
 }
 
 .bv-hairline::after {
-  position: absolute;
-  box-sizing: border-box;
-  content: '';
-  pointer-events: none;
-  top: -50%;
-  right: -50%;
-  bottom: -50%;
-  left: -50%;
-  border: 0 solid var(--bv-hairline-color, var(--bv-border));
-  transform: scale(0.5);
+    position: absolute;
+    box-sizing: border-box;
+    content: "";
+    pointer-events: none;
+    top: -50%;
+    right: -50%;
+    bottom: -50%;
+    left: -50%;
+    border: 0 solid var(--bv-hairline-color, var(--bv-border));
+    transform: scale(0.5);
 }
 
 .bv-hairline--top::after {
-  border-top-width: var(--bv-border-width);
+    border-top-width: var(--bv-border-width);
 }
 
 .bv-hairline--bottom::after {
-  border-bottom-width: var(--bv-border-width);
-  /* 缩放后视觉内缩 = 声明值 × 2 */
-  left: calc(var(--bv-hairline-inset-left, 0px) * 2);
-  right: calc(var(--bv-hairline-inset-right, 0px) * 2);
+    border-bottom-width: var(--bv-border-width);
+    /* 缩放后视觉内缩 = 声明值 × 2 */
+    left: calc(var(--bv-hairline-inset-left, 0px) * 2);
+    right: calc(var(--bv-hairline-inset-right, 0px) * 2);
 }
 
 .bv-hairline--left::after {
-  border-left-width: var(--bv-border-width);
+    border-left-width: var(--bv-border-width);
 }
 
 .bv-hairline--right::after {
-  border-right-width: var(--bv-border-width);
+    border-right-width: var(--bv-border-width);
 }
 
 .bv-hairline--all::after {
-  border-width: var(--bv-border-width);
+    border-width: var(--bv-border-width);
 }
 
 /* ---------- 按压态蒙层（对应 Vant 按钮的 ::before 黑色蒙层）---------- */
 .bv-press {
-  position: relative;
+    position: relative;
 }
 
 .bv-press::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: var(--bv-black);
-  border-radius: inherit;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  content: '';
-  pointer-events: none;
-  transition: opacity var(--bv-duration-fast);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: var(--bv-black);
+    border-radius: inherit;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    content: "";
+    pointer-events: none;
+    transition: opacity var(--bv-duration-fast);
 }
 
 .bv-press:active::before {
-  opacity: var(--bv-press-overlay, 0.1);
+    opacity: var(--bv-press-overlay, 0.1);
 }
 
 .bv-press:disabled::before,
-.bv-press[data-disabled='true']::before,
-.bv-press[data-loading='true']::before {
-  display: none;
+.bv-press[data-disabled="true"]::before,
+.bv-press[data-loading="true"]::before {
+    display: none;
 }
 
 /* ---------- 滚动锁定（弹层类共用）---------- */
 .bv-lock-scroll {
-  overflow: hidden;
-  touch-action: none;
+    overflow: hidden;
+    touch-action: none;
 }
 
 /* ---------- 安全区（贴边组件共用：Popup / Dialog / Tabbar / NavBar）----------
  * 用 constant() 兜底 iOS 11.0~11.2，env() 为现代标准；
  * 顺序不可颠倒，老浏览器会忽略不认识的后者。 */
 .bv-safe-area-top {
-  padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
 }
 
 .bv-safe-area-bottom {
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bv-safe-area-margin-bottom {
-  margin-bottom: constant(safe-area-inset-bottom);
-  margin-bottom: env(safe-area-inset-bottom);
+    margin-bottom: constant(safe-area-inset-bottom);
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
 /* ---------- 弹层进出场动画（PC 居中模态 / 遮罩）----------
@@ -106,59 +106,59 @@
  * [data-state] 上，而不是走 React 的 state 分支。
  * 时长取 --bv-popup-duration，随模式变化（H5 300ms / PC 200ms）。 */
 @keyframes bv-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes bv-fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes bv-modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes bv-modal-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
 }
 
-[data-slot='dialog-overlay'][data-state='open'] {
-  animation: bv-fade-in var(--bv-popup-duration) var(--bv-ease-out);
+[data-slot="dialog-overlay"][data-state="open"] {
+    animation: bv-fade-in var(--bv-popup-duration) var(--bv-ease-out);
 }
 
-[data-slot='dialog-overlay'][data-state='closed'] {
-  animation: bv-fade-out var(--bv-popup-duration) var(--bv-ease-in);
+[data-slot="dialog-overlay"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-popup-duration) var(--bv-ease-in);
 }
 
-[data-slot='dialog'][data-variant='modal'][data-state='open'] {
-  animation: bv-modal-in var(--bv-popup-duration) var(--bv-ease-out);
+[data-slot="dialog"][data-variant="modal"][data-state="open"] {
+    animation: bv-modal-in var(--bv-popup-duration) var(--bv-ease-out);
 }
 
-[data-slot='dialog'][data-variant='modal'][data-state='closed'] {
-  animation: bv-modal-out var(--bv-popup-duration) var(--bv-ease-in);
+[data-slot="dialog"][data-variant="modal"][data-state="closed"] {
+    animation: bv-modal-out var(--bv-popup-duration) var(--bv-ease-in);
 }
 
 /* PC 的锚定下拉浮层（Select / 后续 DropdownMenu、Popover 共用）。
@@ -166,61 +166,105 @@
  * 换个名字动画会静默不跑（契约第 16 条）。
  * 时长取 --bv-select-pc-duration（120ms）：锚定浮层离触发器很近，
  * 用弹层的 200~300ms 会显得拖沓。 */
-[data-slot='select-panel'][data-state='open'] {
-  animation: bv-fade-in var(--bv-select-pc-duration) var(--bv-ease-out);
+[data-slot="select-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-select-pc-duration) var(--bv-ease-out);
 }
 
-[data-slot='select-panel'][data-state='closed'] {
-  animation: bv-fade-out var(--bv-select-pc-duration) var(--bv-ease-in);
+[data-slot="select-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-select-pc-duration) var(--bv-ease-in);
 }
 
 /* PC 的 DropdownMenu 浮层与二级浮层。
  * 槽名必须与 components/pc/menu.tsx 上的 data-slot 逐字一致（契约第 16 条）。
  * SubContent 走 keyframes 而不是 transition：Radix 的子菜单是「挂载/卸载」，
  * 没有可过渡的前一帧；动画则让 Presence 能等到播完再卸载。 */
-[data-slot='menu-panel'][data-state='open'] {
-  animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
+[data-slot="menu-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
 }
 
-[data-slot='menu-panel'][data-state='closed'] {
-  animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
+[data-slot="menu-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
 }
 
-[data-slot='menu-subpanel'][data-state='open'] {
-  animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
+[data-slot="menu-subpanel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
 }
 
-[data-slot='menu-subpanel'][data-state='closed'] {
-  animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
+[data-slot="menu-subpanel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
 }
 
 /* DatePicker 的 PC 月历浮层。槽名必须与 components/pc/date-picker.tsx 上的
  * data-slot="date-picker-panel" 逐字一致（契约第 16 条）。
  * 时长取 --bv-date-picker-pc-duration（160ms）：月历比单列浮层面积大，
  * 用 120ms 会显得「啪」地跳出来，用弹层的 300ms 又太慢。 */
-[data-slot='date-picker-panel'][data-state='open'] {
-  animation: bv-fade-in var(--bv-date-picker-pc-duration) var(--bv-ease-out);
+[data-slot="date-picker-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-date-picker-pc-duration) var(--bv-ease-out);
 }
 
-[data-slot='date-picker-panel'][data-state='closed'] {
-  animation: bv-fade-out var(--bv-date-picker-pc-duration) var(--bv-ease-in);
+[data-slot="date-picker-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-date-picker-pc-duration) var(--bv-ease-in);
 }
 
 /* H5 滚轮列上下两端的渐隐遮罩。
  * 放在 CSS 而不是 Tailwind 类里：渐变色要用 `linear-gradient(to bottom, var(--x), transparent)`，
  * 写进 `bg-[...]` 任意值会在逗号处被 Tailwind 的解析切开。
  * 下遮罩复用同一条规则并整体 `rotate-180` —— 旋转围绕中心，底边锚定的盒子转完仍在原位。 */
-[data-slot='date-picker-wheel-mask'] {
-  background: linear-gradient(to bottom, var(--bv-date-picker-wheel-mask-color), transparent);
+[data-slot="date-picker-wheel-mask"] {
+    background: linear-gradient(
+        to bottom,
+        var(--bv-date-picker-wheel-mask-color),
+        transparent
+    );
+}
+
+/* TimePicker 的 PC 浮层（可点击列表面板）。时长取 --bv-time-picker-pc-duration（160ms）。 */
+[data-slot="time-picker-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-time-picker-pc-duration) var(--bv-ease-out);
+}
+
+[data-slot="time-picker-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-time-picker-pc-duration) var(--bv-ease-in);
+}
+
+/* H5 滚轮列上下两端的渐隐遮罩（同 date-picker-wheel-mask 的来历）。 */
+[data-slot="time-picker-wheel-mask"] {
+    background: linear-gradient(
+        to bottom,
+        var(--bv-time-picker-wheel-mask-color),
+        transparent
+    );
+}
+
+/* DateTimePicker PC 浮层（锚定滚轮面板，时长对齐 TimePicker）。 */
+[data-slot="datetime-picker-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-datetime-picker-pc-duration)
+        var(--bv-ease-out);
+}
+
+[data-slot="datetime-picker-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-datetime-picker-pc-duration)
+        var(--bv-ease-in);
+}
+
+/* DateTimePicker 滚轮列渐隐遮罩（来历同 date-picker-wheel-mask）。 */
+[data-slot="datetime-picker-wheel-mask"] {
+    background: linear-gradient(
+        to bottom,
+        var(--bv-datetime-picker-wheel-mask-color),
+        transparent
+    );
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-slot='dialog-overlay'],
-  [data-slot='dialog'][data-variant='modal'],
-  [data-slot='menu-panel'],
-  [data-slot='menu-subpanel'],
-  [data-slot='select-panel'],
-  [data-slot='date-picker-panel'] {
-    animation: none;
-  }
+    [data-slot="dialog-overlay"],
+    [data-slot="dialog"][data-variant="modal"],
+    [data-slot="menu-panel"],
+    [data-slot="menu-subpanel"],
+    [data-slot="select-panel"],
+    [data-slot="date-picker-panel"],
+    [data-slot="time-picker-panel"],
+    [data-slot="datetime-picker-panel"] {
+        animation: none;
+    }
 }

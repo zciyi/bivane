@@ -706,6 +706,200 @@
                 "date-picker-h5",
                 "date-picker-pc"
             ]
+        },
+        {
+            "name": "use-time-value",
+            "type": "registry:hook",
+            "title": "时间值模型",
+            "description": "跨模式共用的『时间』值逻辑：解析/格式化（HH/H/mm/m/ss/s 六 token）、min-max 逐字段夹紧、列裁剪、区间排序、默认值落「现在」。全部为纯函数（不含任何组件，避免环形依赖）。与 DatePicker 同族，两端只共享「时间怎么算」，不共享「怎么选」。",
+            "files": [
+                {
+                    "path": "hooks/use-time-value.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-time-value.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "time-parts",
+            "type": "registry:component",
+            "title": "TimePicker 共用零件",
+            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）、H5 区间端点切换条与滚轮列、PC 列表面板选项，以及面板 props 契约。外壳形态走 JS 分支（模式 A），不依赖祖先是否带 data-mode。PC 的可点击列表面板不在此处 —— 那是与 H5 滚轮不同的交互范式（模式 C 规则 ④「交互范式不同」）。",
+            "files": [
+                {
+                    "path": "components/ui/time-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/time-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-time-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "time-picker-h5",
+            "type": "registry:component",
+            "title": "TimePicker（H5 实现）",
+            "description": "底部弹层 + N 列拖拽滚轮（时/分/秒），惯性滚动 + 吸附对齐，顶部工具条（取消 · 标题 · 确定）+ 底部安全区；区间模式用「开始/结束」两段式。",
+            "files": [
+                {
+                    "path": "components/h5/time-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/time-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "time-parts",
+                "popup",
+                "panel-header",
+                "use-time-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "time-picker-pc",
+            "type": "registry:component",
+            "title": "TimePicker（PC 实现）",
+            "description": "Radix Popover 锚定浮层 + 可点击列表面板（listbox）：点选即生效、键盘方向键巡航、Home/End 跳边界、Esc 关闭，区间模式复用同一条端点切换条。",
+            "files": [
+                {
+                    "path": "components/pc/time-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/time-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "time-parts",
+                "use-time-value",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-popover"]
+        },
+        {
+            "name": "time-picker",
+            "type": "registry:component",
+            "title": "TimePicker 时间选择",
+            "description": "模式 C 分发层：H5 拖拽滚轮弹层 / PC 可点击列表面板。支持单值、区间、min/max 约束、列裁剪（时/分/秒任意子集）、格式化、清除。",
+            "files": [
+                {
+                    "path": "components/responsive/time-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/time-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-time-value",
+                "time-parts",
+                "time-picker-h5",
+                "time-picker-pc"
+            ]
+        },
+        {
+            "name": "use-datetime-value",
+            "type": "registry:hook",
+            "title": "日期时间值模型",
+            "description": "DateTimePicker 跨模式共用的『年月日时分秒』值逻辑：6 字段 parts、三档精度列归一（年月日时/时分/时分秒）、解析/格式化（日期+时间 token 并集）、跨日期的 min-max 逐字段级联夹紧、默认范围被已选值撑开、无值落「此刻」。纯函数，不含组件。",
+            "files": [
+                {
+                    "path": "hooks/use-datetime-value.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-datetime-value.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "datetime-parts",
+            "type": "registry:component",
+            "title": "DateTimePicker 共用零件",
+            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）与时间滚轮行（时/分/秒，补零两位，支持 band 居中高亮带 / solid 实心选中两种观感与键盘高亮列），以及面板 props 契约。H5 也用它渲染年/月/日列；PC 日期段是独立月历，滚轮行只承担时间列。外壳形态走 JS 分支（契约 17），不依赖祖先是否带 data-mode。",
+            "files": [
+                {
+                    "path": "components/ui/datetime-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/datetime-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-datetime-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "datetime-picker-h5",
+            "type": "registry:component",
+            "title": "DateTimePicker（H5 实现）",
+            "description": "底部弹层 + N 列拖拽滚轮（年/月/日 + 时/分/秒三档精度），惯性滚动 + 吸附对齐，顶部工具条（取消 · 标题 · 确定）+ 底部安全区；恒走暂存 → 确定。",
+            "files": [
+                {
+                    "path": "components/h5/datetime-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/datetime-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "datetime-parts",
+                "popup",
+                "panel-header",
+                "use-datetime-value",
+                "use-picker-column",
+                "tokens"
+            ]
+        },
+        {
+            "name": "datetime-picker-pc",
+            "type": "registry:component",
+            "title": "DateTimePicker（PC 实现）",
+            "description": "Radix Popover 锚定浮层：左侧月历网格（« < 年月 > » 年/月导航、星期头、6×7 定高网格、今天描边、越界日禁用），右侧时/分/秒 1~3 条实心时间列（宽度随精度），顶部右侧回显草稿时间，底部「此刻 / 确定」；面板级键盘分区驾驶（日期区 ←→ 走天 ↑↓ 走周 PgUp/PgDn 走月；时间区 ↑↓ 改值 ←→ 换列），Enter 确定、Esc 取消。",
+            "files": [
+                {
+                    "path": "components/pc/datetime-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/datetime-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "datetime-parts",
+                "use-datetime-value",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-popover"]
+        },
+        {
+            "name": "datetime-picker",
+            "type": "registry:component",
+            "title": "DateTimePicker 日期时间选择",
+            "description": "模式 C 分发层：H5 底部弹层里年/月/日/时/分/秒 N 列滚轮；PC 左月历网格 + 右侧时/分/秒实心时间列的锚定浮层。单值，三档精度（年月日时 / 年月日时分 / 年月日时分秒），值恒为 'YYYY-MM-DD HH[:mm[:ss]]' 字符串；支持 min/max 跨日期时刻约束、格式化、清除。",
+            "files": [
+                {
+                    "path": "components/responsive/datetime-picker.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/datetime-picker.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-datetime-value",
+                "datetime-parts",
+                "datetime-picker-h5",
+                "datetime-picker-pc"
+            ]
         }
     ]
 }

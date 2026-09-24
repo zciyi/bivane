@@ -68,6 +68,59 @@ export function alignTargetIfNeeded(
   return Math.abs(offset - target) > WHEEL_ALIGN_TOLERANCE ? target : null;
 }
 
+/** 按住微调钮后，等多久进入连发（先等一下，避免误触就连发） */
+export const PRESS_REPEAT_DELAY = 400;
+/** 连发态下两次步进的间隔 */
+export const PRESS_REPEAT_INTERVAL = 70;
+
+/**
+ * 「按住连发」手势：pointerdown 先立即触发一次（= 单击步进），
+ * 按住超过 PRESS_REPEAT_DELAY 后按 PRESS_REPEAT_INTERVAL 连续触发；
+ * pointerup / 移出 / 取消 / 卸载即停。
+ *
+ * action 用 ref 持有最新引用 —— 连发过程中可选区间/当前下标会随每次步进重算，
+ * 不能让 setTimeout 闭包锁住旧回调。
+ */
+export function usePressRepeat(action: () => void): {
+    start: () => void;
+    stop: () => void;
+} {
+    const actionRef = React.useRef(action);
+    actionRef.current = action;
+    const delayTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
+    const intervalTimerRef = React.useRef<ReturnType<
+        typeof setInterval
+    > | null>(null);
+
+    const stop = React.useCallback(() => {
+        if (delayTimerRef.current !== null) {
+            clearTimeout(delayTimerRef.current);
+            delayTimerRef.current = null;
+        }
+        if (intervalTimerRef.current !== null) {
+            clearInterval(intervalTimerRef.current);
+            intervalTimerRef.current = null;
+        }
+    }, []);
+
+    React.useEffect(() => stop, [stop]);
+
+    const start = React.useCallback(() => {
+        stop();
+        actionRef.current();
+        delayTimerRef.current = setTimeout(() => {
+            actionRef.current();
+            intervalTimerRef.current = setInterval(() => {
+                actionRef.current();
+            }, PRESS_REPEAT_INTERVAL);
+        }, PRESS_REPEAT_DELAY);
+    }, [stop]);
+
+    return { start, stop };
+}
+
 export interface UsePickerColumnOptions {
   /** 当前选中行下标（受控） */
   index: number;
