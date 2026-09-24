@@ -900,6 +900,168 @@
                 "datetime-picker-h5",
                 "datetime-picker-pc"
             ]
+        },
+        {
+            "name": "use-loading-store",
+            "type": "registry:hook",
+            "title": "Loading 状态存储",
+            "description": "命令式 Loading 的叠加队列与自动关闭计时（纯逻辑，不含组件，避免与渲染层互引成环）。",
+            "files": [
+                {
+                    "path": "hooks/use-loading-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-loading-store.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "loading-parts",
+            "type": "registry:component",
+            "title": "Loading 共用零件",
+            "description": "转圈（Tailwind 内置 animate-spin）与全屏遮罩布局；文本可选。遮罩浓度走 bg-bv-overlay 的模式 token。",
+            "files": [
+                {
+                    "path": "components/ui/loading-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/loading-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "use-loading-store",
+                "tokens"
+            ]
+        },
+        {
+            "name": "loading",
+            "type": "registry:component",
+            "title": "Loading 加载遮罩",
+            "description": "模式 A/B 分发层 + 双轨 API：全屏遮罩 + 居中转圈，两端视觉一致（仅遮罩浓度随模式）。showLoading / hideLoading / updateLoading，遮罩点击不关闭。",
+            "files": [
+                {
+                    "path": "components/responsive/loading.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/loading.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "portal",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "use-loading-store",
+                "loading-parts"
+            ]
+        },
+        {
+            "name": "use-notify-store",
+            "type": "registry:hook",
+            "title": "Notify 状态存储",
+            "description": "命令式 Notify 的队列、四态语义色与默认 3s 自动关闭计时（纯逻辑，不含组件）。",
+            "files": [
+                {
+                    "path": "hooks/use-notify-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-notify-store.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "notify-parts",
+            "type": "registry:component",
+            "title": "Notify 共用零件",
+            "description": "两模式共用的一条通知：H5 顶部通栏横幅（自上滑入）/ PC 右上角圆角卡片（自右滑入）。进场动画用两阶段挂载 + data-state，不新增 utilities.css 槽名。",
+            "files": [
+                {
+                    "path": "components/ui/notify-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/notify-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "use-notify-store",
+                "tokens"
+            ]
+        },
+        {
+            "name": "notify",
+            "type": "registry:component",
+            "title": "Notify 消息通知",
+            "description": "模式 C 分发层 + 双轨 API：H5 顶部横幅（单例，新的替换旧的）/ PC 右上角卡片栈（可多条并存）。showNotify / closeNotify / updateNotify，支持 primary/success/danger/warning 四态。",
+            "files": [
+                {
+                    "path": "components/responsive/notify.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/notify.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "portal",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "use-notify-store",
+                "notify-parts"
+            ]
+        },
+        {
+            "name": "use-action-sheet-store",
+            "type": "registry:hook",
+            "title": "ActionSheet 状态存储",
+            "description": "命令式 ActionSheet 的队列与配置更新（纯逻辑，不含组件）。",
+            "files": [
+                {
+                    "path": "hooks/use-action-sheet-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-action-sheet-store.ts"
+                }
+            ],
+            "registryDependencies": ["use-device-mode"]
+        },
+        {
+            "name": "action-sheet-parts",
+            "type": "registry:component",
+            "title": "ActionSheet 共用零件",
+            "description": "两模式共用的头部（标题/描述）、动作行与取消按钮。行高走 JS 分支（H5 48px / PC 36px），不使用 bv-h5:/bv-pc: 变体（契约第 19/20 条）。",
+            "files": [
+                {
+                    "path": "components/ui/action-sheet-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/action-sheet-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "use-action-sheet-store",
+                "tokens"
+            ]
+        },
+        {
+            "name": "action-sheet",
+            "type": "registry:component",
+            "title": "ActionSheet 动作面板",
+            "description": "模式 B 分发层 + 双轨 API：H5 底部弹层列表 + 取消按钮分离；PC 居中对话框纵向列表（PC 居中由 Popup 统一降级）。showActionSheet / closeActionSheet / updateActionSheet。",
+            "files": [
+                {
+                    "path": "components/responsive/action-sheet.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/action-sheet.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "popup",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "use-action-sheet-store",
+                "action-sheet-parts",
+                "tokens"
+            ]
         }
     ]
 }

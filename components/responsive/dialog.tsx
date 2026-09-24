@@ -449,7 +449,19 @@ export function showDialog(options: DialogOptions): DialogHandle {
   return showDialogEntry(options);
 }
 
-/** 命令式：打开确认对话框（默认带取消按钮） */
+/**
+ * 命令式：提示框（Alert 语义）
+ *
+ * 矩阵 §2.1 的 Alert/Confirm 复用 Dialog 底座：两者渲染逻辑与按钮序完全一致
+ * （H5 纵向「确认在上、取消在下」；PC 横向右对齐且主按钮在右），
+ * 差别只在默认是否带取消按钮 —— Alert 只有一个确认按钮。
+ */
+export function showAlertDialog(options: DialogOptions): DialogHandle {
+  ensureImperativeHost(DIALOG_HOST_KEY, <DialogHost auto />);
+  return showDialogEntry({ showCancelButton: false, ...options });
+}
+
+/** 命令式：打开确认对话框（Confirm 语义，默认带取消按钮） */
 export function showConfirmDialog(options: DialogOptions): DialogHandle {
   ensureImperativeHost(DIALOG_HOST_KEY, <DialogHost auto />);
   return showConfirmDialogEntry(options);

@@ -92,24 +92,32 @@ npx shadcn@latest add @bivane/select
 
 ## 二、在应用根部挂载
 
-命令式弹层（`showDialog` / `showToast`）需要一个宿主；声明式组件不需要。
+命令式弹层（`showDialog` / `showToast` / `showLoading` / `showNotify` / `showActionSheet`）需要一个宿主；声明式组件不需要。
 
 ```tsx
 // main.tsx
 import { ResponsiveProvider } from "@/components/providers/responsive-provider";
 import { DialogHost } from "@/components/responsive/dialog";
 import { ToastHost } from "@/components/responsive/toast";
+import { LoadingHost } from "@/components/responsive/loading";
+import { NotifyHost } from "@/components/responsive/notify";
+import { ActionSheetHost } from "@/components/responsive/action-sheet";
 
 createRoot(document.getElementById("root")!).render(
     <ResponsiveProvider breakpoint={768}>
         <App />
-        <DialogHost /> {/* 命令式对话框的宿主 */}
-        <ToastHost /> {/* Toast 的宿主 */}
+        <DialogHost />      {/* 命令式对话框的宿主 */}
+        <ToastHost />       {/* Toast 的宿主 */}
+        <LoadingHost />     {/* 命令式 Loading 的宿主 */}
+        <NotifyHost />      {/* 命令式 Notify 的宿主 */}
+        <ActionSheetHost /> {/* 命令式 ActionSheet 的宿主 */}
     </ResponsiveProvider>,
 );
 ```
 
-`ResponsiveProvider` 挂在 `DialogHost` / `ToastHost` **上面**，宿主才能继承到断点配置。
+**这些宿主都是可选的**：不挂载时，命令式 API 会自动创建一个独立 React root（此时断点是默认的 `768`）。手动挂载的唯一目的是让命令式弹层继承你的 `<ResponsiveProvider>` 配置。
+
+`ResponsiveProvider` 挂在各个 Host **上面**，宿主才能继承到断点配置。
 
 | Provider prop | 说明                                                                               |
 | ------------- | ---------------------------------------------------------------------------------- |
@@ -321,6 +329,115 @@ showToast("第二条");
 ```
 
 **两端差异（同一组调用，信息模型不同）**：H5 是顶部居中胶囊、白字深底、**单例**——连发两条只看到第二条；PC 是右上角卡片栈、白底彩色图标、**可多条并存**并带关闭按钮。
+
+### ActionSheet
+
+```tsx
+import { ActionSheet, showActionSheet } from "@/components/responsive/action-sheet";
+
+// 声明式
+<ActionSheet
+    open={open}
+    onOpenChange={setOpen}
+    title="标题"
+    description="描述信息"
+    actions={[
+        { name: "选项一" },
+        { name: "选项二", subname: "副文案" },
+        { name: "删除", color: "var(--bv-danger)" },
+        { name: "禁用项", disabled: true },
+    ]}
+    onSelect={(action, index) => showToast(`选中第 ${index} 项`)}
+    onCancel={() => showToast("已取消")}
+/>;
+
+// 命令式（不进 JSX）
+showActionSheet({
+    title: "操作",
+    actions: [{ name: "删除", color: "var(--bv-danger)" }],
+    onSelect: (action) => showSuccessToast(`已${action.name}`),
+});
+```
+
+| prop                  | 默认     | 说明                                             |
+| --------------------- | -------- | ------------------------------------------------ |
+| `actions`             | —        | 动作列表，支持 `subname` / `color` / `disabled` / `loading` |
+| `title` / `description` | —      | 头部标题与描述，都为空时不渲染头部               |
+| `cancelText`          | `取消`   | 取消按钮文案；传 `null` 隐藏                     |
+| `closeOnClickAction`  | `true`   | 点选项后自动关闭；单项可用 `closeOnClick` 覆盖   |
+
+**两端差异**：H5 是底部弹层（项高 48px、取消按钮与列表分离）；PC 是居中对话框纵向列表（项高 36px）。**PC 的居中由 Popup 统一降级**，本组件两端都只写 `position="bottom"` —— 这是模式 B。
+
+### Loading
+
+```tsx
+import { showLoading, hideLoading, updateLoading } from "@/components/responsive/loading";
+
+// 默认常驻，必须显式关闭
+const handle = showLoading({ text: "加载中" });
+updateLoading(handle.id, { text: "努力加载…" });
+handle.close();      // 关这一条
+hideLoading();       // 关全部
+
+// 传 duration 可自动关闭
+showLoading({ text: "1.5s 后消失", duration: 1500 });
+
+// 声明式
+<Loading open={loading} text="加载中" />;
+```
+
+| prop          | 默认   | 说明                                                     |
+| ------------- | ------ | -------------------------------------------------------- |
+| `text`        | —      | 提示文案；不传只显示转圈                                 |
+| `mask`        | `true` | 是否渲染遮罩                                             |
+| `forbidClick` | `false`| 遮罩是否穿透点击（不阻断下层操作）                       |
+| `duration`    | —      | 自动关闭毫秒数；不传则常驻                               |
+
+**两端差异**：两端视觉一致（全屏遮罩 + 居中转圈），仅遮罩浓度随模式（H5 `rgba(0,0,0,.7)` / PC `rgba(0,0,0,.45)`）。**点遮罩不会关闭**，必须显式 `hideLoading`。
+
+### Notify
+
+```tsx
+import { showNotify, closeNotify } from "@/components/responsive/notify";
+
+showNotify("危险提示");                                   // 默认 danger，3s 自动关闭
+showNotify({ message: "操作成功", type: "success", duration: 2000 });
+showNotify({ message: "常驻通知", duration: 0 });          // 不自动关闭
+showNotify({ message: "自定义配色", background: "#7232dd" });
+
+const handle = showNotify({ message: "稍后手动关" });
+handle.close();
+closeNotify(); // 关全部
+```
+
+`type` 可选 `primary` · `success` · `danger`（默认） · `warning`；`color` / `background` 可覆盖语义配色。
+
+**两端差异**：H5 是顶部**通栏横幅**、自上方滑入、**单例**（新的替换旧的）；PC 是右上角圆角**卡片栈**、自右侧滑入、**可多条并存**并带关闭按钮。
+
+### Alert / Confirm
+
+复用 Dialog 底座，只是默认按钮组合不同 —— Alert 只有一个确认按钮，Confirm 带取消。
+
+```tsx
+import { showAlertDialog, showConfirmDialog } from "@/components/responsive/dialog";
+
+showAlertDialog({
+    title: "提示",
+    message: "只有一个确认按钮。",
+    onConfirm: () => showToast("已确认"),
+});
+
+showConfirmDialog({
+    title: "删除确认",
+    message: "删除后不可恢复。",
+    confirmText: "删除",
+    cancelText: "再想想",
+    onConfirm: () => showSuccessToast("已删除"),
+    onCancel: () => showToast("已取消"),
+});
+```
+
+**两端差异**：与 Dialog 完全一致 —— H5 底部抽屉、按钮纵向（**确认在上、取消在下**）；PC 居中模态、按钮横向右对齐（**主按钮在最右**）。
 
 ### Select
 

@@ -18,7 +18,7 @@
 |---|---|---|
 | P0 | token 层 / 模式判定 / Button · Cell · CellGroup · Tag · Badge · Icon | ✅ 已完成 |
 | P1 | 弹层地基（portal · imperative-host · overlay · 滚动锁 · 手势）+ **Popup · Dialog · Toast** | ✅ 已完成 |
-| P1′ | ActionSheet · Alert/Confirm · Notify · Loading | ⬜ 待做 |
+| P1′ | ActionSheet · Alert/Confirm · Notify · Loading | ✅ 已完成 |
 | P2 | **Select** ✅ · **DropdownMenu** ✅ · **DatePicker** ✅ · **TimePicker** ✅ · Picker · Calendar · Tooltip · Popover | 🔄 进行中（4/8） |
 | P3 | 表单类 · Uploader · Search · Tabs · List/Table | ⬜ 待开始 |
 | P4 | 多风格 · tweakcn 适配 · 文档站 · registry 发布 | ⬜ 待开始 |

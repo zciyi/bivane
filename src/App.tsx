@@ -10,6 +10,7 @@ import { useDeviceMode, useDeviceModeAttrs } from "@/hooks/use-device-mode";
 import {
     Dialog,
     DialogHost,
+    showAlertDialog,
     showConfirmDialog,
     showDialog,
 } from "@/components/responsive/dialog";
@@ -29,6 +30,24 @@ import {
     showSuccessToast,
     showToast,
 } from "@/components/responsive/toast";
+import {
+    Loading,
+    LoadingHost,
+    hideLoading,
+    showLoading,
+    updateLoading,
+} from "@/components/responsive/loading";
+import {
+    NotifyHost,
+    closeNotify,
+    showNotify,
+} from "@/components/responsive/notify";
+import {
+    ActionSheet,
+    ActionSheetHost,
+    showActionSheet,
+    type ActionSheetAction,
+} from "@/components/responsive/action-sheet";
 
 /**
  * P0/P1 验证台
@@ -175,6 +194,14 @@ const GROUPED_CITY_OPTIONS: SelectItem[] = [
  * 菜单树：刻意同时包含「叶子项 / 二级菜单 / 分隔线 / 危险项 / 禁用项 / 快捷键」六种形态，
  * 否则两端的差异（推入 vs 右展、48 vs 36、有没有 kbd）在验证台上根本触发不到。
  */
+/** ActionSheet 示例动作：刻意混入副文案 / 禁用 / 危险色，验证行内三种状态在两端的表现 */
+const SHEET_ACTIONS: ActionSheetAction[] = [
+    { name: "分享给好友" },
+    { name: "复制链接", subname: "有效期 7 天" },
+    { name: "置顶（禁用）", disabled: true },
+    { name: "删除", color: "var(--bv-danger)" },
+];
+
 const MENU_ITEMS: MenuItem[] = [
     {
         value: "edit",
@@ -228,6 +255,10 @@ function Playground() {
     });
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [longDialogOpen, setLongDialogOpen] = React.useState(false);
+
+    // P1′ 反馈组件示例状态（声明式那一轨的受控开关）
+    const [loadingOpen, setLoadingOpen] = React.useState(false);
+    const [sheetOpen, setSheetOpen] = React.useState(false);
 
     // P2 DropdownMenu「可选值」示例的受控值：默认取**嵌套**叶子，
     // 好让「触发器回填完整层级路径」这条行为在页面上直接看得见
@@ -628,6 +659,272 @@ function Playground() {
                             {mode === "mobile"
                                 ? "顶部居中胶囊、白字深底、单例（连发两条只看到第二条）、2s 自动消失"
                                 : "右上角卡片栈、白底彩色图标、可多条并存、带关闭按钮"}
+                        </p>
+                    </Block>
+                </Section>
+
+                <Section title="P1′ · Loading 加载（模式 A：两端同形态，仅遮罩浓度不同）">
+                    <Block className="flex flex-col gap-bv-gutter">
+                        <Row>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    const handle = showLoading({
+                                        text: "加载中",
+                                        forbidClick: true,
+                                    });
+                                    setTimeout(() => hideLoading(handle.id), 1500);
+                                }}
+                            >
+                                命令式 · 1.5s 后关闭
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    const handle = showLoading({
+                                        text: "步骤 1/3",
+                                    });
+                                    setTimeout(
+                                        () =>
+                                            updateLoading(handle.id, {
+                                                text: "步骤 2/3",
+                                            }),
+                                        700,
+                                    );
+                                    setTimeout(
+                                        () =>
+                                            updateLoading(handle.id, {
+                                                text: "步骤 3/3",
+                                            }),
+                                        1400,
+                                    );
+                                    setTimeout(() => hideLoading(handle.id), 2100);
+                                }}
+                            >
+                                动态改文案
+                            </Button>
+                            <Button onClick={() => showLoading({ duration: 1200 })}>
+                                无文案 · 1.2s 自关
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setLoadingOpen(true);
+                                    setTimeout(() => setLoadingOpen(false), 2000);
+                                }}
+                            >
+                                声明式 · 2s 后自关
+                            </Button>
+                            <Button type="danger" onClick={() => hideLoading()}>
+                                关闭全部
+                            </Button>
+                        </Row>
+                        <p className="text-bv-sm text-bv-text-2">
+                            当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
+                            两端都是全屏遮罩 + 居中转圈，差异只有遮罩浓度（H5 .7 / PC
+                            .45，由 bg-bv-overlay 的模式覆盖给出）。
+                            默认常驻，必须显式 hideLoading(id) 或给 duration；
+                            forbidClick 默认 false（对齐 Vant，不阻断下层），传 true
+                            才吃事件。
+                        </p>
+                    </Block>
+                </Section>
+
+                <Section title="P1′ · Notify 消息通知（模式 C：顶部横幅 vs 右上角角标）">
+                    <Block className="flex flex-col gap-bv-gutter">
+                        <Row>
+                            <Button onClick={() => showNotify("默认类型（danger）")}>
+                                默认
+                            </Button>
+                            <Button
+                                type="primary"
+                                onClick={() =>
+                                    showNotify({
+                                        type: "primary",
+                                        message: "这是一条主要通知",
+                                    })
+                                }
+                            >
+                                primary
+                            </Button>
+                            <Button
+                                type="success"
+                                onClick={() =>
+                                    showNotify({
+                                        type: "success",
+                                        message: "保存成功",
+                                    })
+                                }
+                            >
+                                success
+                            </Button>
+                            <Button
+                                type="warning"
+                                onClick={() =>
+                                    showNotify({
+                                        type: "warning",
+                                        message: "网络不稳定",
+                                    })
+                                }
+                            >
+                                warning
+                            </Button>
+                            <Button
+                                type="danger"
+                                onClick={() =>
+                                    showNotify({
+                                        type: "danger",
+                                        message: "删除失败",
+                                    })
+                                }
+                            >
+                                danger
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    showNotify({
+                                        type: "primary",
+                                        message: "常驻通知 · 点 ✕ 关闭",
+                                        duration: 0,
+                                    })
+                                }
+                            >
+                                常驻（duration=0）
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    showNotify("第一条");
+                                    showNotify("第二条");
+                                    showNotify("第三条");
+                                }}
+                            >
+                                连发三条
+                            </Button>
+                            <Button onClick={() => closeNotify()}>关闭全部</Button>
+                        </Row>
+                        <p className="text-bv-sm text-bv-text-2">
+                            当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
+                            {mode === "mobile"
+                                ? "顶部通栏横幅、自上方滑入、单例（连发三条只看到最后一条）、3s 自动消失、无关闭按钮"
+                                : "右上角圆角卡片栈、自右侧滑入、可多条并存、每条带关闭按钮"}
+                            。duration=0 时常驻，H5 也会补一个 ✕ 出口。
+                        </p>
+                    </Block>
+                </Section>
+
+                <Section title="P1′ · ActionSheet 动作面板（模式 B：底部弹层 vs 居中对话框）">
+                    <Block className="flex flex-col gap-bv-gutter">
+                        <Row>
+                            <Button
+                                type="primary"
+                                onClick={() =>
+                                    showActionSheet({
+                                        title: "选择操作",
+                                        description: "同一份 actions，两端只换壳",
+                                        actions: SHEET_ACTIONS,
+                                        onSelect: (action) =>
+                                            showToast(`选中 ${String(action.name)}`),
+                                    })
+                                }
+                            >
+                                命令式 · 带标题
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    showActionSheet({
+                                        actions: SHEET_ACTIONS,
+                                        onSelect: (action) =>
+                                            showToast(`选中 ${String(action.name)}`),
+                                        onCancel: () => showToast("已取消"),
+                                    })
+                                }
+                            >
+                                命令式 · 无标题
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    showActionSheet({
+                                        title: "没有取消按钮",
+                                        actions: SHEET_ACTIONS.slice(0, 2),
+                                        cancelText: false,
+                                        closeOnClickOverlay: false,
+                                    })
+                                }
+                            >
+                                无取消 + 点遮罩不关
+                            </Button>
+                            <Button
+                                type="danger"
+                                onClick={() =>
+                                    showActionSheet({
+                                        title: "异步动作",
+                                        actions: [
+                                            {
+                                                name: "导出报表",
+                                                loading: true,
+                                                closeOnClick: false,
+                                            },
+                                            {
+                                                name: "删除记录",
+                                                color: "var(--bv-danger)",
+                                            },
+                                        ],
+                                        onSelect: (action) =>
+                                            showToast(`选中 ${String(action.name)}`),
+                                    })
+                                }
+                            >
+                                loading 项（禁用）+ 危险色项
+                            </Button>
+                            <Button onClick={() => setSheetOpen(true)}>
+                                声明式（受控 open）
+                            </Button>
+                        </Row>
+                        <p className="text-bv-sm text-bv-text-2">
+                            当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
+                            {mode === "mobile"
+                                ? "底部弹层、项高 48px、取消按钮与列表分离、点遮罩/ESC 关闭"
+                                : "居中对话框纵向列表、项高 36px（桌面密度）"}
+                            。两端 props 完全一致，居中降级由 Popup 统一承担。
+                        </p>
+                    </Block>
+                </Section>
+
+                <Section title="P1′ · Alert / Confirm（复用 Dialog 底座）">
+                    <Block className="flex flex-col gap-bv-gutter">
+                        <Row>
+                            <Button
+                                type="primary"
+                                onClick={() =>
+                                    showAlertDialog({
+                                        title: "提示",
+                                        message:
+                                            "Alert 语义：只有一个确认按钮（showCancelButton 默认 false）。",
+                                        confirmText: "我知道了",
+                                    })
+                                }
+                            >
+                                showAlertDialog
+                            </Button>
+                            <Button
+                                type="danger"
+                                onClick={() =>
+                                    showConfirmDialog({
+                                        title: "删除确认",
+                                        message: "Confirm 语义：默认带取消按钮。",
+                                        confirmText: "删除",
+                                        cancelText: "再想想",
+                                        onConfirm: () =>
+                                            showSuccessToast("已删除"),
+                                        onCancel: () => showToast("已取消"),
+                                    })
+                                }
+                            >
+                                showConfirmDialog
+                            </Button>
+                        </Row>
+                        <p className="text-bv-sm text-bv-text-2">
+                            Alert 与 Confirm 共用同一渲染逻辑与按钮序（H5
+                            纵向「确认在上、取消在下」；PC
+                            横向右对齐、主按钮在右），差别只在默认是否带取消按钮。
                         </p>
                     </Block>
                 </Section>
@@ -1293,6 +1590,18 @@ function Playground() {
                         ))}
                     </div>
                 </Dialog>
+
+                {/* ---------- P1′ 声明式反馈组件（命令式与声明式共用同一渲染逻辑） ---------- */}
+
+                <Loading open={loadingOpen} text="声明式 loading" forbidClick />
+
+                <ActionSheet
+                    open={sheetOpen}
+                    onOpenChange={setSheetOpen}
+                    title="声明式动作面板"
+                    actions={SHEET_ACTIONS}
+                    onSelect={(action) => showToast(`选中 ${String(action.name)}`)}
+                />
             </div>
         </div>
     );
@@ -1305,6 +1614,10 @@ export function App() {
             {/* 命令式弹层的宿主：挂在这里可继承上面的 Provider 配置（断点 768） */}
             <DialogHost />
             <ToastHost />
+            {/* P1′ 反馈组件的命令式宿主（同上，挂在 Provider 内才能继承断点） */}
+            <LoadingHost />
+            <NotifyHost />
+            <ActionSheetHost />
         </ResponsiveProvider>
     );
 }
