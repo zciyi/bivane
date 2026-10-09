@@ -17,11 +17,12 @@ import {
  * Bivane DateTimePicker · 分发层
  *
  * ┌ H5 ── 年/月/日 + 时/分/秒 N 列滚轮（4/5/6 列），底部弹层 + 顶部工具条
- * └ PC ── 左月历网格（« < 年月 > »）选日期 + 右侧时/分/秒 1~3 条时间列，
- *         band 居中上下双线指示选中值，锚定浮层，顶部回显草稿时间，底部「此刻 / 确定」
+ * └ PC ── 左月历网格（« < 年月 > »）选日期 + 右侧时/分/秒 1~3 条居中滚轮列
+ *         （选中行上下发丝线，列顶/尾 ▲▼ 按住连发），锚定浮层，顶部回显草稿
+ *         时间，底部「此刻 / 确定」
  *
  * 与 DatePicker 同族的模式 C：日期段范式不同（滚轮 vs 月历），时间段两端共用
- * 同一滚轮列（PC 时间列也走 band 样式，不再用 solid 实心选中块）；恒走「暂存 → 确定」。
+ * 同一滚轮列（PC 多挂微调钮与列间竖线）；恒走「暂存 → 确定」。
  *
  * 单值组件（对齐 Vant DatetimePicker）：值恒为字符串，
  *   'YYYY-MM-DD HH' / 'YYYY-MM-DD HH:mm' / 'YYYY-MM-DD HH:mm:ss' 三档之一。
@@ -117,14 +118,15 @@ export const DateTimePicker = React.forwardRef<
         format: resolvedFormat,
     });
 
-    // 单值草稿：打开时播种已选值，没有则播种「此刻」；关闭清空，半截草稿不跨次复活
+    // 单值草稿：打开时播种已选值，没有则播种「此刻」。
+    // 关闭时**不能清空**：Popover/Popup 有退出动画，动画期间面板仍在渲染 draft，
+    // 一旦清空，resolveCursor 会回落到「此刻」，月历与时间列在关闭前 visibly 跳一下
+    // （现象：再点触发器关闭时「闪到当前时间」）。下次打开会无条件重新播种，
+    // 半截草稿不会跨次复活，因此保留它没有副作用。
     const [draft, setDraft] = React.useState<string[]>([]);
 
     React.useEffect(() => {
-        if (!open) {
-            setDraft([]);
-            return;
-        }
+        if (!open) return;
         setDraft([
             selected[0] ?? formatParts(nowDateTimeParts(), resolvedFormat),
         ]);

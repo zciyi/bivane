@@ -21,10 +21,11 @@ import {
 /**
  * Bivane DateTimePicker · 跨模式共用零件
  *
- * 两端共用：触发器 + **时间滚轮行（时/分/秒，含滚轮列）**。
- * H5 的年/月/日也是滚轮（整条 4~6 列铺在底部弹层）；PC 的日期段则是独立月历
- * （见 components/pc/datetime-picker.tsx），这里的滚轮行只渲染时间列、用 solid 观感。
- * 因此组件归属与 DatePicker 同族的**模式 C**：时间段同范式（只换选中观感），日期段换范式。
+ * 两端共用：触发器 + **滚轮行（含滚轮列）**。
+ * H5 的年/月/日/时/分/秒整条 4~6 列铺在底部弹层；PC 的日期段是独立月历
+ * （见 components/pc/datetime-picker.tsx），滚轮行只渲染时/分/秒时间列。
+ * 因此组件归属与 DatePicker 同族的**模式 C**：时间段两端共用同一个居中双横线滚轮列，
+ * 日期段换范式。PC 时间列额外挂 ▲▼ 微调钮（stepButtons，按住连发），H5 不挂。
  *
  * 本文件不使用 bv-h5:/bv-pc: 变体：变体编译成后代选择器，触发器渲染在用户页面里、
  * 未必有 data-mode 祖先。外壳差异走显式 JS 分支（架构契约 17，与 time-parts 同做法）。
@@ -249,13 +250,6 @@ function formatColumnValue(key: DateTimeColumnKey, value: number): string {
     return key === "year" ? String(value) : pad2(value);
 }
 
-/**
- * 选中态观感：
- *  - band：滚轮居中上下双线指示，不填充背景（H5 与 PC 时间列当前样式）；
- *  - solid：当前值独立实心色块（保留实现，当前无消费者使用）。
- */
-export type WheelSelectionStyle = "band" | "solid";
-
 export interface DateTimeWheelColumnProps {
     mode: DeviceMode;
     /** 无障碍名称，如「年」 */
@@ -265,16 +259,17 @@ export interface DateTimeWheelColumnProps {
     value: number;
     columnKey: DateTimeColumnKey;
     disabled?: boolean;
-    /** 键盘光标所在列（仅 PC 传）：原点亮高亮带，现统一只用上下双线指示 */
+    /** 键盘光标所在列（仅 PC 传） */
     active?: boolean;
-    selectionStyle?: WheelSelectionStyle;
-    /** solid 下列左侧的发丝分隔线（由行按「非首列」传入，首列左边贴着月历边框） */
+    /** 列左侧的发丝分隔线（由行按「非首列」传入，首列左边贴着月历边框） */
     divider?: boolean;
+    /** 列顶/列尾渲染 ▲▼ 微调钮（仅 PC 时间列传 true，H5 不挂） */
+    stepButtons?: boolean;
     onValueChange: (value: number) => void;
 }
 
 /**
- * solid 时间列顶/尾的微调钮（▲ / ▼）：单击 ±1，**按住连发**（usePressRepeat）。
+ * 滚轮列顶/尾的微调钮（▲ / ▼）：单击 ±1，**按住连发**（usePressRepeat）。
  * 到可选区间端点时隐藏（disabled:invisible，绝对定位无布局位移）。
  * 只响应主键 pointerdown，不进 Tab 流 —— 键盘驾驶由面板统一处理，避免双路步进。
  */
@@ -336,13 +331,12 @@ export const DateTimeWheelColumn = React.forwardRef<
         columnKey,
         disabled = false,
         active = false,
-        selectionStyle = "band",
         divider = false,
+        stepButtons = false,
         onValueChange,
     },
     ref,
 ) {
-    const solid = selectionStyle === "solid";
     const index = React.useMemo(() => {
         const found = values.indexOf(value);
         return found >= 0 ? found : 0;
@@ -388,8 +382,8 @@ export const DateTimeWheelColumn = React.forwardRef<
         }
     }, [values.length, containerRef]);
 
-    // solid 是顶对齐的普通滚动列表（选中项吸顶），不要居中滚轮的上下补位
-    const padding = solid ? 0 : wheelPadding(itemHeight, WHEEL_VISIBLE_ROWS);
+    // 首尾各补两行空白，让任意选项都能滚到正中（5 行制居中滚轮）
+    const padding = wheelPadding(itemHeight, WHEEL_VISIBLE_ROWS);
 
     return (
         <div
@@ -398,7 +392,6 @@ export const DateTimeWheelColumn = React.forwardRef<
             role="listbox"
             aria-label={label}
             data-slot="datetime-picker-wheel"
-            data-variant={solid ? "solid" : "band"}
             data-active={active ? "true" : undefined}
             className={cn(
                 "relative min-w-0 flex-1 overflow-hidden",
@@ -406,31 +399,27 @@ export const DateTimeWheelColumn = React.forwardRef<
             )}
             style={{ height: alignOffset(WHEEL_VISIBLE_ROWS, itemHeight) }}
         >
-            {solid ? null : (
-                <div
-                    aria-hidden="true"
-                    data-slot="datetime-picker-wheel-indicator"
-                    className={cn(
-                        // z-0：选中指示线画在数字下面，保持居中两条线、不填充背景
-                        "pointer-events-none absolute inset-x-0 z-0",
-                        "border-y border-[var(--bv-datetime-picker-wheel-line-color)]",
-                    )}
-                    style={{
-                        top: alignOffset(2, itemHeight),
-                        height: itemHeight,
-                    }}
-                />
-            )}
+            <div
+                aria-hidden="true"
+                data-slot="datetime-picker-wheel-indicator"
+                className={cn(
+                    // z-0：双横线画在数字下面；只留上下发丝线、不铺底色
+                    // （选中态靠居中位置 + 加粗文本表达，对齐 Vant Picker）
+                    "pointer-events-none absolute inset-x-0 z-0",
+                    "border-y border-[var(--bv-datetime-picker-wheel-line-color)]",
+                )}
+                style={{
+                    top: alignOffset(2, itemHeight),
+                    height: itemHeight,
+                }}
+            />
 
             <div
                 ref={containerRef}
                 onScroll={onScroll}
                 data-bv-scroll-container=""
                 data-slot="datetime-picker-wheel-scroller"
-                className={cn(
-                    "relative z-[1] h-full w-full overflow-y-auto overscroll-contain",
-                    !solid && "snap-y snap-mandatory",
-                )}
+                className="relative z-[1] h-full w-full snap-y snap-mandatory overflow-y-auto overscroll-contain"
                 style={{ paddingTop: padding, paddingBottom: padding }}
             >
                 {values.map((item, itemIndex) => {
@@ -452,22 +441,12 @@ export const DateTimeWheelColumn = React.forwardRef<
                                 onValueChange(item);
                             }}
                             className={cn(
-                                "flex w-full cursor-pointer items-center justify-center border-0 bg-transparent",
+                                "flex w-full cursor-pointer snap-center items-center justify-center border-0 bg-transparent",
                                 "h-[var(--bv-datetime-picker-wheel-item-height)]",
                                 "text-bv-md leading-[var(--bv-datetime-picker-wheel-item-line-height)]",
-                                solid
-                                    ? cn(
-                                          "mx-1 box-border w-[calc(100%-0.5rem)] snap-start rounded-[var(--bv-datetime-picker-pc-wheel-radius)]",
-                                          selected
-                                              ? "bg-[var(--bv-datetime-picker-pc-wheel-selected-background)] font-bold text-[var(--bv-datetime-picker-pc-wheel-selected-color)]"
-                                              : "text-[var(--bv-datetime-picker-wheel-color)] hover:bg-[var(--bv-datetime-picker-pc-cell-hover-background)]",
-                                      )
-                                    : cn(
-                                          "snap-center",
-                                          selected
-                                              ? "font-bold text-[var(--bv-datetime-picker-wheel-selected-color)]"
-                                              : "text-[var(--bv-datetime-picker-wheel-color)]",
-                                      ),
+                                selected
+                                    ? "font-bold text-[var(--bv-datetime-picker-wheel-selected-color)]"
+                                    : "text-[var(--bv-datetime-picker-wheel-color)]",
                                 disabled && "cursor-not-allowed",
                             )}
                         >
@@ -477,27 +456,23 @@ export const DateTimeWheelColumn = React.forwardRef<
                 })}
             </div>
 
-            {solid ? null : (
-                <>
-                    <div
-                        aria-hidden="true"
-                        data-slot="datetime-picker-wheel-mask"
-                        data-mask="top"
-                        className="pointer-events-none absolute inset-x-0 top-0 z-[2]"
-                        style={{ height: alignOffset(2, itemHeight) }}
-                    />
-                    <div
-                        aria-hidden="true"
-                        data-slot="datetime-picker-wheel-mask"
-                        data-mask="bottom"
-                        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] rotate-180"
-                        style={{ height: alignOffset(2, itemHeight) }}
-                    />
-                </>
-            )}
+            <div
+                aria-hidden="true"
+                data-slot="datetime-picker-wheel-mask"
+                data-mask="top"
+                className="pointer-events-none absolute inset-x-0 top-0 z-[2]"
+                style={{ height: alignOffset(2, itemHeight) }}
+            />
+            <div
+                aria-hidden="true"
+                data-slot="datetime-picker-wheel-mask"
+                data-mask="bottom"
+                className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] rotate-180"
+                style={{ height: alignOffset(2, itemHeight) }}
+            />
 
-            {/* solid（PC）：列顶/列尾微调钮，按住可连发 */}
-            {solid && (
+            {/* PC 时间列：列顶/列尾微调钮，按住可连发（H5 不挂） */}
+            {stepButtons && (
                 <>
                     <WheelStepButton
                         direction="up"
@@ -524,8 +499,10 @@ export interface DateTimeWheelRowProps {
     disabled?: boolean;
     /** 键盘光标所在列下标；H5 不传 */
     activeColumnIndex?: number;
-    /** 选中态观感，默认居中高亮带；PC 月历旁的时间列传 'solid' */
-    selectionStyle?: WheelSelectionStyle;
+    /** 每列顶/尾挂 ▲▼ 微调钮（仅 PC 时间列） */
+    stepButtons?: boolean;
+    /** 非首列左侧画发丝竖线（仅 PC 月历旁的时间列；H5 通栏滚轮不画） */
+    dividers?: boolean;
     onColumnChange: (key: DateTimeColumnKey, value: number) => void;
     className?: string;
 }
@@ -547,7 +524,8 @@ export const DateTimeWheelRow = React.forwardRef<
         maxParts,
         disabled = false,
         activeColumnIndex,
-        selectionStyle = "band",
+        stepButtons = false,
+        dividers = false,
         onColumnChange,
         className,
     },
@@ -581,9 +559,9 @@ export const DateTimeWheelRow = React.forwardRef<
                     value={column.value}
                     disabled={disabled}
                     active={index === activeColumnIndex}
-                    selectionStyle={selectionStyle}
-                    // solid 下非首列画左侧发丝线（截图里时/分/秒列之间的竖线）
-                    divider={selectionStyle === "solid" && index > 0}
+                    stepButtons={stepButtons}
+                    // PC 时间列非首列画左侧发丝竖线（截图里时/分/秒列之间的线）
+                    divider={dividers && index > 0}
                     onValueChange={(item) => onColumnChange(column.key, item)}
                 />
             ))}

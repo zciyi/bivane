@@ -822,7 +822,7 @@
             "name": "datetime-parts",
             "type": "registry:component",
             "title": "DateTimePicker 共用零件",
-            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）与时间滚轮行（时/分/秒，补零两位，支持 band 居中上下双线 / solid 实心选中两种观感），以及面板 props 契约。H5 也用它渲染年/月/日列；PC 日期段是独立月历，滚轮行只承担时间列。外壳形态走 JS 分支（契约 17），不依赖祖先是否带 data-mode。",
+            "description": "两模式共用的触发器（PC 描边圆角盒、H5 Cell 通栏）与滚轮行（年/月/日/时/分/秒，补零两位，5 行制居中双横线选中），以及面板 props 契约。H5 用它渲染整条 4~6 列；PC 日期段是独立月历，滚轮行只承担时/分/秒时间列并可挂 ▲▼ 按住连发微调钮与列间竖线。外壳形态走 JS 分支（契约 17），不依赖祖先是否带 data-mode。",
             "files": [
                 {
                     "path": "components/ui/datetime-parts.tsx",
@@ -864,7 +864,7 @@
             "name": "datetime-picker-pc",
             "type": "registry:component",
             "title": "DateTimePicker（PC 实现）",
-            "description": "Radix Popover 锚定浮层：左侧月历网格（« < 年月 > » 年/月导航、星期头、6×7 定高网格、今天描边、越界日禁用），右侧时/分/秒 1~3 条实心时间列（宽度随精度），顶部右侧回显草稿时间，底部「此刻 / 确定」；面板级键盘分区驾驶（日期区 ←→ 走天 ↑↓ 走周 PgUp/PgDn 走月；时间区 ↑↓ 改值 ←→ 换列），Enter 确定、Esc 取消。",
+            "description": "Radix Popover 锚定浮层：左侧月历网格（« < 年月 > » 年/月导航、星期头、6×7 定高网格、今天描边、越界日禁用），右侧时/分/秒 1~3 条居中双横线滚轮列（宽度随精度，列顶/尾 ▲▼ 单击 ±1、按住连发，列间竖发丝线），顶部右侧回显草稿时间，底部「此刻 / 确定」；面板级键盘分区驾驶（日期区 ←→ 走天 ↑↓ 走周 PgUp/PgDn 走月；时间区 ↑↓ 改值 ←→ 换列），Enter 确定、Esc 取消。",
             "files": [
                 {
                     "path": "components/pc/datetime-picker.tsx",
@@ -884,7 +884,7 @@
             "name": "datetime-picker",
             "type": "registry:component",
             "title": "DateTimePicker 日期时间选择",
-            "description": "模式 C 分发层：H5 底部弹层里年/月/日/时/分/秒 N 列滚轮；PC 左月历网格 + 右侧时/分/秒实心时间列的锚定浮层。单值，三档精度（年月日时 / 年月日时分 / 年月日时分秒），值恒为 'YYYY-MM-DD HH[:mm[:ss]]' 字符串；支持 min/max 跨日期时刻约束、格式化、清除。",
+            "description": "模式 C 分发层：H5 底部弹层里年/月/日/时/分/秒 N 列滚轮；PC 左月历网格 + 右侧时/分/秒居中双横线滚轮列（▲▼ 按住连发）的锚定浮层。单值，三档精度（年月日时 / 年月日时分 / 年月日时分秒），值恒为 'YYYY-MM-DD HH[:mm[:ss]]' 字符串；支持 min/max 跨日期时刻约束、格式化、清除。",
             "files": [
                 {
                     "path": "components/responsive/datetime-picker.tsx",
@@ -899,168 +899,6 @@
                 "datetime-parts",
                 "datetime-picker-h5",
                 "datetime-picker-pc"
-            ]
-        },
-        {
-            "name": "use-loading-store",
-            "type": "registry:hook",
-            "title": "Loading 状态存储",
-            "description": "命令式 Loading 的叠加队列与自动关闭计时（纯逻辑，不含组件，避免与渲染层互引成环）。",
-            "files": [
-                {
-                    "path": "hooks/use-loading-store.ts",
-                    "type": "registry:hook",
-                    "target": "hooks/use-loading-store.ts"
-                }
-            ],
-            "dependencies": []
-        },
-        {
-            "name": "loading-parts",
-            "type": "registry:component",
-            "title": "Loading 共用零件",
-            "description": "转圈（Tailwind 内置 animate-spin）与全屏遮罩布局；文本可选。遮罩浓度走 bg-bv-overlay 的模式 token。",
-            "files": [
-                {
-                    "path": "components/ui/loading-parts.tsx",
-                    "type": "registry:component",
-                    "target": "components/ui/loading-parts.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "utils",
-                "use-loading-store",
-                "tokens"
-            ]
-        },
-        {
-            "name": "loading",
-            "type": "registry:component",
-            "title": "Loading 加载遮罩",
-            "description": "模式 A/B 分发层 + 双轨 API：全屏遮罩 + 居中转圈，两端视觉一致（仅遮罩浓度随模式）。showLoading / hideLoading / updateLoading，遮罩点击不关闭。",
-            "files": [
-                {
-                    "path": "components/responsive/loading.tsx",
-                    "type": "registry:component",
-                    "target": "components/responsive/loading.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "portal",
-                "imperative-host",
-                "use-device-mode",
-                "responsive-provider",
-                "use-loading-store",
-                "loading-parts"
-            ]
-        },
-        {
-            "name": "use-notify-store",
-            "type": "registry:hook",
-            "title": "Notify 状态存储",
-            "description": "命令式 Notify 的队列、四态语义色与默认 3s 自动关闭计时（纯逻辑，不含组件）。",
-            "files": [
-                {
-                    "path": "hooks/use-notify-store.ts",
-                    "type": "registry:hook",
-                    "target": "hooks/use-notify-store.ts"
-                }
-            ],
-            "dependencies": []
-        },
-        {
-            "name": "notify-parts",
-            "type": "registry:component",
-            "title": "Notify 共用零件",
-            "description": "两模式共用的一条通知：H5 顶部通栏横幅（自上滑入）/ PC 右上角圆角卡片（自右滑入）。进场动画用两阶段挂载 + data-state，不新增 utilities.css 槽名。",
-            "files": [
-                {
-                    "path": "components/ui/notify-parts.tsx",
-                    "type": "registry:component",
-                    "target": "components/ui/notify-parts.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "utils",
-                "use-notify-store",
-                "tokens"
-            ]
-        },
-        {
-            "name": "notify",
-            "type": "registry:component",
-            "title": "Notify 消息通知",
-            "description": "模式 C 分发层 + 双轨 API：H5 顶部横幅（单例，新的替换旧的）/ PC 右上角卡片栈（可多条并存）。showNotify / closeNotify / updateNotify，支持 primary/success/danger/warning 四态。",
-            "files": [
-                {
-                    "path": "components/responsive/notify.tsx",
-                    "type": "registry:component",
-                    "target": "components/responsive/notify.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "utils",
-                "portal",
-                "imperative-host",
-                "use-device-mode",
-                "responsive-provider",
-                "use-notify-store",
-                "notify-parts"
-            ]
-        },
-        {
-            "name": "use-action-sheet-store",
-            "type": "registry:hook",
-            "title": "ActionSheet 状态存储",
-            "description": "命令式 ActionSheet 的队列与配置更新（纯逻辑，不含组件）。",
-            "files": [
-                {
-                    "path": "hooks/use-action-sheet-store.ts",
-                    "type": "registry:hook",
-                    "target": "hooks/use-action-sheet-store.ts"
-                }
-            ],
-            "registryDependencies": ["use-device-mode"]
-        },
-        {
-            "name": "action-sheet-parts",
-            "type": "registry:component",
-            "title": "ActionSheet 共用零件",
-            "description": "两模式共用的头部（标题/描述）、动作行与取消按钮。行高走 JS 分支（H5 48px / PC 36px），不使用 bv-h5:/bv-pc: 变体（契约第 19/20 条）。",
-            "files": [
-                {
-                    "path": "components/ui/action-sheet-parts.tsx",
-                    "type": "registry:component",
-                    "target": "components/ui/action-sheet-parts.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "utils",
-                "use-action-sheet-store",
-                "tokens"
-            ]
-        },
-        {
-            "name": "action-sheet",
-            "type": "registry:component",
-            "title": "ActionSheet 动作面板",
-            "description": "模式 B 分发层 + 双轨 API：H5 底部弹层列表 + 取消按钮分离；PC 居中对话框纵向列表（PC 居中由 Popup 统一降级）。showActionSheet / closeActionSheet / updateActionSheet。",
-            "files": [
-                {
-                    "path": "components/responsive/action-sheet.tsx",
-                    "type": "registry:component",
-                    "target": "components/responsive/action-sheet.tsx"
-                }
-            ],
-            "registryDependencies": [
-                "utils",
-                "popup",
-                "imperative-host",
-                "use-device-mode",
-                "responsive-provider",
-                "use-action-sheet-store",
-                "action-sheet-parts",
-                "tokens"
             ]
         }
     ]

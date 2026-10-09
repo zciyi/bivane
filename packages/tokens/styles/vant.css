@@ -619,10 +619,4 @@
     --bv-datetime-picker-pc-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     --bv-datetime-picker-pc-duration: 160ms;
     --bv-datetime-picker-pc-z-index: var(--bv-z-popup);
-
-    /* PC 月历旁的实心时间列（时/分/秒）：当前值独立主色块 */
-    --bv-datetime-picker-pc-wheel-radius: var(--bv-radius-sm);
-    --bv-datetime-picker-pc-wheel-selected-background: var(--bv-primary);
-    --bv-datetime-picker-pc-wheel-selected-color: var(--bv-white);
-    --bv-datetime-picker-pc-cell-hover-background: var(--bv-muted);
 }

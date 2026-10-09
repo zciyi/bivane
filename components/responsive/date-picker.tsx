@@ -1,19 +1,19 @@
-import * as React from 'react';
-import { H5DatePicker } from '@/components/h5/date-picker';
-import { PcDatePicker } from '@/components/pc/date-picker';
-import type { DatePanelProps } from '@/components/ui/date-parts';
-import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
+import * as React from "react";
+import { H5DatePicker } from "@/components/h5/date-picker";
+import { PcDatePicker } from "@/components/pc/date-picker";
+import type { DatePanelProps } from "@/components/ui/date-parts";
+import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
-  defaultFormatForColumns,
-  formatParts,
-  orderDateTexts,
-  resolveColumns,
-  todayParts,
-  useDateValue,
-  type DateColumnKey,
-  type DatePickerType,
-  type DatePickerValue,
-} from '@/hooks/use-date-value';
+    defaultFormatForColumns,
+    formatParts,
+    orderDateTexts,
+    resolveColumns,
+    todayParts,
+    useDateValue,
+    type DateColumnKey,
+    type DatePickerType,
+    type DatePickerValue,
+} from "@/hooks/use-date-value";
 
 /**
  * Bivane DatePicker · 分发层（模式 C）
@@ -43,170 +43,179 @@ import {
  */
 
 export interface DatePickerProps {
-  /** 受控值：单值是 'YYYY-MM-DD' 字符串，区间是 [start, end] 元组 */
-  value?: DatePickerValue;
-  /** 非受控初始值 */
-  defaultValue?: DatePickerValue;
-  /** 值变化即回调（H5 在点「确定」时、PC 在选满时） */
-  onChange?: (value: DatePickerValue) => void;
-  /** 确认回调，与 onChange 同值。两端都会触发，便于统一接埋点 */
-  onConfirm?: (value: DatePickerValue) => void;
-  /** 单选 / 区间。区间时值恒为有序的两元素元组 */
-  type?: DatePickerType;
-  /** 可选下界（含），'YYYY-MM-DD' */
-  min?: string;
-  /** 可选上界（含），'YYYY-MM-DD' */
-  max?: string;
-  /**
-   * 参与展示的日期列，默认 `['year','month','day']`，顺序由组件固定为「年→月→日」。
-   *
-   * 两端都生效：PC 会按列组合切换为年、年月或日历面板。
-   */
-  columnsType?: DateColumnKey[];
-  /**
-   * 展示格式，默认由 columnsType 推出（'YYYY-MM-DD' / 'YYYY-MM' / 'MM-DD'…）。
-   * 支持 YYYY / YY / MM / M / DD / D 六个 token。
-   */
-  format?: string;
-  /** H5 面板标题栏文案。PC 不渲染标题栏（浮层由触发器说明自己是什么） */
-  title?: React.ReactNode;
-  /** 无选中值时展示 */
-  placeholder?: React.ReactNode;
-  disabled?: boolean;
-  /** 展示清除按钮（仅在有选中值、且未禁用时出现） */
-  clearable?: boolean;
-  /** 无障碍名称；没有可见 label 时应当传入 */
-  ariaLabel?: string;
-  id?: string;
-  className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
-  forceMode?: DeviceMode;
+    /** 受控值：单值是 'YYYY-MM-DD' 字符串，区间是 [start, end] 元组 */
+    value?: DatePickerValue;
+    /** 非受控初始值 */
+    defaultValue?: DatePickerValue;
+    /** 值变化即回调（H5 在点「确定」时、PC 在选满时） */
+    onChange?: (value: DatePickerValue) => void;
+    /** 确认回调，与 onChange 同值。两端都会触发，便于统一接埋点 */
+    onConfirm?: (value: DatePickerValue) => void;
+    /** 单选 / 区间。区间时值恒为有序的两元素元组 */
+    type?: DatePickerType;
+    /** 可选下界（含），'YYYY-MM-DD' */
+    min?: string;
+    /** 可选上界（含），'YYYY-MM-DD' */
+    max?: string;
+    /**
+     * 参与展示的日期列，默认 `['year','month','day']`，顺序由组件固定为「年→月→日」。
+     *
+     * 两端都生效：PC 会按列组合切换为年、年月或日历面板。
+     */
+    columnsType?: DateColumnKey[];
+    /**
+     * 展示格式，默认由 columnsType 推出（'YYYY-MM-DD' / 'YYYY-MM' / 'MM-DD'…）。
+     * 支持 YYYY / YY / MM / M / DD / D 六个 token。
+     */
+    format?: string;
+    /** H5 面板标题栏文案。PC 不渲染标题栏（浮层由触发器说明自己是什么） */
+    title?: React.ReactNode;
+    /** 无选中值时展示 */
+    placeholder?: React.ReactNode;
+    disabled?: boolean;
+    /** 展示清除按钮（仅在有选中值、且未禁用时出现） */
+    clearable?: boolean;
+    /** 无障碍名称；没有可见 label 时应当传入 */
+    ariaLabel?: string;
+    id?: string;
+    className?: string;
+    /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+    forceMode?: DeviceMode;
 }
 
-export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(function DatePicker(
-  {
-    value,
-    defaultValue,
-    onChange,
-    onConfirm,
-    type = 'single',
-    min,
-    max,
-    columnsType,
-    format,
-    title,
-    placeholder = '请选择',
-    disabled = false,
-    clearable = false,
-    ariaLabel,
-    id,
-    className,
-    forceMode,
-  },
-  ref,
-) {
-  const mode = useDeviceMode(forceMode);
-  const [open, setOpen] = React.useState(false);
+export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
+    function DatePicker(
+        {
+            value,
+            defaultValue,
+            onChange,
+            onConfirm,
+            type = "single",
+            min,
+            max,
+            columnsType,
+            format,
+            title,
+            placeholder = "请选择",
+            disabled = false,
+            clearable = false,
+            ariaLabel,
+            id,
+            className,
+            forceMode,
+        },
+        ref,
+    ) {
+        const mode = useDeviceMode(forceMode);
+        const [open, setOpen] = React.useState(false);
 
-  const columns = React.useMemo(() => resolveColumns(columnsType), [columnsType]);
+        const columns = React.useMemo(
+            () => resolveColumns(columnsType),
+            [columnsType],
+        );
 
-  /** format 的默认值跟随实际展示列，两端提交与回显保持同一种值形态。 */
-  const resolvedFormat = React.useMemo(
-    () => format ?? defaultFormatForColumns(columns),
-    [format, columns],
-  );
+        /** format 的默认值跟随实际展示列，两端提交与回显保持同一种值形态。 */
+        const resolvedFormat = React.useMemo(
+            () => format ?? defaultFormatForColumns(columns),
+            [format, columns],
+        );
 
-  const { selected, minParts, maxParts, setValue, clear } = useDateValue({
-    value,
-    defaultValue,
-    onChange,
-    type,
-    min,
-    max,
-    format: resolvedFormat,
-  });
+        const { selected, minParts, maxParts, setValue, clear } = useDateValue({
+            value,
+            defaultValue,
+            onChange,
+            type,
+            min,
+            max,
+            format: resolvedFormat,
+        });
 
-  /**
-   * 草稿：单值形态一定有一项（未选时预填今天，「确定」永远可用）；
-   * 区间形态按位保存两端，'' 表示该端还没选。
-   * 关闭时清空 —— 否则 PC 上「只点了一下就点走」的半截区间会在下次打开时复活。
-   */
-  const [draft, setDraft] = React.useState<string[]>([]);
+        /**
+         * 草稿：单值形态一定有一项（未选时预填今天，「确定」永远可用）；
+         * 区间形态按位保存两端，'' 表示该端还没选。
+         * 关闭时**不清空**：浮层退出动画期间仍在渲染 draft，清空会让月历瞬间跳回
+         * 播种月份（关闭前「闪到当前月」）；下次打开无条件重新播种，半截草稿不复活。
+         */
+        const [draft, setDraft] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    if (!open) {
-      setDraft([]);
-      return;
-    }
-    if (type === 'range') {
-      setDraft([selected[0] ?? '', selected[1] ?? '']);
-      return;
-    }
-    setDraft([selected[0] ?? formatParts(todayParts(), resolvedFormat)]);
-  }, [open, type, selected, resolvedFormat]);
+        React.useEffect(() => {
+            if (!open) return;
+            if (type === "range") {
+                setDraft([selected[0] ?? "", selected[1] ?? ""]);
+                return;
+            }
+            setDraft([
+                selected[0] ?? formatParts(todayParts(), resolvedFormat),
+            ]);
+        }, [open, type, selected, resolvedFormat]);
 
-  const handleSubmit = React.useCallback(
-    (next: string[]) => {
-      let nextValue: DatePickerValue;
-      if (type === 'range') {
-        // 两端不全时不提交也不关闭：用户还差一步，关掉会让他以为选好了
-        const ordered = orderDateTexts(next[0] || undefined, next[1] || undefined, columns);
-        if (!ordered) return;
-        nextValue = ordered;
-      } else {
-        if (!next[0]) return;
-        nextValue = next[0];
-      }
-      setValue(nextValue);
-      onConfirm?.(nextValue);
-      setOpen(false);
+        const handleSubmit = React.useCallback(
+            (next: string[]) => {
+                let nextValue: DatePickerValue;
+                if (type === "range") {
+                    // 两端不全时不提交也不关闭：用户还差一步，关掉会让他以为选好了
+                    const ordered = orderDateTexts(
+                        next[0] || undefined,
+                        next[1] || undefined,
+                        columns,
+                    );
+                    if (!ordered) return;
+                    nextValue = ordered;
+                } else {
+                    if (!next[0]) return;
+                    nextValue = next[0];
+                }
+                setValue(nextValue);
+                onConfirm?.(nextValue);
+                setOpen(false);
+            },
+            [type, columns, setValue, onConfirm],
+        );
+
+        const handleOpenChange = React.useCallback(
+            (next: boolean) => {
+                if (disabled) return;
+                setOpen(next);
+            },
+            [disabled],
+        );
+
+        const panelProps: DatePanelProps = {
+            mode,
+            open,
+            onOpenChange: handleOpenChange,
+            type,
+            columns,
+            format: resolvedFormat,
+            minParts,
+            maxParts,
+            title,
+            placeholder,
+            disabled,
+            clearable,
+            selected,
+            draft,
+            onDraftChange: setDraft,
+            onSubmit: handleSubmit,
+            onCancel: () => setOpen(false),
+            onClear: clear,
+            className,
+            ariaLabel,
+            id,
+        };
+
+        return mode === "mobile" ? (
+            <H5DatePicker ref={ref} {...panelProps} />
+        ) : (
+            <PcDatePicker ref={ref} {...panelProps} />
+        );
     },
-    [type, columns, setValue, onConfirm],
-  );
-
-  const handleOpenChange = React.useCallback(
-    (next: boolean) => {
-      if (disabled) return;
-      setOpen(next);
-    },
-    [disabled],
-  );
-
-  const panelProps: DatePanelProps = {
-    mode,
-    open,
-    onOpenChange: handleOpenChange,
-    type,
-    columns,
-    format: resolvedFormat,
-    minParts,
-    maxParts,
-    title,
-    placeholder,
-    disabled,
-    clearable,
-    selected,
-    draft,
-    onDraftChange: setDraft,
-    onSubmit: handleSubmit,
-    onCancel: () => setOpen(false),
-    onClear: clear,
-    className,
-    ariaLabel,
-    id,
-  };
-
-  return mode === 'mobile' ? (
-    <H5DatePicker ref={ref} {...panelProps} />
-  ) : (
-    <PcDatePicker ref={ref} {...panelProps} />
-  );
-});
+);
 
 export type {
-  DateColumnKey,
-  DateParts,
-  DatePickerType,
-  DatePickerValue,
-  DateRangeValue,
-} from '@/hooks/use-date-value';
+    DateColumnKey,
+    DateParts,
+    DatePickerType,
+    DatePickerValue,
+    DateRangeValue,
+} from "@/hooks/use-date-value";

@@ -256,22 +256,6 @@
     );
 }
 
-/* H5 滚轮列隐藏滚动条：移动端原生滚动条会浮在选中双线右侧、与渐隐遮罩叠在一起，
- * 视觉上像「多了一条右边的线」。按触屏范式（原生动量滚动 + scroll-snap）本就不该出现滚动条。
- * 仅作用于移动端（祖先 [data-mode="h5"]），PC 浮层不受此规则影响。 */
-[data-mode="h5"] [data-slot="date-picker-wheel-scroller"],
-[data-mode="h5"] [data-slot="time-picker-wheel-scroller"],
-[data-mode="h5"] [data-slot="datetime-picker-wheel-scroller"] {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* 旧版 IE / Edge */
-}
-
-[data-mode="h5"] [data-slot="date-picker-wheel-scroller"]::-webkit-scrollbar,
-[data-mode="h5"] [data-slot="time-picker-wheel-scroller"]::-webkit-scrollbar,
-[data-mode="h5"] [data-slot="datetime-picker-wheel-scroller"]::-webkit-scrollbar {
-    display: none; /* Chrome / Safari / 新 Edge */
-}
-
 @media (prefers-reduced-motion: reduce) {
     [data-slot="dialog-overlay"],
     [data-slot="dialog"][data-variant="modal"],

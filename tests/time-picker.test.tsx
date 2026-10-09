@@ -402,7 +402,7 @@ describe("pc mode", () => {
         expect(trigger()).toHaveAttribute("aria-expanded", "false");
     });
 
-    it("键盘：← → 换列（data-active 切换到目标列），Home/End 跳到列边界", () => {
+    it("键盘：← → 换列（点亮该列高亮带），Home/End 跳到列边界", () => {
         render(
             <TimePicker
                 forceMode="desktop"

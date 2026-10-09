@@ -24,8 +24,7 @@ import {
     compareParts,
     daysInMonth,
     formatParts,
-    isDayWithinBounds,
-    monthHasSelectableDay,
+    isWithinBounds,
     pad2,
     parseDateTextForColumns,
     resolveCursor,
@@ -105,22 +104,6 @@ const dateOfParts = (parts: DateParts | null): Date | undefined =>
     parts ? new Date(parts.year, parts.month - 1, parts.day) : undefined;
 const titleOfMonth = (date: Date): string =>
     `${date.getFullYear()} 年 ${date.getMonth() + 1} 月`;
-
-/**
- * 把「当前最左月 / 列数 / 边界」喂给 rdp 的翻页按钮，让它们能按共用函数算 disabled。
- *
- * rdp 的 PreviousMonthButton / NextMonthButton 只收到标准 button 属性（不传目标月），
- * 所以这里用一个轻量 context 把受控的 `month`（= 最左月）和 `numberOfMonths` 透进去；
- * 按钮据此推出「上/下一个月」是否还有可选日（monthHasSelectableDay），
- * 与自研月历（DateTimePicker PC）走同一收口逻辑。
- */
-interface RdpNavContextValue {
-    leadMonth: Date;
-    numberOfMonths: number;
-    minParts: DateParts;
-    maxParts: DateParts;
-}
-const RdpNavContext = React.createContext<RdpNavContextValue | null>(null);
 
 /* ------------------------------------------------------------------ *
  * rdp 扩展点：把 rdp 的状态映射回本库的槽名、data-* 与 token
@@ -302,34 +285,13 @@ function RdpPreviousButton({
     children: _children,
     ...rest
 }: PreviousMonthButtonProps) {
-    const nav = React.useContext(RdpNavContext);
-    let disabled: boolean | undefined = rest.disabled;
-    if (nav) {
-        // 点「上一月」会让最左月再减一个月；若该月无任何可选日则禁用翻页
-        const prev = addMonths(
-            {
-                year: nav.leadMonth.getFullYear(),
-                month: nav.leadMonth.getMonth() + 1,
-                day: 1,
-            },
-            -1,
-        );
-        disabled = !monthHasSelectableDay(
-            prev.year,
-            prev.month,
-            nav.minParts,
-            nav.maxParts,
-        );
-    }
     return (
         <button
             {...rest}
             data-slot="date-picker-month-prev"
-            disabled={disabled}
             className={cn(
                 NAV_BUTTON_CLASS,
                 "left-[var(--bv-date-picker-pc-padding-x)]",
-                disabled && "opacity-30",
                 className,
             )}
         >
@@ -343,34 +305,13 @@ function RdpNextButton({
     children: _children,
     ...rest
 }: NextMonthButtonProps) {
-    const nav = React.useContext(RdpNavContext);
-    let disabled: boolean | undefined = rest.disabled;
-    if (nav) {
-        // 点「下一月」会让最右月再涨 numberOfMonths 个月；该月无任何可选日则禁用翻页
-        const next = addMonths(
-            {
-                year: nav.leadMonth.getFullYear(),
-                month: nav.leadMonth.getMonth() + 1,
-                day: 1,
-            },
-            nav.numberOfMonths,
-        );
-        disabled = !monthHasSelectableDay(
-            next.year,
-            next.month,
-            nav.minParts,
-            nav.maxParts,
-        );
-    }
     return (
         <button
             {...rest}
             data-slot="date-picker-month-next"
-            disabled={disabled}
             className={cn(
                 NAV_BUTTON_CLASS,
                 "right-[var(--bv-date-picker-pc-padding-x)]",
-                disabled && "opacity-30",
                 className,
             )}
         >
@@ -918,12 +859,7 @@ export const PcDatePicker = React.forwardRef<HTMLDivElement, DatePanelProps>(
             [handleSelect, format],
         );
 
-        /**
-         * min/max 交给 rdp 的匹配器：before / after 都是**按日历日**匹配（忽略时分）的开区间，
-         * 正好等于「含端点」的上下界，即 `day >= minDay && day <= maxDay`。
-         * 这与本库 `isDayWithinBounds`（use-date-value.ts）**完全等价**，两端共用同一句语义，
-         * 所以月历里的禁用日与下方翻页按钮的收口不会出现口径分歧。
-         */
+        /** min/max 交给 rdp 的匹配器：before / after 都是**开区间**，正好等于「含端点」的上下界 */
         const rdpDisabled = React.useMemo(
             () => [
                 { before: dateOfParts(minParts) as Date },
@@ -1081,7 +1017,7 @@ export const PcDatePicker = React.forwardRef<HTMLDivElement, DatePanelProps>(
                 const parts = parseDateTextForColumns(text, columns);
                 if (!parts) return false;
                 const selectable = hasDay
-                    ? isDayWithinBounds(parts, minParts, maxParts)
+                    ? isWithinBounds(parts, minParts, maxParts)
                     : isPeriodSelectable(
                           parts,
                           coarsePrecision,
@@ -1285,43 +1221,34 @@ export const PcDatePicker = React.forwardRef<HTMLDivElement, DatePanelProps>(
                          * 静态上没法用一个对象同时满足两个分支 —— 这里按 type 分两次渲染，
                          * 各自给出正确的字面量，避免整块断言。
                          */}
-                        <RdpNavContext.Provider
-                            value={{
-                                leadMonth: rdpMonth,
-                                numberOfMonths: type === "range" ? 2 : 1,
-                                minParts,
-                                maxParts,
-                            }}
-                        >
-                            {!hasDay ? (
-                                <CoarseDateGrid
-                                    columns={columns}
-                                    viewYear={view.year}
-                                    minParts={minParts}
-                                    maxParts={maxParts}
-                                    activeParts={activeParts}
-                                    draft={draft}
-                                    displayRange={displayRange}
-                                    format={format}
-                                    onViewYearChange={(year) =>
-                                        setView((prev) => ({ ...prev, year }))
-                                    }
-                                    onSelect={handleSelect}
-                                />
-                            ) : type === "range" ? (
-                                <DayPicker
-                                    {...rdpSharedProps}
-                                    mode="range"
-                                    selected={rdpRangeSelected}
-                                />
-                            ) : (
-                                <DayPicker
-                                    {...rdpSharedProps}
-                                    mode="single"
-                                    selected={rdpSingleSelected}
-                                />
-                            )}
-                        </RdpNavContext.Provider>
+                        {!hasDay ? (
+                            <CoarseDateGrid
+                                columns={columns}
+                                viewYear={view.year}
+                                minParts={minParts}
+                                maxParts={maxParts}
+                                activeParts={activeParts}
+                                draft={draft}
+                                displayRange={displayRange}
+                                format={format}
+                                onViewYearChange={(year) =>
+                                    setView((prev) => ({ ...prev, year }))
+                                }
+                                onSelect={handleSelect}
+                            />
+                        ) : type === "range" ? (
+                            <DayPicker
+                                {...rdpSharedProps}
+                                mode="range"
+                                selected={rdpRangeSelected}
+                            />
+                        ) : (
+                            <DayPicker
+                                {...rdpSharedProps}
+                                mode="single"
+                                selected={rdpSingleSelected}
+                            />
+                        )}
                     </PopoverPrimitive.Content>
                 </PopoverPrimitive.Portal>
             </PopoverPrimitive.Root>

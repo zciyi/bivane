@@ -12,8 +12,6 @@ import {
     addDays,
     addMonths,
     compareParts as compareDateParts,
-    isDayWithinBounds,
-    monthHasSelectableDay,
     todayParts,
     type DateParts,
 } from "@/hooks/use-date-value";
@@ -30,13 +28,14 @@ import {
 /**
  * Bivane DateTimePicker · PC 实现
  *
- * 形态（对齐 Element / 原生 datetime 面板）：
+ * 形态（对齐 Vant Picker / Element datetime 面板）：
  *   左侧月历 —— « < 年-月 > » 导航 + 星期头 + 6×7 日期网格；
- *   右侧时间列 —— 时/分/秒按精度 1~3 列，与 H5 同款的居中上下双线指示，不填充高亮背景；
+ *   右侧时间列 —— 时/分/秒按精度 1~3 列，5 行制居中滚轮（选中行上下发丝线、
+ *   无底色、加粗文本），列顶/列尾各一个 ▲▼ 微调钮（按住连发），列间竖发丝线；
  *   顶部右侧回显草稿时间；底部「此刻 / 确定」。
  *
  * 因此日期段与 H5 的「年/月/日滚轮」是**不同交互范式**（同 DatePicker 的 C 判据），
- * 但时间段两端仍共用同一个滚轮 primitive（只切了选中观感，PC 时间列现为 band 样式）。
+ * 时间段两端共用同一个滚轮 primitive，PC 仅多挂微调钮与列间竖线。
  *
  * 恒走「暂存 → 确定」：点日 / 滚时间 / 此刻都只写草稿，确定才提交；
  * Esc / 点浮层外部 = 取消。
@@ -77,6 +76,26 @@ function buildMonthGrid(year: number, month: number): MonthCell[] {
 }
 
 /** 日期格是否越过「日期粒度」的硬边界（只比年月日，当天时刻约束归时间列裁剪） */
+function isDayDisabled(
+    day: DateParts,
+    min: DateTimeParts,
+    max: DateTimeParts,
+): boolean {
+    const minDay: DateParts = {
+        year: min.year,
+        month: min.month,
+        day: min.day,
+    };
+    const maxDay: DateParts = {
+        year: max.year,
+        month: max.month,
+        day: max.day,
+    };
+    return (
+        compareDateParts(day, minDay) < 0 || compareDateParts(day, maxDay) > 0
+    );
+}
+
 function sameDay(a: DateParts, b: DateParts): boolean {
     return compareDateParts(a, b) === 0;
 }
@@ -149,18 +168,22 @@ export const PcDateTimePicker = React.forwardRef<
         [columns, format, minParts, maxParts, onDraftChange],
     );
 
-    // 打开那一刻：月历跳到草稿所在月、键盘区回到日期网格。
-    // 依赖不能放 draft，否则点日期会把视图/驾驶区反复拽回。
-    const wasOpenRef = React.useRef(false);
+    // 打开后第一次拿到草稿：月历跳到草稿所在月、键盘区回到日期网格。
+    // 依赖必须包含 draft —— 本组件是子层，open 翻转时父分发层「播种草稿」的
+    // effect 还没跑（子 effect 先于父），若只看 [open]，拿到的是空草稿（回落
+    // 「今天」），草稿月与当前月不同时月历会定错位；首次同步后即短路，
+    // 之后点日期改 draft 不会把用户正在浏览的视图拽回。
+    const initializedForOpenRef = React.useRef(false);
     React.useEffect(() => {
-        const opened = open && !wasOpenRef.current;
-        wasOpenRef.current = open;
-        if (opened) {
-            setView({ year: cursor.year, month: cursor.month });
-            setZone("date");
+        if (!open) {
+            initializedForOpenRef.current = false;
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+        if (initializedForOpenRef.current || !draft[0]) return;
+        initializedForOpenRef.current = true;
+        setView({ year: cursor.year, month: cursor.month });
+        setZone("date");
+    }, [open, draft, cursor]);
 
     const cells = React.useMemo(
         () => buildMonthGrid(view.year, view.month),
@@ -173,48 +196,12 @@ export const PcDateTimePicker = React.forwardRef<
         day: today.getDate(),
     };
 
-    // 上一月/下一年…的目标月：翻页按钮能否点，由两个日历共用的 monthHasSelectableDay 决定，
-    // 翻到整月无可选日的空月一律禁用（与 PC DatePicker 的 rdp 导航收口同一口径）。
-    const prevMonthTarget = addMonths(
-        { year: view.year, month: view.month, day: 1 },
-        -1,
-    );
-    const nextMonthTarget = addMonths(
-        { year: view.year, month: view.month, day: 1 },
-        1,
-    );
-    const prevYearTarget = addMonths(
-        { year: view.year, month: view.month, day: 1 },
-        -12,
-    );
-    const nextYearTarget = addMonths(
-        { year: view.year, month: view.month, day: 1 },
-        12,
-    );
-    const canPrevYear = monthHasSelectableDay(
-        prevYearTarget.year,
-        prevYearTarget.month,
-        minParts,
-        maxParts,
-    );
-    const canPrevMonth = monthHasSelectableDay(
-        prevMonthTarget.year,
-        prevMonthTarget.month,
-        minParts,
-        maxParts,
-    );
-    const canNextYear = monthHasSelectableDay(
-        nextYearTarget.year,
-        nextYearTarget.month,
-        minParts,
-        maxParts,
-    );
-    const canNextMonth = monthHasSelectableDay(
-        nextMonthTarget.year,
-        nextMonthTarget.month,
-        minParts,
-        maxParts,
-    );
+    const canPrevYear = view.year > minParts.year;
+    const canPrevMonth =
+        view.year > minParts.year || view.month > minParts.month;
+    const canNextYear = view.year < maxParts.year;
+    const canNextMonth =
+        view.year < maxParts.year || view.month < maxParts.month;
 
     const shiftView = React.useCallback((monthDelta: number) => {
         setView((prev) => {
@@ -242,7 +229,7 @@ export const PcDateTimePicker = React.forwardRef<
 
     /** 点月历里的某一天（含前后月补位格 —— 点补位格顺带翻月） */
     const handleDayClick = (day: DateParts) => {
-        if (!isDayWithinBounds(day, minParts, maxParts)) return;
+        if (isDayDisabled(day, minParts, maxParts)) return;
         setZone("date");
         changeDate(day);
     };
@@ -618,7 +605,7 @@ export const PcDateTimePicker = React.forwardRef<
                                         cell.parts,
                                         cursor,
                                     );
-                                    const disabledDay = !isDayWithinBounds(
+                                    const disabledDay = isDayDisabled(
                                         cell.parts,
                                         minParts,
                                         maxParts,
@@ -696,7 +683,8 @@ export const PcDateTimePicker = React.forwardRef<
                                 minParts={minParts}
                                 maxParts={maxParts}
                                 disabled={disabled}
-                                selectionStyle="band"
+                                stepButtons
+                                dividers
                                 activeColumnIndex={
                                     typeof zone === "number" ? zone : undefined
                                 }

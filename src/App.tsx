@@ -272,7 +272,9 @@ function Playground() {
     // P2 min/max 边界约束演示：受控值 + 实时回显，方便直接看「选不出去 / 被夹回」
     const [demoDate, setDemoDate] = React.useState<string | undefined>();
     const [demoTime, setDemoTime] = React.useState<string | undefined>();
-    const [demoDateTime, setDemoDateTime] = React.useState<string | undefined>();
+    const [demoDateTime, setDemoDateTime] = React.useState<
+        string | undefined
+    >();
 
     const openPopup = (position: PopupPosition, long = false) =>
         setPopup({ open: true, position, long });
@@ -673,7 +675,10 @@ function Playground() {
                                         text: "加载中",
                                         forbidClick: true,
                                     });
-                                    setTimeout(() => hideLoading(handle.id), 1500);
+                                    setTimeout(
+                                        () => hideLoading(handle.id),
+                                        1500,
+                                    );
                                 }}
                             >
                                 命令式 · 1.5s 后关闭
@@ -697,18 +702,26 @@ function Playground() {
                                             }),
                                         1400,
                                     );
-                                    setTimeout(() => hideLoading(handle.id), 2100);
+                                    setTimeout(
+                                        () => hideLoading(handle.id),
+                                        2100,
+                                    );
                                 }}
                             >
                                 动态改文案
                             </Button>
-                            <Button onClick={() => showLoading({ duration: 1200 })}>
+                            <Button
+                                onClick={() => showLoading({ duration: 1200 })}
+                            >
                                 无文案 · 1.2s 自关
                             </Button>
                             <Button
                                 onClick={() => {
                                     setLoadingOpen(true);
-                                    setTimeout(() => setLoadingOpen(false), 2000);
+                                    setTimeout(
+                                        () => setLoadingOpen(false),
+                                        2000,
+                                    );
                                 }}
                             >
                                 声明式 · 2s 后自关
@@ -719,11 +732,11 @@ function Playground() {
                         </Row>
                         <p className="text-bv-sm text-bv-text-2">
                             当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
-                            两端都是全屏遮罩 + 居中转圈，差异只有遮罩浓度（H5 .7 / PC
-                            .45，由 bg-bv-overlay 的模式覆盖给出）。
+                            两端都是全屏遮罩 + 居中转圈，差异只有遮罩浓度（H5 .7
+                            / PC .45，由 bg-bv-overlay 的模式覆盖给出）。
                             默认常驻，必须显式 hideLoading(id) 或给 duration；
-                            forbidClick 默认 false（对齐 Vant，不阻断下层），传 true
-                            才吃事件。
+                            forbidClick 默认 false（对齐 Vant，不阻断下层），传
+                            true 才吃事件。
                         </p>
                     </Block>
                 </Section>
@@ -731,7 +744,9 @@ function Playground() {
                 <Section title="P1′ · Notify 消息通知（模式 C：顶部横幅 vs 右上角角标）">
                     <Block className="flex flex-col gap-bv-gutter">
                         <Row>
-                            <Button onClick={() => showNotify("默认类型（danger）")}>
+                            <Button
+                                onClick={() => showNotify("默认类型（danger）")}
+                            >
                                 默认
                             </Button>
                             <Button
@@ -798,7 +813,9 @@ function Playground() {
                             >
                                 连发三条
                             </Button>
-                            <Button onClick={() => closeNotify()}>关闭全部</Button>
+                            <Button onClick={() => closeNotify()}>
+                                关闭全部
+                            </Button>
                         </Row>
                         <p className="text-bv-sm text-bv-text-2">
                             当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
@@ -818,10 +835,14 @@ function Playground() {
                                 onClick={() =>
                                     showActionSheet({
                                         title: "选择操作",
-                                        description: "同一份 actions，两端只换壳",
+                                        description:
+                                            "同一份 actions，两端只换壳",
                                         actions: SHEET_ACTIONS,
-                                        onSelect: (action) =>
-                                            showToast(`选中 ${String(action.name)}`),
+                                        onSelect: (action) => {
+                                            showToast(
+                                                `选中 ${String(action.name)}`,
+                                            );
+                                        },
                                     })
                                 }
                             >
@@ -831,8 +852,11 @@ function Playground() {
                                 onClick={() =>
                                     showActionSheet({
                                         actions: SHEET_ACTIONS,
-                                        onSelect: (action) =>
-                                            showToast(`选中 ${String(action.name)}`),
+                                        onSelect: (action) => {
+                                            showToast(
+                                                `选中 ${String(action.name)}`,
+                                            );
+                                        },
                                         onCancel: () => showToast("已取消"),
                                     })
                                 }
@@ -867,8 +891,11 @@ function Playground() {
                                                 color: "var(--bv-danger)",
                                             },
                                         ],
-                                        onSelect: (action) =>
-                                            showToast(`选中 ${String(action.name)}`),
+                                        onSelect: (action) => {
+                                            showToast(
+                                                `选中 ${String(action.name)}`,
+                                            );
+                                        },
                                     })
                                 }
                             >
@@ -909,7 +936,8 @@ function Playground() {
                                 onClick={() =>
                                     showConfirmDialog({
                                         title: "删除确认",
-                                        message: "Confirm 语义：默认带取消按钮。",
+                                        message:
+                                            "Confirm 语义：默认带取消按钮。",
                                         confirmText: "删除",
                                         cancelText: "再想想",
                                         onConfirm: () =>
@@ -1388,7 +1416,7 @@ function Playground() {
                             当前：{mode === "mobile" ? "H5 交互" : "PC 交互"} ——{" "}
                             {mode === "mobile"
                                 ? "底部弹层，4/5/6 列滚轮（年/月/日/时/分/秒）惯性滚动 + 吸附对齐，顶部「取消 · 标题 · 确定」，列再多也是通栏均宽"
-                                : "锚定浮层：左侧月历（« < 年月 > » 翻年翻月 + 6×7 网格，今天描边）选日期，右侧时/分/秒 1~3 条实心时间列；列顶/列尾有 ▲▼，点一下 ±1、按住连发；顶部回显草稿时间，底部「此刻 / 确定」。键盘在月历区 ←→ 走天、↑↓ 走周、PgUp/PgDn 走月，点时间列后 ↑↓ 改值、←→ 换列，Enter 确定、Esc 关闭"}
+                                : "锚定浮层：左侧月历（« < 年月 > » 翻年翻月 + 6×7 网格，今天描边）选日期，右侧时/分/秒 1~3 条居中滚轮列（选中行在正中、上下发丝线），列顶/列尾有 ▲▼，点一下 ±1、按住连发；顶部回显草稿时间，底部「此刻 / 确定」。键盘在月历区 ←→ 走天、↑↓ 走周、PgUp/PgDn 走月，点时间列后 ↑↓ 改值、←→ 换列，Enter 确定、Esc 关闭"}
                         </p>
                         <p className="text-bv-sm text-bv-text-3">
                             单值组件（对齐 Vant DatetimePicker）：值恒为
@@ -1407,8 +1435,9 @@ function Playground() {
                     <Block className="flex flex-col gap-bv-gutter">
                         <p className="text-bv-sm text-bv-text-2">
                             闭区间（含端点）。滚轮列按边界「逐字段级联收窄」：只有压在边界的那一级才裁剪；
-                            PC 月历禁用越界日；越界输入/选中会被夹回范围内。拖动窗口跨过 768px
-                            可对比 H5 滚轮 / PC 月历两种拦截形态。
+                            PC
+                            月历禁用越界日；越界输入/选中会被夹回范围内。拖动窗口跨过
+                            768px 可对比 H5 滚轮 / PC 月历两种拦截形态。
                         </p>
                         <Row>
                             <div className="flex items-center gap-bv-sm">
@@ -1504,7 +1533,8 @@ function Playground() {
                                     />
                                 </div>
                                 <span className="text-bv-sm text-bv-text-3">
-                                    24 号时列从 14 起、25 号时列到 09 止（逐字段级联）
+                                    24 号时列从 14 起、25 号时列到 09
+                                    止（逐字段级联）
                                 </span>
                             </div>
                         </Row>
@@ -1600,7 +1630,9 @@ function Playground() {
                     onOpenChange={setSheetOpen}
                     title="声明式动作面板"
                     actions={SHEET_ACTIONS}
-                    onSelect={(action) => showToast(`选中 ${String(action.name)}`)}
+                    onSelect={(action) => {
+                        showToast(`选中 ${String(action.name)}`);
+                    }}
                 />
             </div>
         </div>
