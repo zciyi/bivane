@@ -1,3 +1,4 @@
+import type { MutableRefObject, Ref, RefCallback } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
@@ -67,4 +68,17 @@ const twMerge = extendTailwindMerge({
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * 合并多个 ref（cloneElement 触发器时，外层 forwardRef、消费者自带 ref 与
+ * Radix Slot 的 ref 都要落到同一个 DOM 节点上）。函数/对象 ref 都支持。
+ */
+export function composeRefs<T>(...refs: Array<Ref<T> | undefined>): RefCallback<T> {
+  return (node: T | null) => {
+    refs.forEach((ref) => {
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as MutableRefObject<T | null>).current = node;
+    });
+  };
 }

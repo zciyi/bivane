@@ -59,10 +59,9 @@ export function NotifyHost() {
         className={cn(
           'pointer-events-none fixed flex flex-col',
           isMobile
-            ? 'inset-x-0 top-0'
-            : 'right-bv-md top-bv-md w-fit max-w-[320px] gap-bv-sm',
+            ? 'inset-x-0 top-0 z-[var(--bv-toast-z-index)]'
+            : 'right-bv-md top-bv-md z-[var(--bv-toast-z-index)] w-fit max-w-[320px] gap-bv-sm',
         )}
-        style={{ zIndex: 'var(--bv-toast-z-index)' }}
       >
         {visible.map((item) => (
           <div key={item.id} className="pointer-events-auto">

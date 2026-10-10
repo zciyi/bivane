@@ -256,6 +256,26 @@
     );
 }
 
+/* Tooltip 跟随指针的小气泡（两端共用；只淡入淡出，位移由 JS transform 接管，
+ * 不能用 bv-modal-in 的 scale —— 会与定位 transform 互相顶掉）。 */
+[data-slot="tooltip-bubble"][data-state="open"] {
+    animation: bv-fade-in var(--bv-tooltip-duration) var(--bv-ease-out);
+}
+
+[data-slot="tooltip-bubble"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-tooltip-duration) var(--bv-ease-in);
+}
+
+/* Popover 的锚定气泡（H5 轻量气泡与 PC 浮层共用同一槽名与时长；
+ * H5 的底部抽屉形态走 Popup 自己的滑入动画）。 */
+[data-slot="popover-panel"][data-state="open"] {
+    animation: bv-fade-in var(--bv-popover-duration) var(--bv-ease-out);
+}
+
+[data-slot="popover-panel"][data-state="closed"] {
+    animation: bv-fade-out var(--bv-popover-duration) var(--bv-ease-in);
+}
+
 @media (prefers-reduced-motion: reduce) {
     [data-slot="dialog-overlay"],
     [data-slot="dialog"][data-variant="modal"],
@@ -264,7 +284,9 @@
     [data-slot="select-panel"],
     [data-slot="date-picker-panel"],
     [data-slot="time-picker-panel"],
-    [data-slot="datetime-picker-panel"] {
+    [data-slot="datetime-picker-panel"],
+    [data-slot="tooltip-bubble"],
+    [data-slot="popover-panel"] {
         animation: none;
     }
 }

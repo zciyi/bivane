@@ -223,16 +223,19 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 
 ### 6.4 技术选型
 
-| 场景                                           | 方案                                                                                                      |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| 底部弹层拖拽关闭                               | 自研 pointer 手势（`use-drag-to-dismiss`，位移超 16px 才认速度）                                          |
-| 滚轮 Picker                                    | 原生惯性 + CSS scroll-snap 吸附；`use-picker-column` 只做算索引与兜底对齐                                 |
-| 滚动锁                                         | 自研双策略（H5 `fixed`+记录 scrollTop 治 iOS 橡皮筋；PC `overflow:hidden`+补偿滚动条宽度）                |
-| PC Dialog                                      | `@radix-ui/react-dialog`                                                                                  |
-| PC 浮层（Select/DatePicker/TimePicker 触发器） | Radix Popover 的碰撞检测；**触发器共用件用 `Anchor` 不用 `Trigger`**（避免 Slot 叠加 onClick 导致双触发） |
-| PC 多层菜单                                    | `@radix-ui/react-dropdown-menu`（焦点/typeahead/子菜单整套交给 Radix）                                    |
-| PC 月历日期引擎                                | `react-day-picker` v10，本库只留渲染层、值语义与键盘                                                      |
-| SwipeCell / PullRefresh                        | 自研手势                                                                                                  |
+| 场景                                           | 方案                                                                                                                                                       |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 底部弹层拖拽关闭                               | 自研 pointer 手势（`use-drag-to-dismiss`，位移超 16px 才认速度）                                                                                           |
+| 滚轮 Picker                                    | 原生惯性 + CSS scroll-snap 吸附；`use-picker-column` 只做算索引与兜底对齐                                                                                  |
+| 滚动锁                                         | 自研双策略（H5 `fixed`+记录 scrollTop 治 iOS 橡皮筋；PC `overflow:hidden`+补偿滚动条宽度）                                                                 |
+| PC Dialog                                      | `@radix-ui/react-dialog`                                                                                                                                   |
+| PC 浮层（Select/DatePicker/TimePicker 触发器） | Radix Popover 的碰撞检测；**触发器共用件用 `Anchor` 不用 `Trigger`**（避免 Slot 叠加 onClick 导致双触发）                                                  |
+| PC 多层菜单                                    | `@radix-ui/react-dropdown-menu`（焦点/typeahead/子菜单整套交给 Radix）                                                                                     |
+| Tooltip 气泡 / 说明                            | **自研**：PC hover/focus 跟随指针气泡（指针点定位，Radix Tooltip 是触发元素锚点模型，跟不了手）；H5 不做浮层，说明常驻成 ⓘ 信息提示条（触屏无 hover 惯例） |
+| 长文展开/收起                                  | **自研 Ellipsis**（`-webkit-line-clamp` + scrollHeight 实测），不引截断库；与 Tooltip 解耦，任何文本容器可单用                                             |
+| Popover 容器                                   | 两端都建在 `@radix-ui/react-popover` 上：H5 只取气泡（抽屉另复用 Popup），PC 全用；触发器仍一律 `Anchor`                                                   |
+| PC 月历日期引擎                                | `react-day-picker` v10，本库只留渲染层、值语义与键盘                                                                                                       |
+| SwipeCell / PullRefresh                        | 自研手势                                                                                                                                                   |
 
 **自研还是交给 Radix 的判据**：交互复杂度是否值得自研。单层列表选择（Select）自研以精确对齐行为；
 多层树/含焦点契约的浮层（DropdownMenu）交给 Radix。不是「一律 Radix」。
@@ -326,7 +329,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 - **P0 基建** ✅：token → `lib/utils` → `use-device-mode`/Provider → Button → Cell → Tag → Badge → Icon
 - **P1 弹层** ✅：Popup → Dialog → Toast → use-lock-scroll
 - **P1′ 弹层补全** ⬜：ActionSheet（Popup+列表）→ Alert/Confirm（Dialog preset）→ Notify（Toast 换信息模型）→ Loading
-- **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Picker/Cascader → Calendar → Tooltip/Popover ⬜
+- **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker/Cascader → Calendar ⬜
 - **P3 表单与列表** ⬜：Field/Input/Textarea → Switch/Checkbox/Radio → Rate/Slider/Stepper → Uploader → Search → Tabs/Tabbar/NavBar → List vs Table
 - **P4 生态** ⬜：第 2/3 套风格 → tweakcn 适配 → 文档站 → registry 发布验证
 

@@ -19,18 +19,18 @@
 
 ### 2.1 弹层与反馈类
 
-| 组件                | H5 模式                                             | PC 模式                                                                                  | 模式    | 共享逻辑              | 状态   |
-| ------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------- | --------------------- | ------ |
-| **Popup（基础）**   | 四向滑入，默认 bottom，圆角 + 安全区，下拉关闭      | `position` 一律降级为居中模态（原值留 `data-position`，实态记 `data-position-resolved`） | **B**   | 进出场动画时长        | ✅ P1  |
-| **Overlay / 遮罩**  | 点击即关，蒙层 `rgba(0,0,0,.7)`                     | 蒙层 `rgba(0,0,0,.45)`，点击不关（可配）                                                 | A       | 滚动锁定              | ✅ P1  |
-| **Dialog**          | 底部抽屉，可下拉关闭，顶部圆角 16px，内容随高度增长 | 居中模态 520px，遮罩/ESC 关闭，焦点陷阱                                                  | **B**   | open 状态机、关闭时机 | ✅ P1  |
-| **Toast**           | 顶部居中胶囊，单例（新覆盖旧），2s 自关             | 右上卡片栈，带关闭按钮，可多条并存                                                       | **C**   | 队列与生命周期        | ✅ P1  |
-| **ActionSheet**     | 底部动作列表 + 取消按钮分离，项高 48px              | 居中对话框纵向列表，或上下文菜单（≤5 项用 Popover）                                      | **B**   | 选项数据结构          | ⬜ P1′ |
-| **Alert / Confirm** | 抽屉式或居中窄弹窗，按钮纵向排列                    | 居中弹窗，按钮横向右对齐（主按钮在右）                                                   | **A**   | 按钮语义顺序          | ⬜ P1′ |
-| **Notify**          | 顶部横幅滑入                                        | 右上角角标通知                                                                           | **C**   | 队列管理              | ⬜ P1′ |
-| **Loading**         | 全屏遮罩 + 居中转圈                                 | 局部骨架屏优先，全屏遮罩降级                                                             | **A/B** | 展示时机              | ⬜ P1′ |
-| **Tooltip**         | 长按触发，浮层跟随手指，1.5s 自关                   | hover 触发 200ms 延迟，跟随鼠标，ESC 可关                                                | **C**   | 内容渲染              | ⬜ P2  |
-| **Popover**         | 底部抽屉（内容 > 3 行）或轻量气泡（≤ 3 行）         | 锚定浮层，Radix Popper 翻转防溢出，键盘可导航                                            | **C**   | 内容渲染              | ⬜ P2  |
+| 组件                | H5 模式                                                                                        | PC 模式                                                                                  | 模式    | 共享逻辑                  | 状态   |
+| ------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------- | ------------------------- | ------ |
+| **Popup（基础）**   | 四向滑入，默认 bottom，圆角 + 安全区，下拉关闭                                                 | `position` 一律降级为居中模态（原值留 `data-position`，实态记 `data-position-resolved`） | **B**   | 进出场动画时长            | ✅ P1  |
+| **Overlay / 遮罩**  | 点击即关，蒙层 `rgba(0,0,0,.7)`                                                                | 蒙层 `rgba(0,0,0,.45)`，点击不关（可配）                                                 | A       | 滚动锁定                  | ✅ P1  |
+| **Dialog**          | 底部抽屉，可下拉关闭，顶部圆角 16px，内容随高度增长                                            | 居中模态 520px，遮罩/ESC 关闭，焦点陷阱                                                  | **B**   | open 状态机、关闭时机     | ✅ P1  |
+| **Toast**           | 顶部居中胶囊，单例（新覆盖旧），2s 自关                                                        | 右上卡片栈，带关闭按钮，可多条并存                                                       | **C**   | 队列与生命周期            | ✅ P1  |
+| **ActionSheet**     | 底部动作列表 + 取消按钮分离，项高 48px                                                         | 居中对话框纵向列表，或上下文菜单（≤5 项用 Popover）                                      | **B**   | 选项数据结构              | ✅ P1′ |
+| **Alert / Confirm** | 抽屉式或居中窄弹窗，按钮纵向排列                                                               | 居中弹窗，按钮横向右对齐（主按钮在右）                                                   | **A**   | 按钮语义顺序              | ✅ P1′ |
+| **Notify**          | 顶部横幅滑入                                                                                   | 右上角角标通知                                                                           | **C**   | 队列管理                  | ✅ P1′ |
+| **Loading**         | 全屏遮罩 + 居中转圈                                                                            | 局部骨架屏优先，全屏遮罩降级                                                             | **A/B** | 展示时机                  | ✅ P1′ |
+| **Tooltip**         | **无浮层**：说明直接常驻——主体下方一条行首 ⓘ 的信息提示条，全文展示；超长用 Ellipsis 展开/收起 | hover 触发 200ms 延迟，跟随鼠标，focus 锚定，ESC 关                                      | **B**   | 同一份说明文案（content） | ✅ P2  |
+| **Popover**         | 底部抽屉（内容 > 3 行）或轻量气泡（≤ 3 行）                                                    | 锚定浮层，Radix Popper 翻转防溢出，键盘可导航                                            | **C**   | 内容渲染                  | ✅ P2  |
 
 ### 2.2 选择与输入类（双实现重灾区，核心价值）
 
@@ -52,7 +52,7 @@
 | **Rate**                      | 点击/滑动选择，热区 44px                                                                                                                             | 点击/悬停预览 + 键盘方向键                                                                                                                                                  | **C**   | 值语义                                                            | ⬜    |
 | **Checkbox / Radio / Switch** | 行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）                                                                                                    | 标准控件 16~20px，label 可点，键盘空格                                                                                                                                      | **A**   | 受控状态                                                          | ⬜    |
 
-### 2.3 导航与列表类
+### 2.3 导航、列表与文本类
 
 | 组件                      | H5 模式                                      | PC 模式                                       | 模式  | 共享逻辑         |
 | ------------------------- | -------------------------------------------- | --------------------------------------------- | ----- | ---------------- |
@@ -70,17 +70,20 @@
 
 ### 3.1 总览
 
-| 组件           | 模式 | 本质差异                                                                                                                                                        |
-| -------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Popup          | B    | 同一 position 状态机 + 内容，H5 贴边滑入壳 / PC 居中模态壳                                                                                                      |
-| Overlay        | A    | 仅浓度与「点遮罩关闭」默认值不同                                                                                                                                |
-| Dialog         | B    | H5 复用 Popup bottom；PC 用 Radix Dialog                                                                                                                        |
-| Toast          | C    | 信息模型不同：H5 单例胶囊 vs PC 可并存卡片栈                                                                                                                    |
-| Select         | C    | 信息模型不同：底部热区单选即关 vs 锚定浮层键盘巡航/多选不关                                                                                                     |
-| DropdownMenu   | C    | 导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地                                                                                                          |
-| DatePicker     | C    | 交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航                                                                                                                  |
-| TimePicker     | B    | 同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）                            |
-| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一居中双横线滚轮列（PC 多挂 ▲▼ 微调钮与列间竖线，`DateTimeWheelRow`）；单值字符串 |
+| 组件           | 模式 | 本质差异                                                                                                                                                                                                      |
+| -------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Popup          | B    | 同一 position 状态机 + 内容，H5 贴边滑入壳 / PC 居中模态壳                                                                                                                                                    |
+| Overlay        | A    | 仅浓度与「点遮罩关闭」默认值不同                                                                                                                                                                              |
+| Dialog         | B    | H5 复用 Popup bottom；PC 用 Radix Dialog                                                                                                                                                                      |
+| Toast          | C    | 信息模型不同：H5 单例胶囊 vs PC 可并存卡片栈                                                                                                                                                                  |
+| Select         | C    | 信息模型不同：底部热区单选即关 vs 锚定浮层键盘巡航/多选不关                                                                                                                                                   |
+| DropdownMenu   | C    | 导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地                                                                                                                                                        |
+| DatePicker     | C    | 交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航                                                                                                                                                                |
+| TimePicker     | B    | 同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）                                                                          |
+| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一居中双横线滚轮列（PC 多挂 ▲▼ 微调钮与列间竖线，`DateTimeWheelRow`）；单值字符串                                               |
+| Tooltip        | B    | 同一份说明文案、容器密度不同：H5 无浮层，常驻成主体下方的 ⓘ 信息提示条（超长交 Ellipsis 折叠）vs PC hover/focus 触发的跟随气泡；恒纯展示不可交互（2026-10-09 由 C/B 改判：H5 长按气泡不符合触屏惯例，改常驻） |
+| Ellipsis       | A    | 两端同形：`-webkit-line-clamp` 截断 N 行 + 实测溢出才出现「展开/收起」；不与 Tooltip 耦合，任何文本容器可单独使用                                                                                             |
+| Popover        | C    | 容器范式不同：H5 ≤3 行轻量气泡 / >3 行降级 Popup 底部抽屉（打开瞬间按实测高度定形态）vs PC Radix 锚定浮层；面板内容（自定义区 + actions 行）两端同源                                                          |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -250,6 +253,64 @@ H5 = Popup 底部弹层 + 顶部 `PanelHeader` 工具条 + 安全区；PC = Radi
 - **无值草稿播种「此刻」**（`nowDateTimeParts()`），不是元旦 00:00:00；打开时月历定位到草稿月、驾驶区归日期区；开合 effect 依赖不放 draft（同 3.6）。
 - 底部无取消钮（对齐 Element/原生面板）：取消走 Esc 与点外部；footer 键事件放行、按钮拼 `buttonVariants` 不用 `<Button>` 沿用 3.6 规则。
 - 值模型全在 `hooks/use-datetime-value.ts`（纯函数），与 use-date-value / use-time-value 同族并复用 `daysInMonth / pad2 / todayParts / nowParts / addDays / addMonths`；月历网格是 PC 文件内的轻量纯函数（`buildMonthGrid`，42 格补位），不引 react-day-picker（单月单选不需要其区间/双月能力）。
+
+### 3.8 Tooltip（模式 B）/ Ellipsis（模式 A）/ Popover（模式 C）
+
+同一段补充说明，Tooltip 两端**容器密度不同**（H5 常驻说明条 / PC hover 气泡）；「长文展开收起」独立成 Ellipsis（模式 A，任何文本容器可单独使用，Tooltip 不内置截断）；Popover 仍是模式 C，共享面板内容（`ui/popover-parts.tsx` 的 `PopoverBody`），两端都建在 Radix Popover 之上（H5 只取气泡，抽屉复用 Popup）。Tooltip 的 PC 气泡不引 Radix（要跟手自研定位，Radix Tooltip 的锚点模型不匹配）。
+
+> 2026-10-09 改判：H5 原方案是「长按 500ms 跟手气泡 + 1.5s 自关」，落地复核发现长按看提示是把桌面范式硬搬触屏——Vant / Ant Design Mobile 都没有长按 Tooltip，H5 真实惯例就是**辅助说明常驻**，长文走**展开/收起**。H5 长按/自关/位移护栏/压 click 全套已删除，模式由 C 改判 B（信息相同、容器不同），PC 实现不变。
+
+**Tooltip 定死取值**
+
+| 项         | H5（常驻信息条）                                                    | PC（跟随气泡）                                                       | token / JS 镜像常量                                  |
+| ---------- | ------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- |
+| 形态       | 主体在上、下方一条行首 ⓘ 的浅底圆角说明条，**全文常驻**、不拦截手势 | hover 200ms 延迟弹出；focus 立即；Esc 关                             | `--bv-tooltip-pc-open-delay`                         |
+| 超长文案   | content 传 `<Ellipsis rows>` 折叠，Tooltip 自身不截断               | 气泡 max-width 240px 自然折行                                        | —                                                    |
+| 信息条配色 | 底 `--bv-background`、字 `--bv-text-2`、ⓘ `--bv-primary`，字号 sm   | 深色 `rgba(0,0,0,.75)` 白字                                          | `--bv-tooltip-h5-info-*` / `--bv-tooltip-*`          |
+| 信息条间距 | 与主体 gap xs；条内 ⓘ 与文案 gap base；ⓘ 14px                       | 气泡 gap 12px、距视口边 8px                                          | `--bv-tooltip-h5-info-*` / `-gap`/`-viewport-margin` |
+| 进出场     | 无（常驻）                                                          | 120ms 淡入淡出，两阶段挂载、退场后卸载                               | `--bv-tooltip-duration` / `TOOLTIP_TRANSITION_MS`    |
+| 无障碍     | 主体 `aria-describedby` 指向提示条（ⓘ 装饰性 `aria-hidden`）        | 打开时主体挂 `aria-describedby`，`role=tooltip`、pointer-events:none | 分发层 `useId`                                       |
+
+**Ellipsis 定死取值**
+
+| 项       | 取值                                                                                          | token / 实现                                     |
+| -------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 截断行数 | `rows` 默认 2，非法值（<1/非整数）回落 1                                                      | 内联 `WebkitLineClamp`（动态值只能内联）         |
+| 截断 CSS | `[display:-webkit-box] [-webkit-box-orient:vertical] overflow-hidden`                         | Tailwind 任意属性类                              |
+| 溢出判定 | `scrollHeight > rows × lineHeight + 1px`，实测不溢出不显示开关                                | `useLayoutEffect` 测量 + ResizeObserver 跟随宽度 |
+| 开关     | 「展开/收起」文字按钮（可自定义文案）+ arrow-down 图标（展开旋转 180°），`aria-expanded` 同步 | `--bv-ellipsis-action-color`（primary）          |
+| 受控     | `expanded` / `defaultExpanded` / `onExpandedChange`                                           | 与库内其他件同一套                               |
+
+**Popover 定死取值**
+
+| 项          | H5                                                                                                                                                                                                                                                      | PC                     | token                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| 形态分界    | 内容实测高度 **严格大于 N 行** → 底部抽屉，否则轻量气泡；纯 actions 直接数行。N 取 token `--bv-popover-h5-bubble-max-rows`（默认 3），实例可用 `maxRows` prop 覆盖；`h5Form="bubble"\|"drawer"` 可强制形态（默认 `auto`，强制时跳过探针）。均仅 H5 生效 | 恒锚定浮层             | `resolvePopoverForm()` 纯函数 / `--bv-popover-h5-bubble-max-rows` |
+| 动作行高    | 48px                                                                                                                                                                                                                                                    | 36px（hover muted 底） | `--bv-popover-h5-row-height` / `-pc-row-height`                   |
+| 气泡宽      | max-width 240px                                                                                                                                                                                                                                         | min 160 / max 320      | `--bv-popover-h5-bubble-max-width` / `-pc-panel-min/max`          |
+| 面板        | 圆角 lg + 阴影，max-h 60vh                                                                                                                                                                                                                              | 同左                   | `--bv-popover-radius` / `-shadow` / `-panel-max-height`           |
+| 间距/进出场 | offset 4px（Popper sideOffset）、120ms                                                                                                                                                                                                                  | 同左                   | `--bv-popover-offset` / `-duration`                               |
+
+**关键规则**
+
+- **H5 常驻条不做触发态**：`H5Tooltip` 不渲染浮层、不收 open/disabled/onOpenChange（分发层按端传参，对外 TooltipProps 仍双模式一致）；主体 cloneElement 只补 ref/槽位/`aria-describedby`，**不叠加任何事件**。外层 `inline-flex flex-col items-start` 纵向排，信息条 `max-w-full`、文案包 `min-w-0` 才能正常换行；ⓘ 用 Icon `name="info"`（currentColor 吃 `--bv-tooltip-h5-info-icon-color`），按行高差做半行距位移与首行对齐。
+- **折叠职责归 Ellipsis，不进 Tooltip**：要「常驻 + 超长折叠」就 `<Tooltip content={<Ellipsis rows={2}>…</Ellipsis>}>`；Tooltip 全文渲染、不量高度，避免一个件同时背「提示」和「截断」两个会各自演化的职责。
+- **Ellipsis 只在实测溢出时出现开关**：统一用 `scrollHeight > rows × lineHeight + 1` 判定（收起/展开两态都成立：-webkit-box 裁剪下 scrollHeight 仍是完整内容高），lineHeight 取不到（normal/空）回落 fontSize×1.2；ResizeObserver 跟随容器宽度重测（响应式换行后溢出结论会变）。动态行数的 `-webkit-line-clamp` 只能内联（Tailwind 类无法参数化 N），内联值是变量数字、不撞 eslint 的字面量 style 禁令。
+- **（PC）Tooltip 定位是纯函数**（`resolveBubblePosition`，无 DOM 依赖可单测）：指针点锚点优先落右下（光标挡住左上），右/下放不下翻左/上，最后统一夹回视口留白；元素矩形锚点（键盘 focus 无指针坐标）水平居中、默认上方、放不下翻下。jsdom 量不到气泡尺寸，几何断言只验「坐标 + gap」与纯函数翻转。
+- **（PC）跟随用 rAF 合帧**：mousemove 只写 pending ref，一帧内多次移动只重定位一次。
+- **（PC）hover/focus 双意图独立**（`hoveredRef` / `focusedRef`）：键盘聚焦时鼠标移出、或鼠标悬停时 blur 都不关，两者都消失才关；Esc 监听 window 关闭。
+- **无障碍配对**：分发层 `useId` 生成 id，主体与提示体（H5 常驻条 / PC 气泡）以 `aria-describedby` 配对；PC 气泡 `pointer-events:none` 且不可聚焦，纯展示不承载操作（要可点操作请用 Popover）。
+- **Popover 形态只在打开瞬间定，关闭后收回**：纯 actions 行数确定直接数；带自定义内容先挂**不可见限宽测量探针**（Portal 内 `invisible`、宽 = 气泡限宽，宽度不定时测高无意义），`useLayoutEffect` 报实测高度再和 3 行阈值比。注意形态判定 effect 不能在打开时无条件 `setForm(null)`——layout effect 子先父后，会覆盖探针刚回传的形态；null 由初始态与关闭收回（气泡退场 120ms 后 / Popup `onClosed`）保证。
+- **Popover 触发器两端都用 Radix Anchor 自管 click，不用 Trigger**（同 Select/TimePicker 既定范式）：触发器是外部传入的任意元素、自带 onClick，叠 Radix Trigger 的 pointerdown 开合会双触发/失效（实测克隆触发器上 Trigger 不回调 open）。后果自负的两件事：`aria-expanded` 自己同步；PC 关闭焦点用 `onCloseAutoFocus` 显式还给触发器（Anchor 不会自动还焦）。
+- **H5 气泡触屏不抢焦**（`onOpenAutoFocus` preventDefault，避免点击后页面滚动与虚焦轮廓）；点触发器不关的拦截放在 `onPointerDownOutside`（Radix 的延迟外部关 + 触发器自身 click 会一关一开）。
+- **actions 语义**：点行先调业务 `onClick(action)`，再按 `closeOnClickAction`（默认 true）关闭；danger 行复用 `--bv-danger`（不新增颜色 token），禁用行原生 disabled。
+
+**测试开关信号**
+
+- H5 Tooltip 无浮层无计时，用真实计时器；断言「主体 + `[data-slot=tooltip-info]` 同时存在、任何指针手势都不产生 `tooltip-bubble`」。
+- （PC）hover/退场计时全 fake：退场是「关闭后再挂退场计时器」，fake 时钟下要**分段 advance**，退场计时器在 act 刷掉状态更新后才挂载。
+- Ellipsis 的布局尺寸 jsdom 恒为 0（默认不显示开关）；几何分支 mock 时**不能整体替换 `getComputedStyle`**（返回对象丢掉 `getPropertyValue` 会让 dom-accessibility-api 算按钮 accessible name 时报 `getPropertyValue is not a function`），也不能 spy `CSSStyleDeclaration.prototype`（WebIDL 命名属性不挂原型）——正确做法：调真实 `getComputedStyle` 拿原对象，再 `defineProperty` 遮蔽 `lineHeight/fontSize`，另 mock `HTMLElement.prototype.scrollHeight`。
+- Radix Popover 两个 jsdom 已知时序：document 的 pointerdown 监听在弹层挂载后 `setTimeout(0)` 才注册（外部关闭用例打开后先让一帧）；`deferPointerDownOutside` 要求外部 pointerdown 后**再派一个 click** 才真关，且最终 dismiss 在 `setTimeout(0)`（整段包 async act，避免 PopperContent 的 act 警告）。
 
 ## 4. 测试要求
 

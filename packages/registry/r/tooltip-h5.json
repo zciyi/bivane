@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tooltip-h5",
+  "type": "registry:component",
+  "title": "Tooltip（H5 实现）",
+  "description": "触屏没有 hover，辅助说明直接常驻：被说明主体在上、下方一条行首带 ⓘ 的信息提示条（浅底圆角、全文展示、aria-describedby 关联）。无浮层/开合/禁用概念，open/disabled 仅服务 PC；文案太长时 content 传 Ellipsis 折叠。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/icon",
+    "@bivane/use-device-mode",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/tooltip.tsx",
+      "content": "import * as React from \"react\";\nimport { cn, composeRefs } from \"@/lib/utils\";\nimport { Icon } from \"@/components/ui/icon\";\nimport type { DeviceMode } from \"@/hooks/use-device-mode\";\n\n/**\n * Bivane Tooltip · H5 实现\n * 交互定义见 bivane-responsive-matrix.md §2.1\n *\n *   触屏没有 hover，辅助说明**直接常驻展示**：被说明的主体在上，\n *   下方一条行首带 ⓘ 的信息提示条，全文展示、不拦截任何手势。\n *   文案太长需要折叠时，由消费者用 <Ellipsis> 包 content ——\n *   「展开/收起」是独立组件的职责，Tooltip 不内置截断。\n *\n * 为什么不是长按气泡：长按看提示是把桌面范式硬搬到触屏，H5 的真实惯例\n * （Vant / Ant Design Mobile）就是说明文字常驻，长按留给系统上下文菜单。\n *\n * 因此 PC 才有的 open / disabled / onOpenChange 在本端均无作用对象，\n * H5TooltipProps 也不收它们（对外 TooltipProps 仍双模式一致，分发层按端传参）。\n */\n\nexport interface H5TooltipProps {\n    mode: DeviceMode;\n    /** 提示全文（需要折叠时传 <Ellipsis>） */\n    content: React.ReactNode;\n    /** 提示条 id，与主体 aria-describedby 配对（分发层 useId 生成） */\n    infoId: string;\n    /** 透传给信息提示条的 className */\n    className?: string;\n    /** 被说明的主体 */\n    children: React.ReactElement;\n}\n\nexport const H5Tooltip = React.forwardRef<HTMLElement, H5TooltipProps>(\n    function H5Tooltip({ mode, content, infoId, className, children }, ref) {\n        const childProps = children.props as Partial<{\n            ref: React.Ref<HTMLElement>;\n            className: string;\n        }>;\n\n        // 主体原样保留，仅补 ref / 槽位 / 与提示条的 aria 关联，不叠加任何事件\n        const trigger = React.cloneElement(\n            children as React.ReactElement<Record<string, unknown>>,\n            {\n                ref: composeRefs(ref, childProps.ref),\n                \"data-slot\": \"tooltip-trigger\",\n                \"data-mode\": \"h5\",\n                \"aria-describedby\": infoId,\n                className: cn(childProps.className),\n            },\n        );\n\n        return (\n            <span\n                data-slot=\"tooltip-h5\"\n                data-mode={mode === \"mobile\" ? \"h5\" : \"pc\"}\n                className=\"inline-flex max-w-full flex-col items-start gap-[var(--bv-tooltip-h5-info-margin-top)]\"\n            >\n                {trigger}\n                <span\n                    id={infoId}\n                    data-slot=\"tooltip-info\"\n                    data-mode=\"h5\"\n                    className={cn(\n                        \"inline-flex max-w-full items-start rounded-[var(--bv-tooltip-h5-info-radius)]\",\n                        \"bg-[var(--bv-tooltip-h5-info-background)]\",\n                        \"px-[var(--bv-tooltip-h5-info-padding-x)] py-[var(--bv-tooltip-h5-info-padding-y)]\",\n                        \"gap-[var(--bv-tooltip-h5-info-gap)]\",\n                        \"text-[length:var(--bv-tooltip-h5-info-font)] leading-[var(--bv-tooltip-h5-info-line-height)]\",\n                        \"text-[var(--bv-tooltip-h5-info-color)]\",\n                        className,\n                    )}\n                >\n                    <Icon\n                        name=\"info\"\n                        size=\"var(--bv-tooltip-h5-info-icon-size)\"\n                        aria-hidden\n                        className=\"mt-[calc((var(--bv-tooltip-h5-info-line-height)-var(--bv-tooltip-h5-info-icon-size))/2)] shrink-0 text-[var(--bv-tooltip-h5-info-icon-color)]\"\n                    />\n                    {/* min-w-0 才允许文字在 flex 容器内正常换行 */}\n                    <span className=\"min-w-0\">{content}</span>\n                </span>\n            </span>\n        );\n    },\n);\n",
+      "type": "registry:component",
+      "target": "components/h5/tooltip.tsx"
+    }
+  ]
+}

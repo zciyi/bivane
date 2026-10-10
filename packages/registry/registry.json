@@ -900,6 +900,165 @@
                 "datetime-picker-h5",
                 "datetime-picker-pc"
             ]
+        },
+        {
+            "name": "tooltip-parts",
+            "type": "registry:component",
+            "title": "Tooltip PC 气泡零件",
+            "description": "PC 端跟随指针深色气泡：纯展示（pointer-events:none、role=tooltip）、指针点/元素矩形双锚点定位纯函数（右下优先、碰撞翻转、视口夹回）、两阶段挂载的进出场。H5 不用浮层（改常驻信息提示条），触发 hover 200ms / 退场 120 常量是 JS 侧事实源，与 vant.css token 逐字对齐。",
+            "files": [
+                {
+                    "path": "components/ui/tooltip-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/tooltip-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "portal",
+                "use-device-mode",
+                "tokens"
+            ]
+        },
+        {
+            "name": "tooltip-h5",
+            "type": "registry:component",
+            "title": "Tooltip（H5 实现）",
+            "description": "触屏没有 hover，辅助说明直接常驻：被说明主体在上、下方一条行首带 ⓘ 的信息提示条（浅底圆角、全文展示、aria-describedby 关联）。无浮层/开合/禁用概念，open/disabled 仅服务 PC；文案太长时 content 传 Ellipsis 折叠。",
+            "files": [
+                {
+                    "path": "components/h5/tooltip.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/tooltip.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "tokens"
+            ]
+        },
+        {
+            "name": "tooltip-pc",
+            "type": "registry:component",
+            "title": "Tooltip（PC 实现）",
+            "description": "鼠标 hover 200ms 延迟后弹出并随鼠标移动、移出即关；键盘 focus 立刻弹出、气泡锚定触发元素（无指针坐标）；hover 与 focus 双意图独立，两者都消失才关；Esc 关闭。",
+            "files": [
+                {
+                    "path": "components/pc/tooltip.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/tooltip.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "tooltip-parts",
+                "use-device-mode",
+                "tokens"
+            ]
+        },
+        {
+            "name": "ellipsis",
+            "type": "registry:component",
+            "title": "Ellipsis 多行截断 / 展开收起",
+            "description": "两端同形（模式 A）纯文本容器：收起态 -webkit-line-clamp 截到指定行数（默认 2），实测内容真的超高才显示「展开/收起」文字按钮（scrollHeight 对比 rows×行高，ResizeObserver 跟随宽度重测）；字号/行高继承父级。支持受控/非受控，与 Tooltip 组合实现 H5 常驻长说明的折叠。",
+            "files": [
+                {
+                    "path": "components/ui/ellipsis.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/ellipsis.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"]
+        },
+        {
+            "name": "tooltip",
+            "type": "registry:component",
+            "title": "Tooltip 文字提示",
+            "description": "同一段补充说明两端容器密度不同：H5 常驻 ⓘ 信息提示条（全文铺在主体下方，超长用 Ellipsis 折叠）/ PC hover 跟随鼠标、focus 锚定气泡（Esc 关）。纯展示不可交互，useId 与主体 aria-describedby 配对，受控/非受控仅作用于 PC，forceMode 唯一逃生舱。",
+            "files": [
+                {
+                    "path": "components/responsive/tooltip.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/tooltip.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "tooltip-h5",
+                "tooltip-pc"
+            ]
+        },
+        {
+            "name": "popover-parts",
+            "type": "registry:component",
+            "title": "Popover 共用零件",
+            "description": "两模式共享的面板内容：自定义内容区 + actions 行（图标/禁用/danger/分隔发丝线，H5 48px、PC 36px 密度走 JS 分支），以及无 DOM 依赖的形态判定纯函数（实测高度严格大于 3 行才进抽屉）与触发器 props 契约。",
+            "files": [
+                {
+                    "path": "components/ui/popover-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/popover-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "use-device-mode", "tokens"]
+        },
+        {
+            "name": "popover-h5",
+            "type": "registry:component",
+            "title": "Popover（H5 实现）",
+            "description": "打开即定形态：纯 actions 数行，带自定义内容时挂不可见限宽探针实测高度；行数 ≤ 阈值走 Radix 轻量气泡（Anchor 自管 click，触屏不抢焦，点外部延迟关闭），超阈值降级 Popup 底部抽屉（遮罩/安全区/滚动锁复用现成）。阈值取 token --bv-popover-h5-bubble-max-rows（默认 3），maxRows prop 可单实例覆盖；h5Form 可强制 bubble/drawer（跳过探针）。关闭后等退场播完再收回形态。",
+            "files": [
+                {
+                    "path": "components/h5/popover.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/popover.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "portal",
+                "popover-parts",
+                "popup",
+                "tokens"
+            ],
+            "dependencies": ["@radix-ui/react-popover"]
+        },
+        {
+            "name": "popover-pc",
+            "type": "registry:component",
+            "title": "Popover（PC 实现）",
+            "description": "Radix Popover 锚定浮层：翻转/防溢出/间距交 Popper，Anchor 自管 click（不用 Trigger 防双触发），键盘 Enter/Space 开合后焦点落入面板、Tab 循环、Esc 关闭并显式还焦触发器。",
+            "files": [
+                {
+                    "path": "components/pc/popover.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/popover.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "popover-parts", "tokens"],
+            "dependencies": ["@radix-ui/react-popover"]
+        },
+        {
+            "name": "popover",
+            "type": "registry:component",
+            "title": "Popover 气泡菜单",
+            "description": "模式 C 分发层：H5 轻量气泡 / 内容超行自动降级底部抽屉（分界行数取 token --bv-popover-h5-bubble-max-rows，maxRows prop 可覆盖，h5Form 可强制形态，均仅 H5 生效），PC 锚定浮层。内容为自定义节点 + actions 动作行（图标/禁用/danger），点动作默认关闭（closeOnClickAction 可关），支持受控/非受控，forceMode / h5Form / maxRows 三个逃生舱。",
+            "files": [
+                {
+                    "path": "components/responsive/popover.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/popover.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "popover-h5",
+                "popover-pc"
+            ]
         }
     ]
 }

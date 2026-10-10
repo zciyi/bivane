@@ -620,3 +620,87 @@
     --bv-datetime-picker-pc-duration: 160ms;
     --bv-datetime-picker-pc-z-index: var(--bv-z-popup);
 }
+
+/* ---------- 组件级 token：Tooltip 文字提示 ----------
+ * Vant 没有 Tooltip 组件，本组是 Bivane 扩展（矩阵 §2.1）。
+ * 两端信息相同（一段补充说明）、容器密度不同：
+ *   PC = hover/focus 触发的深色跟随气泡（pointer-events:none、不可交互）；
+ *   H5 = 常驻的 ⓘ 信息提示条（触屏没有 hover，辅助说明应直接展示，长文折叠走 Ellipsis）。
+ * 颜色不注册 bg-bv-* 语义工具类，组件侧一律以任意值 var() 消费（同 DatePicker 组做法）。
+ */
+:root,
+:host {
+    /* —— PC 跟随气泡（H5 已不使用浮层） —— */
+    --bv-tooltip-background: rgba(0, 0, 0, 0.75);
+    --bv-tooltip-color: var(--bv-white);
+    --bv-tooltip-font: var(--bv-font-sm);
+    --bv-tooltip-line-height: var(--bv-line-sm);
+    --bv-tooltip-padding-x: var(--bv-padding-sm);
+    --bv-tooltip-padding-y: 6px;
+    --bv-tooltip-radius: var(--bv-radius-md);
+    --bv-tooltip-max-width: 240px;
+    /* 气泡与光标的间距，同时用于键盘聚焦时与触发元素的间距 */
+    --bv-tooltip-gap: 12px;
+    /* 距视口边缘的最小留白，避免气泡贴边 */
+    --bv-tooltip-viewport-margin: var(--bv-padding-xs);
+    --bv-tooltip-duration: 120ms;
+    --bv-tooltip-z-index: var(--bv-z-popup);
+    /* PC：hover 多久后弹出（矩阵：200ms 延迟，防扫过误触） */
+    --bv-tooltip-pc-open-delay: 200ms;
+
+    /* —— H5 常驻信息提示条（ⓘ + 说明全文，铺在被说明主体下方） —— */
+    --bv-tooltip-h5-info-background: var(--bv-background);
+    --bv-tooltip-h5-info-color: var(--bv-text-2);
+    --bv-tooltip-h5-info-icon-color: var(--bv-primary);
+    --bv-tooltip-h5-info-padding-x: var(--bv-padding-sm);
+    --bv-tooltip-h5-info-padding-y: var(--bv-padding-xs);
+    --bv-tooltip-h5-info-radius: var(--bv-radius-md);
+    /* 行首 ⓘ 与文案的间距 */
+    --bv-tooltip-h5-info-gap: var(--bv-padding-base);
+    --bv-tooltip-h5-info-icon-size: 14px;
+    --bv-tooltip-h5-info-font: var(--bv-font-sm);
+    --bv-tooltip-h5-info-line-height: var(--bv-line-sm);
+    /* 与上方被说明主体的间距 */
+    --bv-tooltip-h5-info-margin-top: var(--bv-padding-xs);
+}
+
+/* ---------- 组件级 token：Ellipsis 多行截断 / 展开收起 ----------
+ * 两端同形（模式 A），只多一个「展开 / 收起」文字按钮；颜色复用 primary，
+ * 字号/行高继承父级（它是通用文本容器，不该自带字号）。
+ */
+:root,
+:host {
+    --bv-ellipsis-action-color: var(--bv-primary);
+    --bv-ellipsis-action-gap: var(--bv-padding-base);
+}
+
+/* ---------- 组件级 token：Popover 气泡弹层 ----------
+ * Vant 4 的 Popover 是锚定触发器的轻量气泡（actions 列表）；本组沿用其视觉，
+ * 另加 H5 的「内容 > 3 行降级底部抽屉」与 PC 的 Radix Popper 防溢出（矩阵 §2.1）。
+ * H5 与 PC 双实现（模式 C），两套行高各写各的，不进 modes.css。
+ * 颜色全部复用既有语义 token（text / danger / active / muted / border / surface）。
+ */
+:root,
+:host {
+    /* 行：H5 48px 触控热区；PC 36px 桌面密度（与 Select/Menu 同一节奏） */
+    --bv-popover-h5-row-height: 48px;
+    --bv-popover-pc-row-height: 36px;
+    --bv-popover-row-padding-x: var(--bv-padding-md);
+    --bv-popover-row-icon-size: 16px;
+    --bv-popover-row-gap: var(--bv-padding-base);
+    /* 自定义内容区（actions 之外）的内边距；actions 列表本身满宽 flush */
+    --bv-popover-content-padding-x: var(--bv-padding-xs);
+    --bv-popover-content-padding-y: var(--bv-padding-xs);
+    /* H5 轻量气泡限宽；同时是「超行降级」测量探针的宽度（宽度不确定高度就无法判定） */
+    --bv-popover-h5-bubble-max-width: 240px;
+    /* H5 气泡/抽屉自动分界：动作行 ≤ 该值走气泡，超出走抽屉；实例可用 maxRows prop 覆盖 */
+    --bv-popover-h5-bubble-max-rows: 3;
+    --bv-popover-pc-panel-min-width: 160px;
+    --bv-popover-pc-panel-max-width: 320px;
+    --bv-popover-panel-max-height: 60vh;
+    --bv-popover-offset: var(--bv-padding-base);
+    --bv-popover-radius: var(--bv-radius-lg);
+    --bv-popover-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    --bv-popover-duration: 120ms;
+    --bv-popover-z-index: var(--bv-z-popup);
+}

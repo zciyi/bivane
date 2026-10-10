@@ -525,6 +525,143 @@ const [pos, setPos] = React.useState('docs');
 
 > 值恒为字符串而非 `Date`（避开 UTC 差一天）；没有区间形态，需要区间请分别约束两个 DateTimePicker 或用 DatePicker/TimePicker 的区间版。
 
+### Tooltip
+
+一段纯展示的补充说明。**同一份 content，两端容器密度不同**（模式 B）：
+
+- **H5**：触屏没有 hover，说明**直接常驻**——被说明的主体在上，下方铺一条行首带 ⓘ 的浅底信息提示条，全文展示、不响应任何手势。文案太长时把 `content` 交给 [Ellipsis](#ellipsis) 折叠。
+- **PC**：鼠标 **hover 200ms** 后深色气泡弹出并跟随鼠标，移出即关；键盘 **focus 立即**弹出（气泡锚定元素上方/下方），`Esc` 关闭；hover 与 focus 任一仍在都不会误关。
+
+```tsx
+import { Tooltip } from "@/components/responsive/tooltip";
+import { Ellipsis } from "@/components/ui/ellipsis";
+
+{
+    /* 短说明：H5 常驻一条 / PC hover 出气泡 */
+}
+<Tooltip content="删除后不可恢复">
+    <button type="button" aria-label="删除">
+        <TrashIcon />
+    </button>
+</Tooltip>;
+
+{
+    /* 长说明：H5 常驻且默认截 2 行，可展开看全文；PC 气泡内同样折叠 */
+}
+<Tooltip
+    content={
+        <Ellipsis rows={2}>
+            开启后修改会实时同步给团队所有成员，新成员加入时也能看到全部历史记录。
+        </Ellipsis>
+    }
+>
+    <button type="button">团队同步</button>
+</Tooltip>;
+
+{
+    /* 受控开合只在 PC 浮层有意义；H5 说明恒常驻 */
+}
+<Tooltip content="已复制" open={copied} onOpenChange={setCopied}>
+    <button type="button" onClick={copy}>
+        复制链接
+    </button>
+</Tooltip>;
+```
+
+| prop                                    | 说明                                                                                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `content`                               | 说明内容（必填）。PC 气泡 `pointer-events:none`、`role=tooltip`，**不能放可交互元素**（要用按钮请选 Popover） |
+| `open` / `defaultOpen` / `onOpenChange` | PC 浮层受控/非受控开合；**H5 无浮层，这三个 prop 在 H5 不生效**                                               |
+| `disabled`                              | PC 下禁用 hover/focus 触发（不影响 children 自身禁用态）；H5 说明条恒展示                                     |
+| `className`                             | 透传给 PC 气泡 / H5 信息提示条                                                                                |
+| `forceMode`                             | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                         |
+
+说明体 id 由分发层 `useId` 生成并与主体的 `aria-describedby` 自动配对；children 必须是**单个**会把 props/ref 落到真实 DOM 的元素。H5 下它与常驻说明条纵向排列（主体在上）。
+
+### Ellipsis
+
+多行文本截断 + 「展开/收起」开关，**两端完全同形**（模式 A），字号/行高继承父级，是一个通用文本容器，不依赖 Tooltip。
+
+只有当内容**实测真的超过** `rows` 行时才显示开关（按 `scrollHeight` 与行高测量，窗口宽度变化会自动重测），短文本不会多出一个没用的按钮。
+
+```tsx
+import { Ellipsis } from '@/components/ui/ellipsis';
+
+// 默认截 2 行
+<Ellipsis>
+  一段可能很长的描述文字……
+</Ellipsis>
+
+// 截 3 行 + 自定义开关文案
+<Ellipsis rows={3} expandText="查看全部" collapseText="收起">
+  一段可能很长的描述文字……
+</Ellipsis>
+
+// 受控
+<Ellipsis expanded={open} onExpandedChange={setOpen}>{text}</Ellipsis>
+```
+
+| prop                                                | 说明                                            |
+| --------------------------------------------------- | ----------------------------------------------- |
+| `rows`                                              | 收起态最多显示行数，默认 `2`，小于 1 的值回落 1 |
+| `expandText` / `collapseText`                       | 开关文案，默认「展开」/「收起」                 |
+| `expanded` / `defaultExpanded` / `onExpandedChange` | 受控/非受控展开态                               |
+| `className`                                         | 透传给外层容器                                  |
+
+截断用的是 `-webkit-line-clamp`（iOS/Android/Chrome/Edge/Safari 全系支持，Firefox 68+ 亦已支持）；开关是一个真实 `<button>` 并带 `aria-expanded`，键盘与读屏均可操作。
+
+### Popover
+
+带动作列表 / 任意内容的气泡菜单。**容器范式两端不同，内容模型同源**（`content` + `actions`，模式 C）：
+
+- **H5**：点击触发，内容行数 **≤ 阈值**是锚定触发器的轻量气泡（自动翻转防溢出，点外部关）；**超出阈值自动降级为底部抽屉**（带遮罩 / 安全区 / 滚动锁）。阈值取 token `--bv-popover-h5-bubble-max-rows`（默认 3），`maxRows` prop 可单实例覆盖；形态在打开那一刻按实测高度决定。
+- **PC**：Radix 锚定浮层（翻转 / 防溢出），打开后焦点落入面板，`Tab` 在动作行间循环，`Esc` 关闭并把焦点还给触发器。
+
+```tsx
+import { Popover } from '@/components/responsive/popover';
+
+const actions = [
+  { key: 'share', text: '分享', icon: <ShareIcon />, onClick: () => share() },
+  { key: 'rename', text: '重命名', onClick: () => rename() },
+  { key: 'delete', text: '删除', danger: true, onClick: () => remove() },
+];
+
+// 只有动作行（H5 行数 ≤ maxRows 气泡、超出抽屉；PC 恒浮层）
+<Popover actions={actions} ariaLabel="更多操作">
+  <button type="button">更多</button>
+</Popover>
+
+// H5 强制抽屉形态（不管几行）；阈值 / 形态只在 H5 生效，PC 恒为锚定浮层
+<Popover actions={actions} h5Form="drawer">
+  <button type="button">更多</button>
+</Popover>
+
+// 自定义内容 + 动作；点动作后保持打开
+<Popover
+  content="此操作会同步给所有团队成员"
+  actions={actions}
+  closeOnClickAction={false}
+  placement="bottom"
+>
+  <button type="button">更多</button>
+</Popover>
+```
+
+| prop                                    | 说明                                                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `actions`                               | `{ key?, text, icon?, disabled?, danger?, onClick?(action) }[]`；danger 行复用危险色，行高 H5 48px / PC 36px |
+| `content`                               | 自定义节点，渲染在动作列表上方；两者可只给其一                                                               |
+| `placement`                             | 优先方向 `'top' \| 'bottom' \| 'left' \| 'right'`（默认 bottom，碰撞自动翻转；H5 抽屉形态忽略）              |
+| `closeOnClickAction`                    | 点动作行后是否关闭，默认 `true`                                                                              |
+| `open` / `defaultOpen` / `onOpenChange` | 受控 / 非受控开合                                                                                            |
+| `disabled`                              | 触发器不响应开合                                                                                             |
+| `ariaLabel`                             | 面板无障碍名称，内容没有可见标题时建议传                                                                     |
+| `h5Form`                                | 仅 H5：`'auto'`（默认）按行数自动分界，`'bubble'` / `'drawer'` 强制形态（跳过测量）                          |
+| `maxRows`                               | 仅 H5 且 `h5Form='auto'`：气泡形态允许的最大行数，缺省读 `--bv-popover-h5-bubble-max-rows`（默认 3）         |
+| `forceMode`                             | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                        |
+
+> 行内 ↑↓ 巡航、快捷键提示、多级子菜单是 DropdownMenu 的语义；Popover 的内容可以是任意节点，面板内导航走 `Tab`。动作行的 `onClick` 第一个参数是 action 本身；H5 气泡形态触屏不抢焦点，避免点击后页面滚动。
+
 ---
 
 ## 四、两端差异由谁决定
