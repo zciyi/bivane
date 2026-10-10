@@ -70,20 +70,22 @@
 
 ### 3.1 总览
 
-| 组件           | 模式 | 本质差异                                                                                                                                                                                                      |
-| -------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Popup          | B    | 同一 position 状态机 + 内容，H5 贴边滑入壳 / PC 居中模态壳                                                                                                                                                    |
-| Overlay        | A    | 仅浓度与「点遮罩关闭」默认值不同                                                                                                                                                                              |
-| Dialog         | B    | H5 复用 Popup bottom；PC 用 Radix Dialog                                                                                                                                                                      |
-| Toast          | C    | 信息模型不同：H5 单例胶囊 vs PC 可并存卡片栈                                                                                                                                                                  |
-| Select         | C    | 信息模型不同：底部热区单选即关 vs 锚定浮层键盘巡航/多选不关                                                                                                                                                   |
-| DropdownMenu   | C    | 导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地                                                                                                                                                        |
-| DatePicker     | C    | 交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航                                                                                                                                                                |
-| TimePicker     | B    | 同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）                                                                          |
-| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一居中双横线滚轮列（PC 多挂 ▲▼ 微调钮与列间竖线，`DateTimeWheelRow`）；单值字符串                                               |
-| Tooltip        | B    | 同一份说明文案、容器密度不同：H5 无浮层，常驻成主体下方的 ⓘ 信息提示条（超长交 Ellipsis 折叠）vs PC hover/focus 触发的跟随气泡；恒纯展示不可交互（2026-10-09 由 C/B 改判：H5 长按气泡不符合触屏惯例，改常驻） |
-| Ellipsis       | A    | 两端同形：`-webkit-line-clamp` 截断 N 行 + 实测溢出才出现「展开/收起」；不与 Tooltip 耦合，任何文本容器可单独使用                                                                                             |
-| Popover        | C    | 容器范式不同：H5 ≤3 行轻量气泡 / >3 行降级 Popup 底部抽屉（打开瞬间按实测高度定形态）vs PC Radix 锚定浮层；面板内容（自定义区 + actions 行）两端同源                                                          |
+| 组件           | 模式 | 本质差异                                                                                                                                                                                                           |
+| -------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Popup          | B    | 同一 position 状态机 + 内容，H5 贴边滑入壳 / PC 居中模态壳                                                                                                                                                         |
+| Overlay        | A    | 仅浓度与「点遮罩关闭」默认值不同                                                                                                                                                                                   |
+| Dialog         | B    | H5 复用 Popup bottom；PC 用 Radix Dialog                                                                                                                                                                           |
+| Toast          | C    | 信息模型不同：H5 单例胶囊 vs PC 可并存卡片栈                                                                                                                                                                       |
+| Select         | C    | 信息模型不同：底部热区单选即关 vs 锚定浮层键盘巡航/多选不关                                                                                                                                                        |
+| DropdownMenu   | C    | 导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地                                                                                                                                                             |
+| DatePicker     | C    | 交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航                                                                                                                                                                     |
+| TimePicker     | B    | 同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）                                                                               |
+| DateTimePicker | C    | 日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一居中双横线滚轮列（PC 多挂 ▲▼ 微调钮与列间竖线，`DateTimeWheelRow`）；单值字符串                                                    |
+| Tooltip        | B    | 同一份说明文案、容器密度不同：H5 无浮层，常驻成主体下方的 ⓘ 信息提示条（超长交 Ellipsis 折叠）vs PC hover/focus 触发的跟随气泡；恒纯展示不可交互（2026-10-09 由 C/B 改判：H5 长按气泡不符合触屏惯例，改常驻）      |
+| Ellipsis       | A    | 两端同形：`-webkit-line-clamp` 截断 N 行 + 实测溢出才出现「展开/收起」；不与 Tooltip 耦合，任何文本容器可单独使用                                                                                                  |
+| Popover        | C    | 容器范式不同：H5 ≤3 行轻量气泡 / >3 行降级 Popup 底部抽屉（打开瞬间按实测高度定形态）vs PC Radix 锚定浮层；面板内容（自定义区 + actions 行）两端同源                                                               |
+| Picker         | C    | 多列独立选择的容器范式不同：H5 N 列吸附滚轮（底部弹层）vs PC N 列纵向面板（锚定浮层，各列独立滚动/键盘巡航）；列间互不影响，两端都暂存→确定；滚轮件两端同款但 PC 不用（`PickerWheelRow` 仅 H5 + Cascader H5 复用） |
+| Cascader       | C    | 树的走法不同：H5 联动滚轮（省市区三列，换父列子列重算）vs PC 面包屑 + 逐级右展多列面板（点叶子即生效）+ 路径全文搜索；值恒为根→叶子完整路径                                                                        |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -139,6 +141,7 @@
 
 **关键规则**
 
+- **PC Root 恒 `modal={false}`**：Radix DropdownMenu 默认 `modal=true`，开着时 body 被置 `pointer-events:none`、外部内容 `aria-hidden`，点别的触发器**第一下只够关菜单、必须再点一次才打开**，也无法与其它弹层同一手势直切（与 §3.11 的 Trigger 时序配套，全库锚定弹层一律非模态）。
 - **PC 整套交 Radix DropdownMenu**（多层树的子菜单/焦点/typeahead/禁用跳过不自研），本库只管外观与「选中后干什么」；Select 的单层巡航是自研，两者选型理由不同。
 - **槽名三分**：`menu-panel`（PC 主浮层）/ `menu-subpanel`（PC 子菜单）/ `menu-layer`（H5 面板层），合并会导致断言假命中 + 动画挂错对象。
 - **状态归属**：`path`（面板栈深度）留 `h5/menu.tsx`；`value` 与暂存草稿跨模式同义，归分发层。
@@ -311,6 +314,75 @@ H5 = Popup 底部弹层 + 顶部 `PanelHeader` 工具条 + 安全区；PC = Radi
 - （PC）hover/退场计时全 fake：退场是「关闭后再挂退场计时器」，fake 时钟下要**分段 advance**，退场计时器在 act 刷掉状态更新后才挂载。
 - Ellipsis 的布局尺寸 jsdom 恒为 0（默认不显示开关）；几何分支 mock 时**不能整体替换 `getComputedStyle`**（返回对象丢掉 `getPropertyValue` 会让 dom-accessibility-api 算按钮 accessible name 时报 `getPropertyValue is not a function`），也不能 spy `CSSStyleDeclaration.prototype`（WebIDL 命名属性不挂原型）——正确做法：调真实 `getComputedStyle` 拿原对象，再 `defineProperty` 遮蔽 `lineHeight/fontSize`，另 mock `HTMLElement.prototype.scrollHeight`。
 - Radix Popover 两个 jsdom 已知时序：document 的 pointerdown 监听在弹层挂载后 `setTimeout(0)` 才注册（外部关闭用例打开后先让一帧）；`deferPointerDownOutside` 要求外部 pointerdown 后**再派一个 click** 才真关，且最终 dismiss 在 `setTimeout(0)`（整段包 async act，避免 PopperContent 的 act 警告）。
+
+### 3.9 Picker（模式 C，多列独立选择）
+
+Vant 把「独立多列」与「级联」塞在同一个 Picker 里；Bivane 拆开：**列与列互不影响的多维度单选归 Picker**（姓/名、品牌/年款），父子联动归 §3.10 Cascader，两者共享触发器、H5 滚轮地基（`ui/picker-parts.tsx`）以及 **PC 同一套多列面板外壳**。
+H5 = Popup 底部弹层 + N 列 `PickerWheelRow` 等平分列（5 行制吸附，复用 `use-picker-column`）+ PanelHeader；PC = Radix Popover 锚定浮层 + N 列纵向 listbox **并排平铺**（行高 36、左对齐、选中 primary + 右勾，与 §3.10 Cascader PC 行同款；但**列宽按内容 `w-max` 撑开、选项不省略**，132px 仅为最小兜底，这点与固定宽的 Cascader 不同；各列独立滚动），差别是**没有面包屑/级联**，底部多一条「取消/确定」。单列时就是一个宽度正常的列表面板（不得退化成窄条）。
+
+**定死取值**
+
+| 项        | H5                                             | PC                                                                                                                                                                                       | token                                        |
+| --------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 触发器    | 同 TimePicker 族：通栏细下边线 44px            | 32px 描边圆角 4px；Cascader 触发器同源复用                                                                                                                                               | `--bv-picker-*` / `--bv-picker-pc-trigger-*` |
+| 行/滚轮   | 滚轮行高 **44px**，可见 5 行，居中吸附         | 行高 **36px**、左对齐、选中 primary 文本 + 右侧 check 勾；**列按本列最长项 `w-max` 撑开、选项不省略**，`--bv-picker-pc-column-width`（132px）只是最小列宽兜底；列区 max-h 280px 各自滚动 | `--bv-picker-wheel-*` / `--bv-picker-pc-*`   |
+| PC 浮层宽 | —                                              | 面板 `w-max` 随列内容撑开（列区 flush，确认条自带 px）；上限取 Radix 可用宽，超出列区横向滚                                                                                              | `--bv-picker-pc-column-width`                |
+| 列分隔    | 滚轮列间 1px 竖发丝线（与中央指示同色 border） | 第 2 列起列自身 `border-l`（border-box 含在列宽内，不占额外宽度，否则顶出横向滚动条）                                                                                                    | `--bv-picker-column-divider-color`           |
+
+**关键规则**
+
+- **两端恒走「暂存 → 确定」**（同 TimePicker 判据）：多列要全部调好才算选完，点某一行/滚某一列就提交关闭不可用。Esc / 点外部 / 「取消」= 丢弃草稿；草稿归分发层，关闭不清空（退场动画仍在渲染草稿）。
+- **入参列支持字面量**：每列可直接给 `string[] | number[]`，`normalizeColumn` 归一成 `{label,value}`（value 与文案相同，对齐 Vant 惯例）。
+- **打开播种**（`resolveDraftValues`）：已提交值仍在列里就用它（即使该项被禁用也尊重回显）；值失效（选项集换了）落该列第一个可选项；**空列位给 undefined，「确定」禁用**并在底部提示「请补全每一列」（槽 `picker-footer-hint`），不提交半截值。
+- **PC 键盘面板级接管**：↑↓ 在当前列巡航（**跳过禁用、到边界不回绕**，与滚轮「滚到头停住」一致；Select 取值列表才回绕）、←→ 换列、Home/End 列首尾、Enter 先写草稿、激活项已等于草稿值时再按一次才提交、Esc 取消；焦点落 `[data-slot=picker-footer]` 内直接放行，否则按钮永远按不动（同 3.6）。
+- PC 行左对齐、`px` 行内边距、文案 `whitespace-nowrap`（**不截断**，长文案把列撑宽而非出省略号；极端超长由面板 max-w + 列区横向滚动收口）+ 右侧 check，**不再是滚轮式居中粗体**；`tabIndex={-1}` 不进 Tab 流；`data-selected` 标草稿选中（primary 文本 + 勾）、`data-active` 标键盘激活（`--bv-active-color` 底，hover 同色）。
+- 底部条按钮拼 `buttonVariants({size:'small'})` 不用 `<Button>`；Radix 用 **Anchor 不用 Trigger**；关闭焦点 `onCloseAutoFocus` 显式还触发器 —— 均沿用 §3.3/§3.6 既定范式。
+- 值 = 每列一个值的数组（`Array<string|number>`），`onChange(values, selectedOptions)` 选项按列对齐（失效位 undefined）。
+
+### 3.10 Cascader（模式 C，树形级联选择）
+
+省 / 市 / 区范式（Vant Area 的交互，但**不引** @vant/area-data，只支持其数据格式）。只有**叶子可选**（点父级只展开/联动，不产生 onChange，对齐 Vant Cascader finish；不做任意级可选）。
+H5 = Popup 底部弹层 + **联动滚轮**（不做 Vant Cascader 的下钻面板：矩阵定死滚轮，且下钻面包屑已由 DropdownMenu 承担）；PC = Radix Popover 锚定浮层 + 面包屑路径 + 逐级向右展开的多列面板，searchable 时顶部路径全文搜索。
+
+**定死取值**
+
+| 项       | H5                                                                  | PC                                                                                 | token / 纯函数                                |
+| -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------- |
+| 列模型   | `deriveLinkedColumns`：所有层级一次摊平成联动滚轮列（深度=列数）    | `derivePanelColumns`：链上每级向右展开一列，**不自动补选**（没点过的层级不高亮）   | use-cascader-state.ts                         |
+| 行/面板  | 复用 `--bv-picker-wheel-*`（44px 5 行制）                           | 行高 36px、列宽 **132px**（放得下「浙江/杭州市」路径）、列区 max-h 280px           | `--bv-cascader-pc-*`                          |
+| 面包屑   | 无（滚轮上方是 PanelHeader 标题）                                   | 根层「请选择」+ 各级选中项，每项可点截到该层；36px 高，横向滚动自动滚入当前层      | `cascader-breadcrumb*` / `-breadcrumb-height` |
+| 搜索     | 不呈现（滚轮没有搜索落点），同一 `searchable` prop 两端差异由模式定 | 顶部搜索框；按**路径全文**匹配叶子（「杭州」能命中其下全部区）；结果行回显完整路径 | `searchLeaves` / `flattenLeaves`              |
+| 提交时机 | 暂存 → 确定（PanelHeader）                                          | 点**叶子**即生效即关（桌面点选即生效，同 Select/DropdownMenu），无确认条           | —                                             |
+
+**关键规则**
+
+- **值恒为根 → 叶子的完整路径值数组**（如 `['zj','hz','xh']`）；`isValidLeafPath` 不完整或中途失效（数据刷新）的已提交值**不回显**、触发器退 placeholder（架构 §6.5 第 6 条）。
+- **联动规则（H5）**：第 i 列改选 = 保留前缀、换掉第 i 级、丢弃更深层级后重新 `deriveLinkedColumns`，子列回到各自**第一个可选项**补到叶子（`withLinkedValue` + 填充）。滚轮只渲染派生出的列，级联计算全在分发层（`onLinkedColumnChange(level,value)`）。
+- **无值播种**：H5 打开时没有效已提交路径，`fillFirstEnabledPath` 每级取第一个可选项补到叶子（滚轮不能停在半截）；PC 打开导航链 = 已提交路径（**展开即定位**，架构 §6.5 第 7 条），无值则从根列开始。
+- **失效路径就地截断**：`resolvePath` 中途任一级对不上就停在最近有效层，PC 不追加空列，H5 从断点继续补首个可选项。
+- **PC 面包屑**：根格恒在（点它链清空回根列）；链上末项是不可点的当前层，其余可点；独立于 PanelHeader（那是 H5 工具条，PC 不需要「取消/确定」行），用 `ui/cascader-parts.tsx` 的 `CascaderBreadcrumb`。
+- **PC 行后缀**：父级右箭头（Icon `arrow`），选中叶子 check；选中 = 链上当前值（primary 文本），键盘激活 = `--bv-active-color` 底。
+- **搜索**：`flattenLeaves` 摊平时**禁用项整棵子树剪枝**（禁用父级展不开，其叶子出现在搜索里就是搜得到点不动的死路）；结果行必须展示完整路径（同名叶子只看末级会选错）；label 是自定义节点无法取文本时退化为匹配 value（同 Select `matchOption`）；空关键词不搜索、无命中给 `emptyText`（默认「暂无数据」，复用 `SelectEmptyState`）。
+- **PC 键盘**：↑↓ 列内巡航跳禁用、→/Enter 展开父级或提交叶子、← 回上一级（链截尾）、Home/End 首尾、Esc/点外部关闭；搜索态按键让给输入框。searchable 打开自动聚焦搜索框（同 Select），否则焦点留面板；Trigger/还焦/点触发器防一关一开沿用 §3.11 范式。
+- **展开即定位的滚入视野挂在选项行 ref 回调上**：Radix Presence 列 DOM 晚挂载，依赖 open 的 effect 拿不到节点；ref 身份保持稳定，节点挂载即把选中/激活行 `scrollIntoView({block:'nearest'})`（架构 §6.5 第 7 条）。
+- **fieldNames**：默认 `{label:'label',value:'value',children:'children'}`，可改映射直接吃 Vant 风格数据；缺 value 的项给列内稳定占位值并强制禁用（不能退化用 label/序号，路径匹配会静默错乱）。
+- 触发器/Cascader H5 滚轮复用 Picker 零件（槽名 `picker-*`）；PC 外壳槽名 `cascader-panel / cascader-breadcrumb* / cascader-pc-column / cascader-option / cascader-search-result`。
+
+### 3.11 PC 通用：锚定弹层必须用 Popover.Trigger（禁止 Anchor 自管开合）
+
+适用：Select / Picker / Cascader / TimePicker / DatePicker / DateTimePicker / Popover 的 PC 触发器（DropdownMenu 用 Radix 原生 Trigger，规则天然一致）。**任何新的锚定弹层触发器都必须遵守本节，不准退回 Anchor + 自管 click。**
+
+- **规则 1：`Popover.Trigger asChild` 包住触发器，禁止 `Popover.Anchor` 自管开合。**
+  Radix 源码级原因：NonModal Content 的三道保护——`onInteractOutside` 里 `context.triggerRef.current.contains(target)` 放行、`deferPointerDownOutside: true` 把外部 pointerdown 延迟到同次手势的 click 再 dismiss、deferred 期间压制 focusoutside——**全部从 `context.triggerRef` 读取，而只有 Trigger 会登记它**（Anchor 只登记 Popper 定位锚点）。Anchor 方案下 triggerRef 恒为 null，保护全失效：开着 A 点 B 时 A 在 document pointerdown 立即 dismiss 并 flush，click 才开 B（「先关再打开」空帧）；mousedown 默认迁焦又触发 focusoutside（「要再点一次 / 打开后立刻关」）。
+  改用 Trigger 后的真实时序：pointerdown 只打标并挂一个 document click 一次性监听；click 时 React root 上 B 的 `onOpenToggle` 先执行（开 B，discrete 事件同步 flush），事件继续冒泡到 document 才派发 A 的 pointerDownOutside（关 A）——**关旧开新在同一帧完成**；点自己的触发器由 targetIsTrigger 放行，同一标志位同时压住迁焦造成的 focusoutside。
+- **规则 2：双端共用零件用 `clickDelegated` 分工。** 零件 click 处理器里 `clickDelegated || event.defaultPrevented || disabled` 时不自激活：H5 不传（默认 false，零件自身 click → onActivate，H5 不经 Radix）；PC 传 true，鼠标 click 全部委托 Radix toggle，杜绝双触发。键盘 Enter/Space/↑↓ 始终保留在零件的 onKeyDown 里——asChild 合并后触发器是 div，没有原生 button 的键盘合成 click。
+- **规则 3：disabled 守卫挂在 Trigger 本身**（Trigger 的 onClick 里 preventDefault），不能挂零件：Radix Slot 合序中 slot 自身处理器先于子元素处理器，写在子元素上拦不住 onOpenToggle。
+- **规则 4：触发器内子元素要拦截 Radix toggle，一律用 React onClick `preventDefault()`，禁止 `stopPropagation()`。** Radix `composeEventHandlers` 以 `event.defaultPrevented` 短路 `onOpenToggle`，防切关目的同样达到；但 `stopPropagation` 会让 click 到不了 document —— DismissableLayer 的延迟 dismiss 在 document capture 先标记「外部交互被拦截」，只有事件冒泡到 document 才解除，一旦被吞，**别的浮层**（不是当前这个）的 `pointerDownOutside` 不派发、不关闭，真机表现为两个浮层叠挂（如区间日历开着点另一个可输入日期框）。清除按钮、可编辑输入框都遵守本条；pointerdown 也不需要处理（目标在 triggerRef 内，Radix 自动放行）。
+- **规则 5：可编辑输入框（DatePicker PC 单值）只开不合。** input 的 click 永远 `preventDefault`（不被点合，收起只走 Esc / 点外部 / 选满），**关闭态**下 click 自行唤起——Esc 关闭会把焦点还回 input，此后再点不再触发 focus，必须靠 click 重开；未聚焦时 mousedown 的 focus 已先唤起（open 已为 true），click 不重复开。
+- **规则 6：Root 恒 `modal={false}`**（DropdownMenu 见 §3.4），外部关闭统一交 DismissableLayer。
+- **规则 7：禁止在 `onCloseAutoFocus` 里无条件 `preventDefault + focus 自己的触发器`。** Radix FocusScope 的卸载还焦在 unmount cleanup **内再排一个 `setTimeout(0)`** 执行（比新浮层挂载 passive effect 更晚一拍）。跨实例点击时旧层若在这个延迟回调里抢焦，新浮层的 focusin 监听已经就位且没有 deferred pointerdown 标志压制 → 新浮层被判 focusOutside 立即关闭（真机症状「B 展开后直接关闭」，100% 复现）。做法：**不传 `onCloseAutoFocus`**，用 Radix NonModal 默认逻辑——外部交互关闭（`hasInteractedOutsideRef`）不还焦，Esc/选中关闭才 focus 已登记的 trigger；自写的 `document.activeElement !== node` 守卫挡不住（此刻焦点已被新浮层拿走，条件恰好成立）。唯一例外是 DatePicker（要还焦到内部 input 而非外层 div），它用 `skipCloseAutoFocusRef`：外部 pointerdown/focusoutside 时置位，延迟还焦回调里读到就跳过。
+- **唯一例外：H5 Popover** 保留 Anchor + 自管 click（bubble/drawer 双形态共用外层 open，Trigger 的内部 toggle 会错位；触屏也没有 mousedown 迁焦竞态），理由见 `components/h5/popover.tsx` 文件头。
+- 回归测试：`tests/anchor-switch.test.tsx` —— 用完整真实手势（pointerdown→迁焦→mousedown→pointerup→mouseup→click），末尾**连排两个 `setTimeout(0)`**（第一个 flush passive effects，旧层 cleanup 在其中再排一个 setTimeout；第二个才跑到旧层的延迟还焦）；jsdom 只派 click 或只等一个 tick 都会漏掉「旧层抢焦关掉新层」。断言跨实例同一手势关旧开新且延迟还焦后新层仍在、同实例反复点击稳定、清除按钮不关层、disabled 不开、Esc 关闭还焦触发器。
 
 ## 4. 测试要求
 

@@ -82,43 +82,43 @@ export const PRESS_REPEAT_INTERVAL = 70;
  * 不能让 setTimeout 闭包锁住旧回调。
  */
 export function usePressRepeat(action: () => void): {
-    start: () => void;
-    stop: () => void;
+  start: () => void;
+  stop: () => void;
 } {
-    const actionRef = React.useRef(action);
-    actionRef.current = action;
-    const delayTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-        null,
-    );
-    const intervalTimerRef = React.useRef<ReturnType<
-        typeof setInterval
-    > | null>(null);
+  const actionRef = React.useRef(action);
+  actionRef.current = action;
+  const delayTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const intervalTimerRef = React.useRef<ReturnType<
+    typeof setInterval
+  > | null>(null);
 
-    const stop = React.useCallback(() => {
-        if (delayTimerRef.current !== null) {
-            clearTimeout(delayTimerRef.current);
-            delayTimerRef.current = null;
-        }
-        if (intervalTimerRef.current !== null) {
-            clearInterval(intervalTimerRef.current);
-            intervalTimerRef.current = null;
-        }
-    }, []);
+  const stop = React.useCallback(() => {
+    if (delayTimerRef.current !== null) {
+      clearTimeout(delayTimerRef.current);
+      delayTimerRef.current = null;
+    }
+    if (intervalTimerRef.current !== null) {
+      clearInterval(intervalTimerRef.current);
+      intervalTimerRef.current = null;
+    }
+  }, []);
 
-    React.useEffect(() => stop, [stop]);
+  React.useEffect(() => stop, [stop]);
 
-    const start = React.useCallback(() => {
-        stop();
+  const start = React.useCallback(() => {
+    stop();
+    actionRef.current();
+    delayTimerRef.current = setTimeout(() => {
+      actionRef.current();
+      intervalTimerRef.current = setInterval(() => {
         actionRef.current();
-        delayTimerRef.current = setTimeout(() => {
-            actionRef.current();
-            intervalTimerRef.current = setInterval(() => {
-                actionRef.current();
-            }, PRESS_REPEAT_INTERVAL);
-        }, PRESS_REPEAT_DELAY);
-    }, [stop]);
+      }, PRESS_REPEAT_INTERVAL);
+    }, PRESS_REPEAT_DELAY);
+  }, [stop]);
 
-    return { start, stop };
+  return { start, stop };
 }
 
 export interface UsePickerColumnOptions {

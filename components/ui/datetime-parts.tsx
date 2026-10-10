@@ -3,19 +3,19 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
 import type { DeviceMode } from "@/hooks/use-device-mode";
 import {
-    buildColumnValues,
-    pad2,
-    type DateTimeColumnKey,
-    type DateTimeParts,
+  buildColumnValues,
+  pad2,
+  type DateTimeColumnKey,
+  type DateTimeParts,
 } from "@/hooks/use-datetime-value";
 import {
-    WHEEL_ITEM_HEIGHT,
-    WHEEL_VISIBLE_ROWS,
-    alignOffset,
-    clampIndex,
-    usePickerColumn,
-    usePressRepeat,
-    wheelPadding,
+  WHEEL_ITEM_HEIGHT,
+  WHEEL_VISIBLE_ROWS,
+  alignOffset,
+  clampIndex,
+  usePickerColumn,
+  usePressRepeat,
+  wheelPadding,
 } from "@/hooks/use-picker-column";
 
 /**
@@ -36,37 +36,37 @@ import {
  * ------------------------------------------------------------------ */
 
 export interface DateTimePanelProps {
-    /** 已解析的模式（含 forceMode 逃生舱），由分发层传入 */
-    mode: DeviceMode;
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    /** 参与展示的列，恒为「年→月→日→时→分→秒」的前缀（年日月必在） */
-    columns: DateTimeColumnKey[];
-    format: string;
-    /** 已解析的可选范围（分发层算一次，两端不重复解析） */
-    minParts: DateTimeParts;
-    maxParts: DateTimeParts;
-    /** H5 面板标题；PC 不渲染标题 */
-    title?: React.ReactNode;
-    placeholder?: React.ReactNode;
-    disabled: boolean;
-    clearable: boolean;
-    /** 已提交值（触发器回显用） */
-    selected: string[];
-    /** 草稿（滚轮滚动只改它，确定才提交） */
-    draft: string[];
-    onDraftChange: (next: string[]) => void;
-    /** 要求提交并关闭 */
-    onSubmit: (next: string[]) => void;
-    /** 关闭并丢弃草稿 */
-    onCancel: () => void;
-    /** 清空已提交值（触发器上的清除按钮） */
-    onClear: () => void;
-    confirmText?: React.ReactNode;
-    cancelText?: React.ReactNode;
-    className?: string;
-    ariaLabel?: string;
-    id?: string;
+  /** 已解析的模式（含 forceMode 逃生舱），由分发层传入 */
+  mode: DeviceMode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** 参与展示的列，恒为「年→月→日→时→分→秒」的前缀（年日月必在） */
+  columns: DateTimeColumnKey[];
+  format: string;
+  /** 已解析的可选范围（分发层算一次，两端不重复解析） */
+  minParts: DateTimeParts;
+  maxParts: DateTimeParts;
+  /** H5 面板标题；PC 不渲染标题 */
+  title?: React.ReactNode;
+  placeholder?: React.ReactNode;
+  disabled: boolean;
+  clearable: boolean;
+  /** 已提交值（触发器回显用） */
+  selected: string[];
+  /** 草稿（滚轮滚动只改它，确定才提交） */
+  draft: string[];
+  onDraftChange: (next: string[]) => void;
+  /** 要求提交并关闭 */
+  onSubmit: (next: string[]) => void;
+  /** 关闭并丢弃草稿 */
+  onCancel: () => void;
+  /** 清空已提交值（触发器上的清除按钮） */
+  onClear: () => void;
+  confirmText?: React.ReactNode;
+  cancelText?: React.ReactNode;
+  className?: string;
+  ariaLabel?: string;
+  id?: string;
 }
 
 /* ------------------------------------------------------------------ *
@@ -74,162 +74,171 @@ export interface DateTimePanelProps {
  * ------------------------------------------------------------------ */
 
 function triggerShellClass(mode: DeviceMode): string {
-    if (mode === "mobile") {
-        return cn(
-            "relative box-border flex w-full items-center",
-            "px-[var(--bv-datetime-picker-padding-x)] py-[var(--bv-datetime-picker-padding-y)]",
-            "bg-bv-surface",
-            "bv-hairline bv-hairline--bottom",
-        );
-    }
+  if (mode === "mobile") {
     return cn(
-        "relative box-border flex w-full items-center",
-        "h-[var(--bv-datetime-picker-pc-trigger-height)]",
-        "px-[var(--bv-datetime-picker-padding-x)] py-0",
-        "rounded-[var(--bv-datetime-picker-pc-trigger-radius)] border border-[var(--bv-datetime-picker-pc-trigger-border-color)] bg-bv-surface",
-        "transition-colors duration-[var(--bv-duration-fast)]",
-        "hover:border-bv-primary",
-        "focus-within:border-bv-primary focus-within:ring-1 focus-within:ring-bv-primary",
-        "focus-visible:border-bv-primary focus-visible:outline-none",
+      "relative box-border flex w-full items-center",
+      "px-[var(--bv-datetime-picker-padding-x)] py-[var(--bv-datetime-picker-padding-y)]",
+      "bg-bv-surface",
+      "bv-hairline bv-hairline--bottom",
     );
+  }
+  return cn(
+    "relative box-border flex w-full items-center",
+    "h-[var(--bv-datetime-picker-pc-trigger-height)]",
+    "px-[var(--bv-datetime-picker-padding-x)] py-0",
+    "rounded-[var(--bv-datetime-picker-pc-trigger-radius)] border border-[var(--bv-datetime-picker-pc-trigger-border-color)] bg-bv-surface",
+    "transition-colors duration-[var(--bv-duration-fast)]",
+    "hover:border-bv-primary",
+    "focus-within:border-bv-primary focus-within:ring-1 focus-within:ring-bv-primary",
+    "focus-visible:border-bv-primary focus-visible:outline-none",
+  );
 }
 
 export interface DateTimeTriggerProps extends Omit<
-    React.HTMLAttributes<HTMLDivElement>,
-    "children"
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
 > {
-    mode: DeviceMode;
-    text: string;
-    placeholder?: React.ReactNode;
-    filled?: boolean;
-    clearable?: boolean;
-    onClear?: () => void;
-    disabled?: boolean;
-    open?: boolean;
-    onActivate?: () => void;
-    onArrowKey?: (direction: "up" | "down") => void;
-    "aria-label"?: string;
+  mode: DeviceMode;
+  text: string;
+  placeholder?: React.ReactNode;
+  filled?: boolean;
+  clearable?: boolean;
+  onClear?: () => void;
+  disabled?: boolean;
+  open?: boolean;
+  onActivate?: () => void;
+  onArrowKey?: (direction: "up" | "down") => void;
+  /**
+   * click 开合是否已委托外层（PC Radix Popover.Trigger）。
+   * 默认 false：H5 由本元素 click 自激活；PC 必须传 true 防双触发
+   */
+  clickDelegated?: boolean;
+  "aria-label"?: string;
 }
 
 export const DateTimeTrigger = React.forwardRef<
-    HTMLDivElement,
-    DateTimeTriggerProps
+  HTMLDivElement,
+  DateTimeTriggerProps
 >(function DateTimeTrigger(
-    {
-        mode,
-        text,
-        placeholder,
-        filled = false,
-        clearable = false,
-        onClear,
-        disabled = false,
-        open = false,
-        onActivate,
-        onArrowKey,
-        className,
-        onClick,
-        onKeyDown,
-        "aria-label": ariaLabel,
-        ...props
-    },
-    ref,
+  {
+    mode,
+    text,
+    placeholder,
+    filled = false,
+    clearable = false,
+    onClear,
+    disabled = false,
+    open = false,
+    onActivate,
+    onArrowKey,
+    clickDelegated = false,
+    className,
+    onClick,
+    onKeyDown,
+    "aria-label": ariaLabel,
+    ...props
+  },
+  ref,
 ) {
-    // 显式取出并组合处理器，避免调用方传入的同名回调把组件的展开逻辑覆盖（time-parts 同款坑）
-    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        onClick?.(event);
-        if (event.defaultPrevented || disabled) return;
-        onActivate?.();
-    };
+  // 鼠标开合：H5 由本元素 click 自激活；PC 委托 Radix Popover.Trigger（原因见 select-parts）
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    onClick?.(event);
+    if (clickDelegated || event.defaultPrevented || disabled) return;
+    onActivate?.();
+  };
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-        onKeyDown?.(event);
-        if (event.defaultPrevented || disabled) return;
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            onActivate?.();
-            return;
-        }
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            onArrowKey?.("down");
-            return;
-        }
-        if (event.key === "ArrowUp") {
-            event.preventDefault();
-            onArrowKey?.("up");
-        }
-    };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented || disabled) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onActivate?.();
+      return;
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      onArrowKey?.("down");
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      onArrowKey?.("up");
+    }
+  };
 
-    return (
-        <div
-            ref={ref}
-            role="combobox"
-            aria-expanded={open}
-            aria-haspopup="dialog"
-            aria-disabled={disabled || undefined}
-            aria-label={ariaLabel}
-            data-mode={mode === "mobile" ? "h5" : "pc"}
-            data-state={open ? "open" : "closed"}
-            data-filled={filled ? "true" : undefined}
-            tabIndex={disabled ? undefined : 0}
-            onClick={handleClick}
-            onKeyDown={handleKeyDown}
-            className={cn(
-                triggerShellClass(mode),
-                "gap-[var(--bv-datetime-picker-gap)]",
-                disabled
-                    ? "cursor-not-allowed opacity-[var(--bv-datetime-picker-disabled-opacity)]"
-                    : "cursor-pointer",
-                className,
-            )}
-            {...props}
-            data-slot="datetime-picker-trigger"
+  return (
+    <div
+      ref={ref}
+      role="combobox"
+      aria-expanded={open}
+      aria-haspopup="dialog"
+      aria-disabled={disabled || undefined}
+      aria-label={ariaLabel}
+      data-mode={mode === "mobile" ? "h5" : "pc"}
+      data-state={open ? "open" : "closed"}
+      data-filled={filled ? "true" : undefined}
+      tabIndex={disabled ? undefined : 0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      className={cn(
+        triggerShellClass(mode),
+        "gap-[var(--bv-datetime-picker-gap)]",
+        disabled
+          ? "cursor-not-allowed opacity-[var(--bv-datetime-picker-disabled-opacity)]"
+          : "cursor-pointer",
+        className,
+      )}
+      {...props}
+      data-slot="datetime-picker-trigger"
+    >
+      <span
+        data-slot="datetime-picker-trigger-value"
+        className={cn(
+          "min-w-0 flex-1 truncate",
+          filled
+            ? "text-[var(--bv-datetime-picker-text-color)]"
+            : "text-[var(--bv-datetime-picker-placeholder-color)]",
+        )}
+      >
+        {filled ? text : placeholder}
+      </span>
+
+      {clearable && filled && !disabled ? (
+        <button
+          type="button"
+          data-slot="datetime-picker-trigger-clear"
+          aria-label="清除"
+          tabIndex={-1}
+          // preventDefault 短路 Radix toggle（X 在 triggerRef 内，同实例
+          // pointerDownOutside 也会被放行）；不能 stopPropagation —— 否则别的
+          // 浮层挂 document 的延迟 dismiss 收不到这次 click
+          onClick={(event) => {
+            event.preventDefault();
+            onClear?.();
+          }}
+          className={cn(
+            "flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0",
+            "text-[length:var(--bv-datetime-picker-icon-size)] text-[var(--bv-datetime-picker-icon-color)]",
+            "hover:text-bv-text-2",
+          )}
         >
-            <span
-                data-slot="datetime-picker-trigger-value"
-                className={cn(
-                    "min-w-0 flex-1 truncate",
-                    filled
-                        ? "text-[var(--bv-datetime-picker-text-color)]"
-                        : "text-[var(--bv-datetime-picker-placeholder-color)]",
-                )}
-            >
-                {filled ? text : placeholder}
-            </span>
+          <Icon name="cross" />
+        </button>
+      ) : null}
 
-            {clearable && filled && !disabled ? (
-                <button
-                    type="button"
-                    data-slot="datetime-picker-trigger-clear"
-                    aria-label="清除"
-                    tabIndex={-1}
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        onClear?.();
-                    }}
-                    className={cn(
-                        "flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0",
-                        "text-[length:var(--bv-datetime-picker-icon-size)] text-[var(--bv-datetime-picker-icon-color)]",
-                        "hover:text-bv-text-2",
-                    )}
-                >
-                    <Icon name="cross" />
-                </button>
-            ) : null}
-
-            <span
-                data-slot="datetime-picker-trigger-indicator"
-                className={cn(
-                    "flex shrink-0 items-center justify-center",
-                    "text-[length:var(--bv-datetime-picker-icon-size)] text-[var(--bv-datetime-picker-icon-color)]",
-                    "transition-transform duration-[var(--bv-duration-fast)]",
-                    open && "rotate-180",
-                )}
-            >
-                <Icon name="arrow-down" />
-            </span>
-        </div>
-    );
+      <span
+        data-slot="datetime-picker-trigger-indicator"
+        className={cn(
+          "flex shrink-0 items-center justify-center",
+          "text-[length:var(--bv-datetime-picker-icon-size)] text-[var(--bv-datetime-picker-icon-color)]",
+          "transition-transform duration-[var(--bv-duration-fast)]",
+          open && "rotate-180",
+        )}
+      >
+        <Icon name="arrow-down" />
+      </span>
+    </div>
+  );
 });
 
 /* ------------------------------------------------------------------ *
@@ -237,35 +246,35 @@ export const DateTimeTrigger = React.forwardRef<
  * ------------------------------------------------------------------ */
 
 const WHEEL_COLUMN_LABELS: Record<DateTimeColumnKey, string> = {
-    year: "年",
-    month: "月",
-    day: "日",
-    hour: "时",
-    minute: "分",
-    second: "秒",
+  year: "年",
+  month: "月",
+  day: "日",
+  hour: "时",
+  minute: "分",
+  second: "秒",
 };
 
 /** 年份按 4 位显示，其余列补零两位 */
 function formatColumnValue(key: DateTimeColumnKey, value: number): string {
-    return key === "year" ? String(value) : pad2(value);
+  return key === "year" ? String(value) : pad2(value);
 }
 
 export interface DateTimeWheelColumnProps {
-    mode: DeviceMode;
-    /** 无障碍名称，如「年」 */
-    label: string;
-    /** 本列当前值在可选值数组中的位置 */
-    values: number[];
-    value: number;
-    columnKey: DateTimeColumnKey;
-    disabled?: boolean;
-    /** 键盘光标所在列（仅 PC 传） */
-    active?: boolean;
-    /** 列左侧的发丝分隔线（由行按「非首列」传入，首列左边贴着月历边框） */
-    divider?: boolean;
-    /** 列顶/列尾渲染 ▲▼ 微调钮（仅 PC 时间列传 true，H5 不挂） */
-    stepButtons?: boolean;
-    onValueChange: (value: number) => void;
+  mode: DeviceMode;
+  /** 无障碍名称，如「年」 */
+  label: string;
+  /** 本列当前值在可选值数组中的位置 */
+  values: number[];
+  value: number;
+  columnKey: DateTimeColumnKey;
+  disabled?: boolean;
+  /** 键盘光标所在列（仅 PC 传） */
+  active?: boolean;
+  /** 列左侧的发丝分隔线（由行按「非首列」传入，首列左边贴着月历边框） */
+  divider?: boolean;
+  /** 列顶/列尾渲染 ▲▼ 微调钮（仅 PC 时间列传 true，H5 不挂） */
+  stepButtons?: boolean;
+  onValueChange: (value: number) => void;
 }
 
 /**
@@ -274,237 +283,237 @@ export interface DateTimeWheelColumnProps {
  * 只响应主键 pointerdown，不进 Tab 流 —— 键盘驾驶由面板统一处理，避免双路步进。
  */
 function WheelStepButton({
-    direction,
-    disabled,
-    onStep,
+  direction,
+  disabled,
+  onStep,
 }: {
-    direction: "up" | "down";
-    disabled: boolean;
-    onStep: () => void;
+  direction: "up" | "down";
+  disabled: boolean;
+  onStep: () => void;
 }) {
-    const { start, stop } = usePressRepeat(onStep);
-    const isUp = direction === "up";
-    return (
-        <button
-            type="button"
-            tabIndex={-1}
-            aria-label={isUp ? "上一项" : "下一项"}
-            aria-hidden={disabled || undefined}
-            data-slot="datetime-picker-wheel-step"
-            data-direction={direction}
-            disabled={disabled}
-            onPointerDown={(event) => {
-                if (event.button !== 0 || disabled) return;
-                // 阻止焦点落到钮上与长按选中文本
-                event.preventDefault();
-                start();
-            }}
-            onPointerUp={stop}
-            onPointerCancel={stop}
-            onPointerLeave={stop}
-            className={cn(
-                "absolute inset-x-0 z-[3] flex h-5 touch-none select-none items-center justify-center border-0 p-0",
-                "cursor-pointer text-[var(--bv-date-picker-pc-nav-color)] hover:text-bv-primary",
-                "disabled:invisible disabled:cursor-default",
-                isUp
-                    ? "top-0 [background:linear-gradient(to_bottom,var(--bv-surface)_70%,transparent)]"
-                    : "bottom-0 [background:linear-gradient(to_top,var(--bv-surface)_70%,transparent)]",
-            )}
-        >
-            <Icon
-                name="arrow-down"
-                className={cn("text-[10px]", isUp && "rotate-180")}
-            />
-        </button>
-    );
+  const { start, stop } = usePressRepeat(onStep);
+  const isUp = direction === "up";
+  return (
+    <button
+      type="button"
+      tabIndex={-1}
+      aria-label={isUp ? "上一项" : "下一项"}
+      aria-hidden={disabled || undefined}
+      data-slot="datetime-picker-wheel-step"
+      data-direction={direction}
+      disabled={disabled}
+      onPointerDown={(event) => {
+        if (event.button !== 0 || disabled) return;
+        // 阻止焦点落到钮上与长按选中文本
+        event.preventDefault();
+        start();
+      }}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      onPointerLeave={stop}
+      className={cn(
+        "absolute inset-x-0 z-[3] flex h-5 touch-none select-none items-center justify-center border-0 p-0",
+        "cursor-pointer text-[var(--bv-date-picker-pc-nav-color)] hover:text-bv-primary",
+        "disabled:invisible disabled:cursor-default",
+        isUp
+          ? "top-0 [background:linear-gradient(to_bottom,var(--bv-surface)_70%,transparent)]"
+          : "bottom-0 [background:linear-gradient(to_top,var(--bv-surface)_70%,transparent)]",
+      )}
+    >
+      <Icon
+        name="arrow-down"
+        className={cn("text-[10px]", isUp && "rotate-180")}
+      />
+    </button>
+  );
 }
 
 export const DateTimeWheelColumn = React.forwardRef<
-    HTMLDivElement,
-    DateTimeWheelColumnProps
+  HTMLDivElement,
+  DateTimeWheelColumnProps
 >(function DateTimeWheelColumn(
-    {
-        mode,
-        label,
-        values,
-        value,
-        columnKey,
-        disabled = false,
-        active = false,
-        divider = false,
-        stepButtons = false,
-        onValueChange,
-    },
-    ref,
+  {
+    mode,
+    label,
+    values,
+    value,
+    columnKey,
+    disabled = false,
+    active = false,
+    divider = false,
+    stepButtons = false,
+    onValueChange,
+  },
+  ref,
 ) {
-    const index = React.useMemo(() => {
-        const found = values.indexOf(value);
-        return found >= 0 ? found : 0;
-    }, [values, value]);
+  const index = React.useMemo(() => {
+    const found = values.indexOf(value);
+    return found >= 0 ? found : 0;
+  }, [values, value]);
 
-    // 行高以实测为准（token 是事实源），jsdom 拿不到布局时回落常量，只影响滚动偏移
-    const [itemHeight, setItemHeight] = React.useState(WHEEL_ITEM_HEIGHT);
+  // 行高以实测为准（token 是事实源），jsdom 拿不到布局时回落常量，只影响滚动偏移
+  const [itemHeight, setItemHeight] = React.useState(WHEEL_ITEM_HEIGHT);
 
-    const handleIndexChange = React.useCallback(
-        (next: number) => {
-            const nextValue = values[next];
-            if (nextValue === undefined || nextValue === value) return;
-            onValueChange(nextValue);
-        },
-        [values, value, onValueChange],
+  const handleIndexChange = React.useCallback(
+    (next: number) => {
+      const nextValue = values[next];
+      if (nextValue === undefined || nextValue === value) return;
+      onValueChange(nextValue);
+    },
+    [values, value, onValueChange],
+  );
+
+  /** ▲/▼ 与按住连发：在当前可选区间内移动一格，越界即停（父层级联夹紧） */
+  const stepBy = React.useCallback(
+    (delta: number) => {
+      const nextIndex = clampIndex(index + delta, values.length);
+      const nextValue = values[nextIndex];
+      if (nextValue === undefined || nextValue === value) return;
+      onValueChange(nextValue);
+    },
+    [index, values, value, onValueChange],
+  );
+
+  const { containerRef, onScroll, scrollToIndex } = usePickerColumn({
+    index,
+    count: values.length,
+    itemHeight,
+    onIndexChange: handleIndexChange,
+  });
+
+  React.useLayoutEffect(() => {
+    const node = containerRef.current?.querySelector(
+      '[data-slot="datetime-picker-wheel-item"]',
     );
+    const measured = node instanceof HTMLElement ? node.offsetHeight : 0;
+    if (measured > 0) {
+      setItemHeight((prev) => (prev === measured ? prev : measured));
+    }
+  }, [values.length, containerRef]);
 
-    /** ▲/▼ 与按住连发：在当前可选区间内移动一格，越界即停（父层级联夹紧） */
-    const stepBy = React.useCallback(
-        (delta: number) => {
-            const nextIndex = clampIndex(index + delta, values.length);
-            const nextValue = values[nextIndex];
-            if (nextValue === undefined || nextValue === value) return;
-            onValueChange(nextValue);
-        },
-        [index, values, value, onValueChange],
-    );
+  // 首尾各补两行空白，让任意选项都能滚到正中（5 行制居中滚轮）
+  const padding = wheelPadding(itemHeight, WHEEL_VISIBLE_ROWS);
 
-    const { containerRef, onScroll, scrollToIndex } = usePickerColumn({
-        index,
-        count: values.length,
-        itemHeight,
-        onIndexChange: handleIndexChange,
-    });
+  return (
+    <div
+      ref={ref}
+      data-mode={mode === "mobile" ? "h5" : "pc"}
+      role="listbox"
+      aria-label={label}
+      data-slot="datetime-picker-wheel"
+      data-active={active ? "true" : undefined}
+      className={cn(
+        "relative min-w-0 flex-1 overflow-hidden",
+        divider && "border-l border-bv-border",
+      )}
+      style={{ height: alignOffset(WHEEL_VISIBLE_ROWS, itemHeight) }}
+    >
+      <div
+        aria-hidden="true"
+        data-slot="datetime-picker-wheel-indicator"
+        className={cn(
+          // z-0：双横线画在数字下面；只留上下发丝线、不铺底色
+          // （选中态靠居中位置 + 加粗文本表达，对齐 Vant Picker）
+          "pointer-events-none absolute inset-x-0 z-0",
+          "border-y border-[var(--bv-datetime-picker-wheel-line-color)]",
+        )}
+        style={{
+          top: alignOffset(2, itemHeight),
+          height: itemHeight,
+        }}
+      />
 
-    React.useLayoutEffect(() => {
-        const node = containerRef.current?.querySelector(
-            '[data-slot="datetime-picker-wheel-item"]',
-        );
-        const measured = node instanceof HTMLElement ? node.offsetHeight : 0;
-        if (measured > 0) {
-            setItemHeight((prev) => (prev === measured ? prev : measured));
-        }
-    }, [values.length, containerRef]);
-
-    // 首尾各补两行空白，让任意选项都能滚到正中（5 行制居中滚轮）
-    const padding = wheelPadding(itemHeight, WHEEL_VISIBLE_ROWS);
-
-    return (
-        <div
-            ref={ref}
-            data-mode={mode === "mobile" ? "h5" : "pc"}
-            role="listbox"
-            aria-label={label}
-            data-slot="datetime-picker-wheel"
-            data-active={active ? "true" : undefined}
-            className={cn(
-                "relative min-w-0 flex-1 overflow-hidden",
-                divider && "border-l border-bv-border",
-            )}
-            style={{ height: alignOffset(WHEEL_VISIBLE_ROWS, itemHeight) }}
-        >
-            <div
-                aria-hidden="true"
-                data-slot="datetime-picker-wheel-indicator"
-                className={cn(
-                    // z-0：双横线画在数字下面；只留上下发丝线、不铺底色
-                    // （选中态靠居中位置 + 加粗文本表达，对齐 Vant Picker）
-                    "pointer-events-none absolute inset-x-0 z-0",
-                    "border-y border-[var(--bv-datetime-picker-wheel-line-color)]",
-                )}
-                style={{
-                    top: alignOffset(2, itemHeight),
-                    height: itemHeight,
-                }}
-            />
-
-            <div
-                ref={containerRef}
-                onScroll={onScroll}
-                data-bv-scroll-container=""
-                data-slot="datetime-picker-wheel-scroller"
-                className="relative z-[1] h-full w-full snap-y snap-mandatory overflow-y-auto overscroll-contain"
-                style={{ paddingTop: padding, paddingBottom: padding }}
+      <div
+        ref={containerRef}
+        onScroll={onScroll}
+        data-bv-scroll-container=""
+        data-slot="datetime-picker-wheel-scroller"
+        className="relative z-[1] h-full w-full snap-y snap-mandatory overflow-y-auto overscroll-contain"
+        style={{ paddingTop: padding, paddingBottom: padding }}
+      >
+        {values.map((item, itemIndex) => {
+          const selected = itemIndex === index;
+          // tabIndex=-1：滚轮项不进 Tab 流（选择面是整个浮层），与 TimePicker 同
+          return (
+            <button
+              key={item}
+              type="button"
+              role="option"
+              aria-selected={selected}
+              disabled={disabled}
+              tabIndex={-1}
+              data-slot="datetime-picker-wheel-item"
+              data-selected={selected ? "true" : undefined}
+              onClick={() => {
+                if (disabled || selected) return;
+                scrollToIndex(itemIndex);
+                onValueChange(item);
+              }}
+              className={cn(
+                "flex w-full cursor-pointer snap-center items-center justify-center border-0 bg-transparent",
+                "h-[var(--bv-datetime-picker-wheel-item-height)]",
+                "text-bv-md leading-[var(--bv-datetime-picker-wheel-item-line-height)]",
+                selected
+                  ? "font-bold text-[var(--bv-datetime-picker-wheel-selected-color)]"
+                  : "text-[var(--bv-datetime-picker-wheel-color)]",
+                disabled && "cursor-not-allowed",
+              )}
             >
-                {values.map((item, itemIndex) => {
-                    const selected = itemIndex === index;
-                    // tabIndex=-1：滚轮项不进 Tab 流（选择面是整个浮层），与 TimePicker 同
-                    return (
-                        <button
-                            key={item}
-                            type="button"
-                            role="option"
-                            aria-selected={selected}
-                            disabled={disabled}
-                            tabIndex={-1}
-                            data-slot="datetime-picker-wheel-item"
-                            data-selected={selected ? "true" : undefined}
-                            onClick={() => {
-                                if (disabled || selected) return;
-                                scrollToIndex(itemIndex);
-                                onValueChange(item);
-                            }}
-                            className={cn(
-                                "flex w-full cursor-pointer snap-center items-center justify-center border-0 bg-transparent",
-                                "h-[var(--bv-datetime-picker-wheel-item-height)]",
-                                "text-bv-md leading-[var(--bv-datetime-picker-wheel-item-line-height)]",
-                                selected
-                                    ? "font-bold text-[var(--bv-datetime-picker-wheel-selected-color)]"
-                                    : "text-[var(--bv-datetime-picker-wheel-color)]",
-                                disabled && "cursor-not-allowed",
-                            )}
-                        >
-                            {formatColumnValue(columnKey, item)}
-                        </button>
-                    );
-                })}
-            </div>
+              {formatColumnValue(columnKey, item)}
+            </button>
+          );
+        })}
+      </div>
 
-            <div
-                aria-hidden="true"
-                data-slot="datetime-picker-wheel-mask"
-                data-mask="top"
-                className="pointer-events-none absolute inset-x-0 top-0 z-[2]"
-                style={{ height: alignOffset(2, itemHeight) }}
-            />
-            <div
-                aria-hidden="true"
-                data-slot="datetime-picker-wheel-mask"
-                data-mask="bottom"
-                className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] rotate-180"
-                style={{ height: alignOffset(2, itemHeight) }}
-            />
+      <div
+        aria-hidden="true"
+        data-slot="datetime-picker-wheel-mask"
+        data-mask="top"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[2]"
+        style={{ height: alignOffset(2, itemHeight) }}
+      />
+      <div
+        aria-hidden="true"
+        data-slot="datetime-picker-wheel-mask"
+        data-mask="bottom"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] rotate-180"
+        style={{ height: alignOffset(2, itemHeight) }}
+      />
 
-            {/* PC 时间列：列顶/列尾微调钮，按住可连发（H5 不挂） */}
-            {stepButtons && (
-                <>
-                    <WheelStepButton
-                        direction="up"
-                        disabled={disabled || index <= 0}
-                        onStep={() => stepBy(-1)}
-                    />
-                    <WheelStepButton
-                        direction="down"
-                        disabled={disabled || index >= values.length - 1}
-                        onStep={() => stepBy(1)}
-                    />
-                </>
-            )}
-        </div>
-    );
+      {/* PC 时间列：列顶/列尾微调钮，按住可连发（H5 不挂） */}
+      {stepButtons && (
+        <>
+          <WheelStepButton
+            direction="up"
+            disabled={disabled || index <= 0}
+            onStep={() => stepBy(-1)}
+          />
+          <WheelStepButton
+            direction="down"
+            disabled={disabled || index >= values.length - 1}
+            onStep={() => stepBy(1)}
+          />
+        </>
+      )}
+    </div>
+  );
 });
 
 export interface DateTimeWheelRowProps {
-    mode: DeviceMode;
-    columnKeys: DateTimeColumnKey[];
-    cursor: DateTimeParts;
-    minParts: DateTimeParts;
-    maxParts: DateTimeParts;
-    disabled?: boolean;
-    /** 键盘光标所在列下标；H5 不传 */
-    activeColumnIndex?: number;
-    /** 每列顶/尾挂 ▲▼ 微调钮（仅 PC 时间列） */
-    stepButtons?: boolean;
-    /** 非首列左侧画发丝竖线（仅 PC 月历旁的时间列；H5 通栏滚轮不画） */
-    dividers?: boolean;
-    onColumnChange: (key: DateTimeColumnKey, value: number) => void;
-    className?: string;
+  mode: DeviceMode;
+  columnKeys: DateTimeColumnKey[];
+  cursor: DateTimeParts;
+  minParts: DateTimeParts;
+  maxParts: DateTimeParts;
+  disabled?: boolean;
+  /** 键盘光标所在列下标；H5 不传 */
+  activeColumnIndex?: number;
+  /** 每列顶/尾挂 ▲▼ 微调钮（仅 PC 时间列） */
+  stepButtons?: boolean;
+  /** 非首列左侧画发丝竖线（仅 PC 月历旁的时间列；H5 通栏滚轮不画） */
+  dividers?: boolean;
+  onColumnChange: (key: DateTimeColumnKey, value: number) => void;
+  className?: string;
 }
 
 /**
@@ -513,58 +522,58 @@ export interface DateTimeWheelRowProps {
  * 两端任何一处都不另写一份列映射。
  */
 export const DateTimeWheelRow = React.forwardRef<
-    HTMLDivElement,
-    DateTimeWheelRowProps
+  HTMLDivElement,
+  DateTimeWheelRowProps
 >(function DateTimeWheelRow(
-    {
-        mode,
-        columnKeys,
-        cursor,
-        minParts,
-        maxParts,
-        disabled = false,
-        activeColumnIndex,
-        stepButtons = false,
-        dividers = false,
-        onColumnChange,
-        className,
-    },
-    ref,
+  {
+    mode,
+    columnKeys,
+    cursor,
+    minParts,
+    maxParts,
+    disabled = false,
+    activeColumnIndex,
+    stepButtons = false,
+    dividers = false,
+    onColumnChange,
+    className,
+  },
+  ref,
 ) {
-    const columns = React.useMemo(
-        () =>
-            columnKeys.map((key) => ({
-                key,
-                label: WHEEL_COLUMN_LABELS[key],
-                values: buildColumnValues(key, cursor, minParts, maxParts),
-                value: cursor[key],
-            })),
-        [columnKeys, cursor, minParts, maxParts],
-    );
+  const columns = React.useMemo(
+    () =>
+      columnKeys.map((key) => ({
+        key,
+        label: WHEEL_COLUMN_LABELS[key],
+        values: buildColumnValues(key, cursor, minParts, maxParts),
+        value: cursor[key],
+      })),
+    [columnKeys, cursor, minParts, maxParts],
+  );
 
-    return (
-        <div
-            ref={ref}
-            data-mode={mode === "mobile" ? "h5" : "pc"}
-            data-slot="datetime-picker-wheels"
-            className={cn("flex items-center", className)}
-        >
-            {columns.map((column, index) => (
-                <DateTimeWheelColumn
-                    key={column.key}
-                    mode={mode}
-                    columnKey={column.key}
-                    label={column.label}
-                    values={column.values}
-                    value={column.value}
-                    disabled={disabled}
-                    active={index === activeColumnIndex}
-                    stepButtons={stepButtons}
-                    // PC 时间列非首列画左侧发丝竖线（截图里时/分/秒列之间的线）
-                    divider={dividers && index > 0}
-                    onValueChange={(item) => onColumnChange(column.key, item)}
-                />
-            ))}
-        </div>
-    );
+  return (
+    <div
+      ref={ref}
+      data-mode={mode === "mobile" ? "h5" : "pc"}
+      data-slot="datetime-picker-wheels"
+      className={cn("flex items-center", className)}
+    >
+      {columns.map((column, index) => (
+        <DateTimeWheelColumn
+          key={column.key}
+          mode={mode}
+          columnKey={column.key}
+          label={column.label}
+          values={column.values}
+          value={column.value}
+          disabled={disabled}
+          active={index === activeColumnIndex}
+          stepButtons={stepButtons}
+          // PC 时间列非首列画左侧发丝竖线（截图里时/分/秒列之间的线）
+          divider={dividers && index > 0}
+          onValueChange={(item) => onColumnChange(column.key, item)}
+        />
+      ))}
+    </div>
+  );
 });

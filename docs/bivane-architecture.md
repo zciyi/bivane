@@ -329,7 +329,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 - **P0 基建** ✅：token → `lib/utils` → `use-device-mode`/Provider → Button → Cell → Tag → Badge → Icon
 - **P1 弹层** ✅：Popup → Dialog → Toast → use-lock-scroll
 - **P1′ 弹层补全** ✅：ActionSheet（Popup+列表）→ Alert/Confirm（Dialog preset）→ Notify（Toast 换信息模型）→ Loading
-- **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker/Cascader → Calendar ⬜
+- **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker ✅ / Cascader ✅ → **Calendar ⬜（下一个）**
 - **P3 表单与列表** ⬜：Field/Input/Textarea → Switch/Checkbox/Radio → Rate/Slider/Stepper → Uploader → Search → Tabs/Tabbar/NavBar → List vs Table
 - **P4 生态** ⬜：第 2/3 套风格 → tweakcn 适配 → 文档站 → registry 发布验证
 

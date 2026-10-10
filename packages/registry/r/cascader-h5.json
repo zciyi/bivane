@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cascader-h5",
+  "type": "registry:component",
+  "title": "Cascader（H5 实现）",
+  "description": "底部弹层 + 联动滚轮（省/市/区三列范式，即 Vant Area 交互）：滚某列其右侧各列整体重算并回到第一个可选项；顶部工具条暂存确定。滚轮本体复用 Picker 的 picker-parts，本组件不含级联计算。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/picker-parts",
+    "@bivane/popup",
+    "@bivane/panel-header",
+    "@bivane/use-cascader-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/cascader.tsx",
+      "content": "import * as React from \"react\";\nimport { Popup } from \"@/components/responsive/popup\";\nimport { PanelHeader } from \"@/components/ui/panel-header\";\nimport { PickerTrigger, PickerWheelRow } from \"@/components/ui/picker-parts\";\nimport type { DeviceMode } from \"@/hooks/use-device-mode\";\nimport type { CascaderValue, LinkedColumns } from \"@/hooks/use-cascader-state\";\n\n/**\n * Bivane Cascader · H5 实现（模式 C）\n * 交互定义见 bivane-responsive-matrix.md §2.2\n *\n * 形态：底部弹层 + **联动滚轮**（省 / 市 / 区 三列范式，即 Vant Area 的交互）。\n * 列集与选中链由分发层的 deriveLinkedColumns 派生：滚某一列，其右侧所有列\n * 整体重算并回到第一项。滚轮本体与 Picker 同源（PickerWheelRow），\n * 本组件不做任何级联计算 —— 它只把「第几列选了谁」报给分发层。\n *\n * 恒走暂存 → 确定：联动过程中必然经过中间值，滚轮一停就提交会让业务值乱跳。\n */\n\nexport interface H5CascaderPanelProps {\n  mode: DeviceMode;\n  open: boolean;\n  onOpenChange: (open: boolean) => void;\n  linked: LinkedColumns;\n  onLinkedColumnChange: (level: number, value: CascaderValue) => void;\n  onSubmit: () => void;\n  onCancel: () => void;\n  onClear: () => void;\n  title?: React.ReactNode;\n  placeholder?: React.ReactNode;\n  disabled: boolean;\n  clearable: boolean;\n  triggerText: string;\n  filled: boolean;\n  confirmText: React.ReactNode;\n  cancelText: React.ReactNode;\n  className?: string;\n  ariaLabel?: string;\n  id?: string;\n}\n\nexport const H5Cascader = React.forwardRef<\n  HTMLDivElement,\n  H5CascaderPanelProps\n>(function H5Cascader(\n  {\n    mode,\n    open,\n    onOpenChange,\n    linked,\n    onLinkedColumnChange,\n    onSubmit,\n    onCancel,\n    onClear,\n    title,\n    placeholder,\n    disabled,\n    clearable,\n    triggerText,\n    filled,\n    confirmText,\n    cancelText,\n    className,\n    ariaLabel,\n    id,\n  },\n  ref,\n) {\n  const wheelColumns = React.useMemo(\n    () =>\n      linked.columns.map((options, level) => ({\n        options,\n        value: linked.values[level],\n      })),\n    [linked],\n  );\n\n  return (\n    <>\n      <PickerTrigger\n        ref={ref}\n        id={id}\n        mode={mode}\n        text={triggerText}\n        placeholder={placeholder}\n        filled={filled}\n        clearable={clearable}\n        onClear={onClear}\n        disabled={disabled}\n        open={open}\n        aria-label={ariaLabel}\n        onActivate={() => onOpenChange(!open)}\n        onArrowKey={() => onOpenChange(true)}\n      />\n\n      <Popup\n        open={open}\n        onOpenChange={onOpenChange}\n        position=\"bottom\"\n        scrollable={false}\n        safeAreaInsetBottom\n        forceMode={mode}\n        aria-label={ariaLabel}\n        className={className}\n      >\n        <PanelHeader\n          mode={mode}\n          title={title}\n          onCancel={onCancel}\n          cancelText={cancelText}\n          onConfirm={onSubmit}\n          confirmText={confirmText}\n        />\n\n        <div\n          data-mode={mode === \"mobile\" ? \"h5\" : \"pc\"}\n          data-slot=\"cascader-panel\"\n          className=\"w-full bg-bv-surface\"\n        >\n          <PickerWheelRow\n            mode={mode}\n            columns={wheelColumns}\n            disabled={disabled}\n            onColumnChange={onLinkedColumnChange}\n          />\n        </div>\n      </Popup>\n    </>\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/h5/cascader.tsx"
+    }
+  ]
+}

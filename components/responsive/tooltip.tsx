@@ -18,83 +18,83 @@ import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
  */
 
 export interface TooltipProps {
-    /** 提示内容（两端共享的唯一信息：内容渲染）；H5 全文常驻，超长折叠可传 <Ellipsis> */
-    content: React.ReactNode;
-    /** 被说明的主体，必须是单个 React 元素 */
-    children: React.ReactElement;
-    /** 受控开合（仅 PC 浮层有意义；H5 说明常驻） */
-    open?: boolean;
-    /** 非受控初始开合（仅 PC） */
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    /** PC 禁用时不响应 hover/focus（不影响 children 自身禁用态）；H5 恒展示说明条 */
-    disabled?: boolean;
-    /** 透传给 PC 气泡 / H5 信息提示条的 className */
-    className?: string;
-    /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
-    forceMode?: DeviceMode;
+  /** 提示内容（两端共享的唯一信息：内容渲染）；H5 全文常驻，超长折叠可传 <Ellipsis> */
+  content: React.ReactNode;
+  /** 被说明的主体，必须是单个 React 元素 */
+  children: React.ReactElement;
+  /** 受控开合（仅 PC 浮层有意义；H5 说明常驻） */
+  open?: boolean;
+  /** 非受控初始开合（仅 PC） */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** PC 禁用时不响应 hover/focus（不影响 children 自身禁用态）；H5 恒展示说明条 */
+  disabled?: boolean;
+  /** 透传给 PC 气泡 / H5 信息提示条的 className */
+  className?: string;
+  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  forceMode?: DeviceMode;
 }
 
 export const Tooltip = React.forwardRef<HTMLElement, TooltipProps>(
-    function Tooltip(
-        {
-            content,
-            children,
-            open,
-            defaultOpen = false,
-            onOpenChange,
-            disabled = false,
-            className,
-            forceMode,
-        },
-        ref,
-    ) {
-        const mode = useDeviceMode(forceMode);
-        const isControlled = open !== undefined;
-        const [innerOpen, setInnerOpen] = React.useState(defaultOpen);
-        const opened = isControlled ? open : innerOpen;
-
-        const setOpen = React.useCallback(
-            (next: boolean) => {
-                if (!isControlled) setInnerOpen(next);
-                onOpenChange?.(next);
-            },
-            [isControlled, onOpenChange],
-        );
-
-        // 提示体 id 与主体 aria-describedby 配对；useId 保证同页多个 Tooltip 不串
-        const rawId = React.useId();
-        const describedById = `bv-tooltip-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
-
-        // H5 是常驻说明条：没有开合/禁用概念，触发类状态只服务 PC 浮层。
-        // 上面的 hooks 仍须无条件调用（不能随模式提前 return 跳过 hook）。
-        if (mode === "mobile") {
-            return (
-                <H5Tooltip
-                    ref={ref}
-                    mode={mode}
-                    content={content}
-                    infoId={describedById}
-                    className={className}
-                >
-                    {children}
-                </H5Tooltip>
-            );
-        }
-
-        return (
-            <PcTooltip
-                ref={ref}
-                mode={mode}
-                open={opened}
-                onOpenChange={setOpen}
-                content={content}
-                bubbleId={describedById}
-                disabled={disabled}
-                className={className}
-            >
-                {children}
-            </PcTooltip>
-        );
+  function Tooltip(
+    {
+      content,
+      children,
+      open,
+      defaultOpen = false,
+      onOpenChange,
+      disabled = false,
+      className,
+      forceMode,
     },
+    ref,
+  ) {
+    const mode = useDeviceMode(forceMode);
+    const isControlled = open !== undefined;
+    const [innerOpen, setInnerOpen] = React.useState(defaultOpen);
+    const opened = isControlled ? open : innerOpen;
+
+    const setOpen = React.useCallback(
+      (next: boolean) => {
+        if (!isControlled) setInnerOpen(next);
+        onOpenChange?.(next);
+      },
+      [isControlled, onOpenChange],
+    );
+
+    // 提示体 id 与主体 aria-describedby 配对；useId 保证同页多个 Tooltip 不串
+    const rawId = React.useId();
+    const describedById = `bv-tooltip-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+
+    // H5 是常驻说明条：没有开合/禁用概念，触发类状态只服务 PC 浮层。
+    // 上面的 hooks 仍须无条件调用（不能随模式提前 return 跳过 hook）。
+    if (mode === "mobile") {
+      return (
+        <H5Tooltip
+          ref={ref}
+          mode={mode}
+          content={content}
+          infoId={describedById}
+          className={className}
+        >
+          {children}
+        </H5Tooltip>
+      );
+    }
+
+    return (
+      <PcTooltip
+        ref={ref}
+        mode={mode}
+        open={opened}
+        onOpenChange={setOpen}
+        content={content}
+        bubbleId={describedById}
+        disabled={disabled}
+        className={className}
+      >
+        {children}
+      </PcTooltip>
+    );
+  },
 );

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "picker-h5",
+  "type": "registry:component",
+  "title": "Picker（H5 实现）",
+  "description": "底部弹层 + N 列独立滚轮（5 行制吸附）+ 顶部工具条（取消 · 标题 · 确定）+ 底部安全区。滚轮只改草稿，确定才一次提交多列值；空列（选项不全）禁用确定。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/picker-parts",
+    "@bivane/popup",
+    "@bivane/panel-header",
+    "@bivane/use-picker-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/picker.tsx",
+      "content": "import * as React from \"react\";\r\nimport { Popup } from \"@/components/responsive/popup\";\r\nimport { PanelHeader } from \"@/components/ui/panel-header\";\r\nimport {\r\n  PickerTrigger,\r\n  PickerWheelRow,\r\n  type PickerPanelProps,\r\n} from \"@/components/ui/picker-parts\";\r\nimport { isDraftComplete, type PickerValue } from \"@/hooks/use-picker-state\";\r\n\r\n/**\r\n * Bivane Picker · H5 实现（模式 C）\r\n * 交互定义见 bivane-responsive-matrix.md §2.2\r\n *\r\n * 形态：底部弹层 + N 列滚轮横排（5 行制、各自吸附）+ 顶部工具条\r\n *       （取消 · 标题 · 确定）+ 底部安全区。\r\n * 恒走「暂存 → 确定」：滚轮只改草稿，确定才提交。空列（选项集不全）时禁用确定。\r\n *\r\n * 拖拽关闭：Popup 只在顶部指示条区域起拖，滚轮内的滑动不会被误判成下拉关闭。\r\n */\r\n\r\nexport const H5Picker = React.forwardRef<HTMLDivElement, PickerPanelProps>(\r\n  function H5Picker(\r\n    {\r\n      mode,\r\n      open,\r\n      onOpenChange,\r\n      columns,\r\n      draft,\r\n      onDraftChange,\r\n      onSubmit,\r\n      onCancel,\r\n      onClear,\r\n      title,\r\n      placeholder,\r\n      disabled,\r\n      clearable,\r\n      triggerText,\r\n      filled,\r\n      confirmText,\r\n      cancelText,\r\n      className,\r\n      ariaLabel,\r\n      id,\r\n    },\r\n    ref,\r\n  ) {\r\n    const handleColumnChange = React.useCallback(\r\n      (columnIndex: number, value: PickerValue) => {\r\n        const next = draft.slice();\r\n        next[columnIndex] = value;\r\n        onDraftChange(next);\r\n      },\r\n      [draft, onDraftChange],\r\n    );\r\n\r\n    const wheelColumns = React.useMemo(\r\n      () =>\r\n        columns.map((options, columnIndex) => ({\r\n          options,\r\n          value: draft[columnIndex],\r\n        })),\r\n      [columns, draft],\r\n    );\r\n\r\n    return (\r\n      <>\r\n        <PickerTrigger\r\n          ref={ref}\r\n          id={id}\r\n          mode={mode}\r\n          text={triggerText}\r\n          placeholder={placeholder}\r\n          filled={filled}\r\n          clearable={clearable}\r\n          onClear={onClear}\r\n          disabled={disabled}\r\n          open={open}\r\n          aria-label={ariaLabel}\r\n          // H5 只要求「方向键能唤起面板」；完整键盘巡航是 PC 的契约\r\n          onActivate={() => onOpenChange(!open)}\r\n          onArrowKey={() => onOpenChange(true)}\r\n        />\r\n\r\n        <Popup\r\n          open={open}\r\n          onOpenChange={onOpenChange}\r\n          position=\"bottom\"\r\n          scrollable={false}\r\n          safeAreaInsetBottom\r\n          // 传已解析的 mode，让 forceMode 逃生舱对 Popup 形态与滚动锁同样生效\r\n          forceMode={mode}\r\n          aria-label={ariaLabel}\r\n          className={className}\r\n        >\r\n          <PanelHeader\r\n            mode={mode}\r\n            title={title}\r\n            onCancel={onCancel}\r\n            cancelText={cancelText}\r\n            onConfirm={() => onSubmit(draft)}\r\n            confirmText={confirmText}\r\n            confirmDisabled={!isDraftComplete(draft)}\r\n          />\r\n\r\n          <div\r\n            data-mode={mode === \"mobile\" ? \"h5\" : \"pc\"}\r\n            data-slot=\"picker-panel\"\r\n            className=\"w-full bg-bv-surface\"\r\n          >\r\n            <PickerWheelRow\r\n              mode={mode}\r\n              columns={wheelColumns}\r\n              disabled={disabled}\r\n              onColumnChange={handleColumnChange}\r\n            />\r\n          </div>\r\n        </Popup>\r\n      </>\r\n    );\r\n  },\r\n);\r\n",
+      "type": "registry:component",
+      "target": "components/h5/picker.tsx"
+    }
+  ]
+}

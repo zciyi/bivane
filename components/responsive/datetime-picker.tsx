@@ -4,13 +4,13 @@ import { PcDateTimePicker } from "@/components/pc/datetime-picker";
 import type { DateTimePanelProps } from "@/components/ui/datetime-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
-    defaultFormatForColumns,
-    formatParts,
-    nowDateTimeParts,
-    resolveColumns,
-    useDateTimeValue,
-    type DateTimeColumnKey,
-    type DateTimePickerValue,
+  defaultFormatForColumns,
+  formatParts,
+  nowDateTimeParts,
+  resolveColumns,
+  useDateTimeValue,
+  type DateTimeColumnKey,
+  type DateTimePickerValue,
 } from "@/hooks/use-datetime-value";
 
 /**
@@ -33,155 +33,155 @@ import {
  */
 
 export interface DateTimePickerProps {
-    /** 受控值：'YYYY-MM-DD HH[:mm[:ss]]' 字符串（格式跟精度走） */
-    value?: DateTimePickerValue;
-    /** 非受控初始值 */
-    defaultValue?: DateTimePickerValue;
-    /** 点「确定」那一瞬回调 */
-    onChange?: (value: DateTimePickerValue) => void;
-    /** 确认回调，与 onChange 同值，便于统一接埋点 */
-    onConfirm?: (value: DateTimePickerValue) => void;
-    /**
-     * 参与展示的列。日期三列（年/月/日）必在，时间列取「时」起的连续前缀，共三档：
-     *   ['year','month','day','hour']                       年月日时
-     *   ['year','month','day','hour','minute']             年月日时分
-     *   ['year','month','day','hour','minute','second']     年月日时分秒（默认）
-     * 拼错（缺日期列、时间列不连续）回落全 6 列。
-     */
-    columnsType?: DateTimeColumnKey[];
-    /** 可选下界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 00:00:00 */
-    min?: string;
-    /** 可选上界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 23:59:59 */
-    max?: string;
-    /**
-     * 展示格式，默认由 columnsType 推出
-     * （'YYYY-MM-DD HH:mm:ss' / 'YYYY-MM-DD HH:mm' / 'YYYY-MM-DD HH'）。
-     */
-    format?: string;
-    /** H5 面板标题栏文案。PC 不渲染标题栏 */
-    title?: React.ReactNode;
-    /** 无选中值时展示 */
-    placeholder?: React.ReactNode;
-    disabled?: boolean;
-    /** 展示清除按钮（仅在有选中值、且未禁用时出现） */
-    clearable?: boolean;
-    /** 无障碍名称；没有可见 label 时应当传入 */
-    ariaLabel?: string;
-    id?: string;
-    className?: string;
-    /** 逃生舱：强制某个模式的交互（架构契约 9 唯一例外） */
-    forceMode?: DeviceMode;
+  /** 受控值：'YYYY-MM-DD HH[:mm[:ss]]' 字符串（格式跟精度走） */
+  value?: DateTimePickerValue;
+  /** 非受控初始值 */
+  defaultValue?: DateTimePickerValue;
+  /** 点「确定」那一瞬回调 */
+  onChange?: (value: DateTimePickerValue) => void;
+  /** 确认回调，与 onChange 同值，便于统一接埋点 */
+  onConfirm?: (value: DateTimePickerValue) => void;
+  /**
+   * 参与展示的列。日期三列（年/月/日）必在，时间列取「时」起的连续前缀，共三档：
+   *   ['year','month','day','hour']                       年月日时
+   *   ['year','month','day','hour','minute']             年月日时分
+   *   ['year','month','day','hour','minute','second']     年月日时分秒（默认）
+   * 拼错（缺日期列、时间列不连续）回落全 6 列。
+   */
+  columnsType?: DateTimeColumnKey[];
+  /** 可选下界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 00:00:00 */
+  min?: string;
+  /** 可选上界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 23:59:59 */
+  max?: string;
+  /**
+   * 展示格式，默认由 columnsType 推出
+   * （'YYYY-MM-DD HH:mm:ss' / 'YYYY-MM-DD HH:mm' / 'YYYY-MM-DD HH'）。
+   */
+  format?: string;
+  /** H5 面板标题栏文案。PC 不渲染标题栏 */
+  title?: React.ReactNode;
+  /** 无选中值时展示 */
+  placeholder?: React.ReactNode;
+  disabled?: boolean;
+  /** 展示清除按钮（仅在有选中值、且未禁用时出现） */
+  clearable?: boolean;
+  /** 无障碍名称；没有可见 label 时应当传入 */
+  ariaLabel?: string;
+  id?: string;
+  className?: string;
+  /** 逃生舱：强制某个模式的交互（架构契约 9 唯一例外） */
+  forceMode?: DeviceMode;
 }
 
 export const DateTimePicker = React.forwardRef<
-    HTMLDivElement,
-    DateTimePickerProps
+  HTMLDivElement,
+  DateTimePickerProps
 >(function DateTimePicker(
-    {
-        value,
-        defaultValue,
-        onChange,
-        onConfirm,
-        columnsType,
-        min,
-        max,
-        format,
-        title,
-        placeholder = "请选择",
-        disabled = false,
-        clearable = false,
-        ariaLabel,
-        id,
-        className,
-        forceMode,
-    },
-    ref,
+  {
+    value,
+    defaultValue,
+    onChange,
+    onConfirm,
+    columnsType,
+    min,
+    max,
+    format,
+    title,
+    placeholder = "请选择",
+    disabled = false,
+    clearable = false,
+    ariaLabel,
+    id,
+    className,
+    forceMode,
+  },
+  ref,
 ) {
-    const mode = useDeviceMode(forceMode);
-    const [open, setOpen] = React.useState(false);
+  const mode = useDeviceMode(forceMode);
+  const [open, setOpen] = React.useState(false);
 
-    const columns = React.useMemo(
-        () => resolveColumns(columnsType),
-        [columnsType],
-    );
-    const resolvedFormat = React.useMemo(
-        () => format ?? defaultFormatForColumns(columns),
-        [format, columns],
-    );
+  const columns = React.useMemo(
+    () => resolveColumns(columnsType),
+    [columnsType],
+  );
+  const resolvedFormat = React.useMemo(
+    () => format ?? defaultFormatForColumns(columns),
+    [format, columns],
+  );
 
-    const { selected, minParts, maxParts, setValue, clear } = useDateTimeValue({
-        value,
-        defaultValue,
-        onChange,
-        min,
-        max,
-        format: resolvedFormat,
-    });
+  const { selected, minParts, maxParts, setValue, clear } = useDateTimeValue({
+    value,
+    defaultValue,
+    onChange,
+    min,
+    max,
+    format: resolvedFormat,
+  });
 
-    // 单值草稿：打开时播种已选值，没有则播种「此刻」。
-    // 关闭时**不能清空**：Popover/Popup 有退出动画，动画期间面板仍在渲染 draft，
-    // 一旦清空，resolveCursor 会回落到「此刻」，月历与时间列在关闭前 visibly 跳一下
-    // （现象：再点触发器关闭时「闪到当前时间」）。下次打开会无条件重新播种，
-    // 半截草稿不会跨次复活，因此保留它没有副作用。
-    const [draft, setDraft] = React.useState<string[]>([]);
+  // 单值草稿：打开时播种已选值，没有则播种「此刻」。
+  // 关闭时**不能清空**：Popover/Popup 有退出动画，动画期间面板仍在渲染 draft，
+  // 一旦清空，resolveCursor 会回落到「此刻」，月历与时间列在关闭前 visibly 跳一下
+  // （现象：再点触发器关闭时「闪到当前时间」）。下次打开会无条件重新播种，
+  // 半截草稿不会跨次复活，因此保留它没有副作用。
+  const [draft, setDraft] = React.useState<string[]>([]);
 
-    React.useEffect(() => {
-        if (!open) return;
-        setDraft([
-            selected[0] ?? formatParts(nowDateTimeParts(), resolvedFormat),
-        ]);
-    }, [open, selected, resolvedFormat]);
+  React.useEffect(() => {
+    if (!open) return;
+    setDraft([
+      selected[0] ?? formatParts(nowDateTimeParts(), resolvedFormat),
+    ]);
+  }, [open, selected, resolvedFormat]);
 
-    const handleSubmit = React.useCallback(
-        (next: string[]) => {
-            if (!next[0]) return;
-            setValue(next[0]);
-            onConfirm?.(next[0]);
-            setOpen(false);
-        },
-        [setValue, onConfirm],
-    );
+  const handleSubmit = React.useCallback(
+    (next: string[]) => {
+      if (!next[0]) return;
+      setValue(next[0]);
+      onConfirm?.(next[0]);
+      setOpen(false);
+    },
+    [setValue, onConfirm],
+  );
 
-    const handleOpenChange = React.useCallback(
-        (next: boolean) => {
-            if (disabled) return;
-            setOpen(next);
-        },
-        [disabled],
-    );
+  const handleOpenChange = React.useCallback(
+    (next: boolean) => {
+      if (disabled) return;
+      setOpen(next);
+    },
+    [disabled],
+  );
 
-    const panelProps: DateTimePanelProps = {
-        mode,
-        open,
-        onOpenChange: handleOpenChange,
-        columns,
-        format: resolvedFormat,
-        minParts,
-        maxParts,
-        title,
-        placeholder,
-        disabled,
-        clearable,
-        selected,
-        draft,
-        onDraftChange: setDraft,
-        onSubmit: handleSubmit,
-        onCancel: () => setOpen(false),
-        onClear: clear,
-        className,
-        ariaLabel,
-        id,
-    };
+  const panelProps: DateTimePanelProps = {
+    mode,
+    open,
+    onOpenChange: handleOpenChange,
+    columns,
+    format: resolvedFormat,
+    minParts,
+    maxParts,
+    title,
+    placeholder,
+    disabled,
+    clearable,
+    selected,
+    draft,
+    onDraftChange: setDraft,
+    onSubmit: handleSubmit,
+    onCancel: () => setOpen(false),
+    onClear: clear,
+    className,
+    ariaLabel,
+    id,
+  };
 
-    return mode === "mobile" ? (
-        <H5DateTimePicker ref={ref} {...panelProps} />
-    ) : (
-        <PcDateTimePicker ref={ref} {...panelProps} />
-    );
+  return mode === "mobile" ? (
+    <H5DateTimePicker ref={ref} {...panelProps} />
+  ) : (
+    <PcDateTimePicker ref={ref} {...panelProps} />
+  );
 });
 
 export type {
-    DateTimeColumnKey,
-    DateTimeParts,
-    DateTimePickerValue,
+  DateTimeColumnKey,
+  DateTimeParts,
+  DateTimePickerValue,
 } from "@/hooks/use-datetime-value";

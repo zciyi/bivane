@@ -794,6 +794,94 @@ const actions = [
 
 > 行内 ↑↓ 巡航、快捷键提示、多级子菜单是 DropdownMenu 的语义；Popover 的内容可以是任意节点，面板内导航走 `Tab`。动作行的 `onClick` 第一个参数是 action 本身；H5 气泡形态触屏不抢焦点，避免点击后页面滚动。
 
+### Picker
+
+多列**独立**选择（对齐 Vant Picker 的多列形态）：每一列是一个互不影响的维度，一次在 N 列上各选一个值。有「省 → 市 → 区」父子联动需求请用 [Cascader](#cascader)。
+
+```tsx
+// 每列是 {label, value, disabled?}[]；也允许直接给字符串/数字数组（value 即文案）
+<Picker
+    ariaLabel="品牌年款"
+    title="选择品牌年款"
+    columns={[
+        [
+            { label: "奔驰", value: "benz" },
+            { label: "宝马", value: "bmw" },
+            { label: "奥迪（暂无车源）", value: "audi", disabled: true },
+        ],
+        ["2024 款", "2025 款", "2026 款"],
+    ]}
+    defaultValue={["bmw", "2025 款"]}
+    clearable
+    onChange={(values, options) => console.log(values, options)}
+/>
+```
+
+| prop                                                   | 说明                                                                                          |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `columns`                                              | 各列选项数组。元素支持 `{label,value,disabled?}` 或直接 `string`/`number`（value 与文案相同） |
+| `value` / `defaultValue`                               | 每列一个值的数组：`Array<string \| number>`                                                   |
+| `onChange(values, options)`                            | 点「确定」时回调；`options` 与各列对齐，值失效位为 `undefined`                                |
+| `title`                                                | H5 工具条标题；PC 不渲染标题栏                                                                |
+| `placeholder` / `clearable` / `disabled` / `ariaLabel` | 同其它选择类                                                                                  |
+| `forceMode`                                            | 逃生舱：强制 `'mobile'` / `'desktop'`                                                         |
+
+两端都**恒走「暂存 → 确定」**（多列要全部调好才算选完）：
+
+- **H5**：底部弹层 + N 列吸附滚轮（5 行制 44px）+ 顶部「取消 · 标题 · 确定」；
+- **PC**：锚定浮层 + N 列纵向面板（各列定宽、独立滚动、36px 行高）+ 底部「取消 / 确定」条。键盘 `←→` 换列、`↑↓` 列内巡航（跳过禁用、到边界不回绕）、`Home/End` 列首尾、`Enter` 先写草稿（激活项已是草稿值时再按一次提交）、`Esc` 取消。
+
+### Cascader
+
+树形级联选择（省 / 市 / 区，即 Vant Area 的交互）。**只有叶子可选**，值恒为根 → 叶子的完整路径值数组。
+
+```tsx
+const area = [
+  {
+    label: '浙江', value: 'zj',
+    children: [
+      {
+        label: '杭州', value: 'hz',
+        children: [
+          { label: '西湖区', value: 'xh' },
+          { label: '拱墅区', value: 'gs' },
+        ],
+      },
+      { label: '宁波', value: 'nb', children: [{ label: '海曙区', value: 'hs' }] },
+    ],
+  },
+];
+
+<Cascader
+  ariaLabel="省市区"
+  title="选择地区"
+  options={area}
+  defaultValue={['zj', 'hz', 'xh']}
+  searchable
+  clearable
+  onChange={(values, options) => console.log(values, options)}
+/>
+
+// 数据是 Vant 风格 {text, value, children}？用 fieldNames 改映射，无需手动转
+<Cascader options={vantAreaData} fieldNames={{ label: 'text' }} />
+```
+
+| prop                                               | 说明                                                                                                                                  |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `options`                                          | 树形数组，默认字段 `label/value/children`；叶子没有 `children`                                                                        |
+| `fieldNames`                                       | `{label?, value?, children?}` 字段名映射，可直接喂 Vant 风格数据；不内置 `@vant/area-data`，避免整包体积                              |
+| `value` / `defaultValue`                           | 根 → 叶子的完整路径值数组。半截/失效路径不回显（触发器退回 placeholder）                                                              |
+| `onChange(values, options)`                        | 叶子选定后回调，`options` 为完整选项链                                                                                                |
+| `searchable`                                       | **仅 PC 呈现**：顶部搜索框按路径全文过滤叶子（「杭州」能命中其下所有区），结果展示完整路径；H5 滚轮没有搜索落点，此 prop 在 H5 被忽略 |
+| `searchPlaceholder` / `emptyText`                  | 搜索占位文案（默认「搜索」）/ 无结果文案（默认「暂无数据」）                                                                          |
+| `title` / `placeholder` / `clearable` / `disabled` | 同其它选择类                                                                                                                          |
+| `forceMode`                                        | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                                                 |
+
+两端走树的方式不同（模式 C）：
+
+- **H5**：底部弹层 + **联动滚轮**（省 / 市 / 区三列）——滚动某一列，其右侧各列整体重算并回到第一个可选项；顶部工具条，暂存 → 确定。
+- **PC**：锚定浮层，顶部**面包屑**（请选择 / 省 / 市，可点回退），下方逐级向右展开的多列面板；点父级展开下一列，**点叶子立即生效并关闭**，打开时自动定位到已选路径。`searchable` 时可按「浙江 杭州 西湖」这样的完整路径搜索，点结果直接选中整条路径。键盘 `↑↓` 巡航、`→/Enter` 展开或选中、`←` 回上级、`Esc` 关闭。
+
 ---
 
 ## 四、两端差异由谁决定

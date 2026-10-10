@@ -20,67 +20,67 @@ import type { DeviceMode } from "@/hooks/use-device-mode";
  */
 
 export interface H5TooltipProps {
-    mode: DeviceMode;
-    /** 提示全文（需要折叠时传 <Ellipsis>） */
-    content: React.ReactNode;
-    /** 提示条 id，与主体 aria-describedby 配对（分发层 useId 生成） */
-    infoId: string;
-    /** 透传给信息提示条的 className */
-    className?: string;
-    /** 被说明的主体 */
-    children: React.ReactElement;
+  mode: DeviceMode;
+  /** 提示全文（需要折叠时传 <Ellipsis>） */
+  content: React.ReactNode;
+  /** 提示条 id，与主体 aria-describedby 配对（分发层 useId 生成） */
+  infoId: string;
+  /** 透传给信息提示条的 className */
+  className?: string;
+  /** 被说明的主体 */
+  children: React.ReactElement;
 }
 
 export const H5Tooltip = React.forwardRef<HTMLElement, H5TooltipProps>(
-    function H5Tooltip({ mode, content, infoId, className, children }, ref) {
-        const childProps = children.props as Partial<{
-            ref: React.Ref<HTMLElement>;
-            className: string;
-        }>;
+  function H5Tooltip({ mode, content, infoId, className, children }, ref) {
+    const childProps = children.props as Partial<{
+      ref: React.Ref<HTMLElement>;
+      className: string;
+    }>;
 
-        // 主体原样保留，仅补 ref / 槽位 / 与提示条的 aria 关联，不叠加任何事件
-        const trigger = React.cloneElement(
-            children as React.ReactElement<Record<string, unknown>>,
-            {
-                ref: composeRefs(ref, childProps.ref),
-                "data-slot": "tooltip-trigger",
-                "data-mode": "h5",
-                "aria-describedby": infoId,
-                className: cn(childProps.className),
-            },
-        );
+    // 主体原样保留，仅补 ref / 槽位 / 与提示条的 aria 关联，不叠加任何事件
+    const trigger = React.cloneElement(
+      children as React.ReactElement<Record<string, unknown>>,
+      {
+        ref: composeRefs(ref, childProps.ref),
+        "data-slot": "tooltip-trigger",
+        "data-mode": "h5",
+        "aria-describedby": infoId,
+        className: cn(childProps.className),
+      },
+    );
 
-        return (
-            <span
-                data-slot="tooltip-h5"
-                data-mode={mode === "mobile" ? "h5" : "pc"}
-                className="inline-flex max-w-full flex-col items-start gap-[var(--bv-tooltip-h5-info-margin-top)]"
-            >
-                {trigger}
-                <span
-                    id={infoId}
-                    data-slot="tooltip-info"
-                    data-mode="h5"
-                    className={cn(
-                        "inline-flex max-w-full items-start rounded-[var(--bv-tooltip-h5-info-radius)]",
-                        "bg-[var(--bv-tooltip-h5-info-background)]",
-                        "px-[var(--bv-tooltip-h5-info-padding-x)] py-[var(--bv-tooltip-h5-info-padding-y)]",
-                        "gap-[var(--bv-tooltip-h5-info-gap)]",
-                        "text-[length:var(--bv-tooltip-h5-info-font)] leading-[var(--bv-tooltip-h5-info-line-height)]",
-                        "text-[var(--bv-tooltip-h5-info-color)]",
-                        className,
-                    )}
-                >
-                    <Icon
-                        name="info"
-                        size="var(--bv-tooltip-h5-info-icon-size)"
-                        aria-hidden
-                        className="mt-[calc((var(--bv-tooltip-h5-info-line-height)-var(--bv-tooltip-h5-info-icon-size))/2)] shrink-0 text-[var(--bv-tooltip-h5-info-icon-color)]"
-                    />
-                    {/* min-w-0 才允许文字在 flex 容器内正常换行 */}
-                    <span className="min-w-0">{content}</span>
-                </span>
-            </span>
-        );
-    },
+    return (
+      <span
+        data-slot="tooltip-h5"
+        data-mode={mode === "mobile" ? "h5" : "pc"}
+        className="inline-flex max-w-full flex-col items-start gap-[var(--bv-tooltip-h5-info-margin-top)]"
+      >
+        {trigger}
+        <span
+          id={infoId}
+          data-slot="tooltip-info"
+          data-mode="h5"
+          className={cn(
+            "inline-flex max-w-full items-start rounded-[var(--bv-tooltip-h5-info-radius)]",
+            "bg-[var(--bv-tooltip-h5-info-background)]",
+            "px-[var(--bv-tooltip-h5-info-padding-x)] py-[var(--bv-tooltip-h5-info-padding-y)]",
+            "gap-[var(--bv-tooltip-h5-info-gap)]",
+            "text-[length:var(--bv-tooltip-h5-info-font)] leading-[var(--bv-tooltip-h5-info-line-height)]",
+            "text-[var(--bv-tooltip-h5-info-color)]",
+            className,
+          )}
+        >
+          <Icon
+            name="info"
+            size="var(--bv-tooltip-h5-info-icon-size)"
+            aria-hidden
+            className="mt-[calc((var(--bv-tooltip-h5-info-line-height)-var(--bv-tooltip-h5-info-icon-size))/2)] shrink-0 text-[var(--bv-tooltip-h5-info-icon-color)]"
+          />
+          {/* min-w-0 才允许文字在 flex 容器内正常换行 */}
+          <span className="min-w-0">{content}</span>
+        </span>
+      </span>
+    );
+  },
 );
