@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "notify-parts",
+  "type": "registry:component",
+  "title": "Notify 共用零件",
+  "description": "通知条目本体：语义色背景、文案与可选关闭按钮；进场方向由已解析 mode 走 JS 分支（H5 自上方 / PC 自右侧）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/use-notify-store"
+  ],
+  "files": [
+    {
+      "path": "components/ui/notify-parts.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport type { NotifyEntry, NotifyType } from '@/hooks/use-notify-store';\n\n/**\n * Notify 共用零件\n *\n * ┌ H5 ── 顶部通栏横幅，自上方滑入\n * └ PC ── 右上角圆角卡片，自右侧滑入\n *\n * 进场动画用「两阶段挂载 + data-state」实现，不新增 utilities.css 槽名\n * （门 5 只核 utilities.css 已引用的槽，新增槽会造 MISS）。\n */\n\nconst typeBackgroundClass: Record<NotifyType, string> = {\n  primary: 'bg-bv-primary',\n  success: 'bg-bv-success',\n  danger: 'bg-bv-danger',\n  warning: 'bg-bv-warning',\n};\n\nexport interface NotifyItemProps {\n  item: NotifyEntry;\n  mode: 'mobile' | 'desktop';\n  onClose?: (id: number) => void;\n}\n\nexport function NotifyItem({ item, mode, onClose }: NotifyItemProps) {\n  const { message, type = 'danger', color, background, onClick, zIndex, className } = item.options;\n\n  // 两阶段挂载：先以 closed 态渲染，下一帧切 open，才能触发进场过渡\n  const [state, setState] = React.useState<'open' | 'closed'>('closed');\n  React.useEffect(() => {\n    const raf = requestAnimationFrame(() => setState('open'));\n    return () => cancelAnimationFrame(raf);\n  }, []);\n\n  const isMobile = mode === 'mobile';\n\n  return (\n    <div\n      data-slot=\"notify\"\n      // DOM 属性值契约是 h5|pc：自身是 Portal 树根，modes.css 的 [data-mode='pc']\n      // 覆盖（动画时长等）靠它命中，写 DeviceMode 原值会静默失效\n      data-mode={mode === 'mobile' ? 'h5' : 'pc'}\n      data-type={type}\n      data-state={state}\n      role=\"status\"\n      aria-live=\"polite\"\n      onClick={onClick}\n      className={cn(\n        'box-border w-full text-bv-md leading-[var(--bv-line-md)] text-white',\n        'transition-[transform,opacity] duration-[var(--bv-popup-duration)] ease-out',\n        'motion-reduce:transition-none',\n        isMobile\n          ? cn(\n              'px-bv-md py-bv-sm',\n              state === 'open' ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0',\n            )\n          : cn(\n              'max-w-[320px] rounded-bv-lg',\n              'px-bv-md py-bv-sm',\n              'shadow-[var(--bv-popup-pc-shadow)]',\n              state === 'open' ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',\n            ),\n        background ? null : typeBackgroundClass[type],\n        className,\n      )}\n      style={{\n        zIndex: zIndex ?? 'var(--bv-toast-z-index)',\n        // 自定义配色是运行时值，属契约允许的内联 style 例外\n        ...(color ? { color } : null),\n        ...(background ? { background } : null),\n      }}\n    >\n      <div className=\"flex items-center justify-between gap-bv-gutter\">\n        <span data-slot=\"notify-message\" className=\"min-w-0 flex-1\">\n          {message}\n        </span>\n        {/* H5 对齐 Vant Notify（无关闭按钮、纯自动消失）；但常驻通知（duration=0）\n            必须给出口，否则用户永远关不掉。PC 一律给关闭按钮。 */}\n        {onClose && (!isMobile || item.options.duration === 0) ? (\n          <button\n            type=\"button\"\n            data-slot=\"notify-close\"\n            aria-label=\"关闭通知\"\n            onClick={(event) => {\n              event.stopPropagation();\n              onClose(item.id);\n            }}\n            className=\"shrink-0 cursor-pointer border-0 bg-transparent p-0 text-white opacity-80\"\n          >\n            ✕\n          </button>\n        ) : null}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/ui/notify-parts.tsx"
+    }
+  ]
+}

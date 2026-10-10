@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "loading",
+  "type": "registry:component",
+  "title": "Loading 加载",
+  "description": "模式 A/B + 双轨 API：两端同为全屏遮罩 + 居中转圈（仅遮罩浓度随模式 token 不同），遮罩点击不关闭；导出 LoadingHost、showLoading、hideLoading、updateLoading 与声明式 Loading。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/portal",
+    "@bivane/loading-parts",
+    "@bivane/use-loading-store",
+    "@bivane/imperative-host",
+    "@bivane/use-device-mode",
+    "@bivane/responsive-provider",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/responsive/loading.tsx",
+      "content": "import * as React from 'react';\nimport { Portal } from '@/lib/portal';\nimport { LoadingOverlay } from '@/components/ui/loading-parts';\nimport { useDeviceMode } from '@/hooks/use-device-mode';\nimport { ensureImperativeHost, useManualImperativeHost } from '@/lib/imperative-host';\nimport {\n  getLoadingEntries,\n  getLoadingServerEntries,\n  hideLoading as hideLoadingEntry,\n  showLoading as showLoadingEntry,\n  subscribeLoadingStore,\n  updateLoading as updateLoadingEntry,\n  type LoadingEntry,\n  type LoadingHandle,\n  type LoadingOptions,\n} from '@/hooks/use-loading-store';\n\n/**\n * Bivane Loading · 模式 A/B\n * 交互定义见 bivane-responsive-matrix.md §2.1\n *\n * ┌ H5 ── 全屏遮罩（rgba(0,0,0,.7)）+ 居中转圈 + 可选文案\n * └ PC ── 同形态（矩阵「局部骨架屏优先、全屏遮罩降级」中的降级路径）\n *\n * 两种模式视觉一致，差异仅在遮罩浓度（bg-bv-overlay 的 [data-mode='pc'] 覆盖）。\n * 遮罩点击不关闭，必须显式 hideLoading(id) —— 与 Vant showLoadingToast 同语义。\n *\n * 双轨 API（契约第 8 条 / 架构 §5）：\n *   声明式  <Loading open text mask />\n *   命令式  showLoading({ text }) / hideLoading(id?) / updateLoading(id, next)\n */\n\nconst LOADING_HOST_KEY = 'bivane-loading';\n\n/**\n * 命令式 loading 宿主。\n *\n * 默认不需要手动挂载（`showLoading()` 会自动创建独立 root）；\n * 若希望继承你的 `<ResponsiveProvider>` 配置（例如断点 1200），\n * 在应用树内挂载一次即可。\n */\nexport function LoadingHost() {\n  useManualImperativeHost(LOADING_HOST_KEY);\n  const items = React.useSyncExternalStore(\n    subscribeLoadingStore,\n    getLoadingEntries,\n    getLoadingServerEntries,\n  );\n  const mode = useDeviceMode();\n\n  if (items.length === 0) return null;\n\n  // 单例观感：多条并存时只呈现最新一条\n  const item = items[items.length - 1];\n\n  return (\n    <Portal>\n      <LoadingOverlay item={item} mode={mode} />\n    </Portal>\n  );\n}\n\n/* ---------- 声明式 ---------- */\n\nexport interface LoadingProps extends LoadingOptions {\n  open?: boolean;\n}\n\n/**\n * 声明式全屏 loading。\n * 不受命令式 store 影响，open 为真即渲染遮罩 + 转圈。\n */\nexport function Loading({ open = false, text, mask, forbidClick, zIndex, className }: LoadingProps) {\n  const mode = useDeviceMode();\n\n  if (!open) return null;\n\n  const item: LoadingEntry = {\n    id: 0,\n    options: { text, mask, forbidClick, zIndex, className },\n  };\n\n  return (\n    <Portal>\n      <LoadingOverlay item={item} mode={mode} />\n    </Portal>\n  );\n}\n\n/* ---------- 命令式 ---------- */\n\n/** 命令式：显示 loading（默认常驻，需 hideLoading 关闭） */\nexport function showLoading(options: LoadingOptions = {}): LoadingHandle {\n  ensureImperativeHost(LOADING_HOST_KEY, <LoadingHost />);\n  return showLoadingEntry(options);\n}\n\n/** 命令式：关闭指定 loading；不传 id 关闭全部 */\nexport function hideLoading(id?: number): void {\n  hideLoadingEntry(id);\n}\n\n/** 命令式：局部更新某条 loading（例如动态改文案） */\nexport function updateLoading(id: number, next: Partial<LoadingOptions>): void {\n  updateLoadingEntry(id, next);\n}\n\nexport type { LoadingEntry, LoadingHandle, LoadingOptions };\n",
+      "type": "registry:component",
+      "target": "components/responsive/loading.tsx"
+    }
+  ]
+}

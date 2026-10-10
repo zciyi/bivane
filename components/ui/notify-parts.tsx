@@ -40,7 +40,9 @@ export function NotifyItem({ item, mode, onClose }: NotifyItemProps) {
   return (
     <div
       data-slot="notify"
-      data-mode={mode}
+      // DOM 属性值契约是 h5|pc：自身是 Portal 树根，modes.css 的 [data-mode='pc']
+      // 覆盖（动画时长等）靠它命中，写 DeviceMode 原值会静默失效
+      data-mode={mode === 'mobile' ? 'h5' : 'pc'}
       data-type={type}
       data-state={state}
       role="status"

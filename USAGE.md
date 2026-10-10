@@ -294,6 +294,18 @@ showDialog({
 });
 ```
 
+**Alert 语义（单按钮）**：`showAlertDialog` 与 `showConfirmDialog` 共用同一底座，唯一区别是 Alert 不渲染取消按钮，适合「我知道了」类纯提示：
+
+```tsx
+import { showAlertDialog } from "@/components/responsive/dialog";
+
+showAlertDialog({
+    title: "提示",
+    message: "该操作不可撤销",
+    confirmText: "我知道了",
+});
+```
+
 **两端差异**：H5 是底部抽屉（顶部拖拽指示条、按钮纵向排列且确认在上）；PC 是居中模态（宽 520px、按钮横向右对齐、焦点陷阱、单击遮罩不关）。
 
 ### Toast
@@ -321,6 +333,126 @@ showToast("第二条");
 ```
 
 **两端差异（同一组调用，信息模型不同）**：H5 是顶部居中胶囊、白字深底、**单例**——连发两条只看到第二条；PC 是右上角卡片栈、白底彩色图标、**可多条并存**并带关闭按钮。
+
+### ActionSheet
+
+动作面板——从一组动作里选一个。命令式适合「点更多按钮弹出操作列表」；也支持声明式放进 JSX 控制开合。
+
+```tsx
+import {
+    showActionSheet,
+    closeActionSheet,
+    ActionSheet,
+    type ActionSheetAction,
+} from "@/components/responsive/action-sheet";
+
+const actions: ActionSheetAction[] = [
+    { name: "编辑" },
+    { name: "分享", subname: "给微信好友" },
+    { name: "删除", color: "var(--bv-danger)" },
+    { name: "不可用项", disabled: true },
+];
+
+// 命令式
+const handle = showActionSheet({
+    title: "请选择操作",
+    actions,
+    cancelText: "取消", // 传 null 隐藏取消按钮
+    onSelect: (action, index) => {
+        console.log("选中", action.name, index);
+    },
+    onCancel: () => console.log("取消"),
+});
+handle.close(); // 或 closeActionSheet(handle.id)；不传 id 关闭全部
+
+// 声明式
+const [open, setOpen] = React.useState(false);
+<ActionSheet
+    open={open}
+    onOpenChange={setOpen}
+    title="请选择操作"
+    actions={actions}
+    closeOnClickAction // 默认 true：点动作即关；单项可用 closeOnClick:false 覆盖
+/>;
+```
+
+| 字段 / prop                              | 说明                                                  |
+| ---------------------------------------- | ----------------------------------------------------- |
+| `actions[].name` / `subname`             | 主文案 / 副文案（副文案存在时行高自动撑开，不会裁切） |
+| `actions[].color`                        | 行文字色，危险操作传 `var(--bv-danger)`               |
+| `actions[].disabled` / `loading`         | 禁用（不可点）/ 加载中（转转圈且不可点）              |
+| `actions[].closeOnClick`                 | 单项覆盖全局 `closeOnClickAction`                     |
+| `cancelText`                             | 取消按钮文案，默认「取消」；传 `null` 隐藏            |
+| `onSelect(action, index)` / `onCancel()` | 选中（关闭前触发）/ 点取消                            |
+| `closeOnClickOverlay`                    | 点遮罩是否关闭；不传时 H5 默认开、PC 默认关           |
+
+**两端差异（模式 B，同一组动作换壳）**：H5 是底部抽屉，动作行高 48px（触控热区），取消按钮与动作列表**分离**成独立一块；PC 自动降级为居中对话框纵向列表，行高 36px，取消按钮仍在列表下方。
+
+### Notify
+
+顶部消息通知——比 Toast 更强的视觉介入，用于成功/警告/危险等状态播报。语义色默认 `danger`（对齐 Vant）。
+
+```tsx
+import { showNotify, closeNotify } from "@/components/responsive/notify";
+
+showNotify("网络异常，请稍后重试"); // 字符串入参，默认 danger
+
+const handle = showNotify({
+    message: "保存成功",
+    type: "success", // primary | success | danger | warning
+    duration: 3000, // 默认 3000ms；传 0 常驻，须手动关闭
+    // color / background 可自定义配色
+    onClick: () => console.log("点击通知"),
+    onClose: () => console.log("已关闭"),
+});
+handle.close();
+closeNotify(); // 不传 id 关闭全部
+
+// 声明式
+<Notify
+    open={open}
+    onOpenChange={setOpen}
+    message="审核已通过"
+    type="success"
+/>;
+```
+
+**两端差异（模式 C，位置与队列模型都不同）**：H5 是**顶部通栏横幅**，自上方滑入，**单例**——新通知直接替换旧的，自动消失型不显示关闭按钮（常驻型为避免用户关不掉会显示 ✕）；PC 是**右上角圆角卡片栈**，自右侧滑入，**多条并存**，每条都带 ✕。
+
+### Loading
+
+全屏加载遮罩。默认**常驻**，必须显式关闭（对齐 Vant `showLoadingToast`），需要定时消失时传 `duration`。
+
+```tsx
+import {
+    showLoading,
+    hideLoading,
+    updateLoading,
+    Loading,
+} from "@/components/responsive/loading";
+
+const handle = showLoading({ text: "加载中" });
+// 请求完成后
+handle.close(); // 或 hideLoading(handle.id)；不传 id 关闭全部
+
+// 动态更新文案（进度提示场景）
+updateLoading(handle.id, { text: "正在保存第 2 步…" });
+
+// 定时自动关闭
+showLoading({ text: "稍候", duration: 1500 });
+
+// 声明式
+<Loading open={submitting} text="提交中…" />;
+```
+
+| 选项          | 说明                                                             |
+| ------------- | ---------------------------------------------------------------- |
+| `text`        | 转圈下方文案，不传则只显示转圈                                   |
+| `mask`        | 是否渲染遮罩，默认 `true`；`false` 为无遮罩转圈                  |
+| `forbidClick` | 默认 `false`——**不阻断**下层操作（对齐 Vant）；`true` 才吃掉点击 |
+| `duration`    | 自动关闭毫秒数；不传常驻                                         |
+
+**两端差异（模式 A/B）**：两端同为全屏遮罩 + 居中转圈，仅遮罩浓度随模式不同（H5 0.7 / PC 0.45）；点击遮罩**不会**关闭，必须显式 `hideLoading`。多条叠加时呈现层始终是单例（只显示最新一条），关掉最新一条后上一条自动顶上来。
 
 ### Select
 

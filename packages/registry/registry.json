@@ -1059,6 +1059,155 @@
                 "popover-h5",
                 "popover-pc"
             ]
+        },
+        {
+            "name": "use-action-sheet-store",
+            "type": "registry:hook",
+            "title": "ActionSheet 命令式 store",
+            "description": "命令式动作面板的队列状态（纯逻辑，不含 React 组件，避免与 action-sheet.tsx 循环依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-action-sheet-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-action-sheet-store.ts"
+                }
+            ],
+            "registryDependencies": ["use-device-mode"]
+        },
+        {
+            "name": "action-sheet-parts",
+            "type": "registry:component",
+            "title": "ActionSheet 共用零件",
+            "description": "跨模式共用的动作列表面板：标题/描述头、动作行（副文案/禁用/loading/危险色）、分离的取消按钮；行高由已解析 mode 走 JS 分支（H5 48px / PC 36px）。",
+            "files": [
+                {
+                    "path": "components/ui/action-sheet-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/action-sheet-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "use-action-sheet-store"]
+        },
+        {
+            "name": "action-sheet",
+            "type": "registry:component",
+            "title": "ActionSheet 动作面板",
+            "description": "模式 B + 双轨 API：H5 底部动作列表（取消按钮分离、项高 48px）/ PC 居中对话框纵向列表（项高 36px，Popup 统一承担位置降级）；导出 ActionSheetHost、showActionSheet、closeActionSheet、updateActionSheet。",
+            "files": [
+                {
+                    "path": "components/responsive/action-sheet.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/action-sheet.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "popup",
+                "action-sheet-parts",
+                "use-action-sheet-store",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-notify-store",
+            "type": "registry:hook",
+            "title": "Notify 状态存储",
+            "description": "跨模式共用的 Notify 生命周期：默认 3s 自动关闭计时（duration=0 常驻）、closeNotify(id?) 语义、四态语义色。",
+            "files": [
+                {
+                    "path": "hooks/use-notify-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-notify-store.ts"
+                }
+            ]
+        },
+        {
+            "name": "notify-parts",
+            "type": "registry:component",
+            "title": "Notify 共用零件",
+            "description": "通知条目本体：语义色背景、文案与可选关闭按钮；进场方向由已解析 mode 走 JS 分支（H5 自上方 / PC 自右侧）。",
+            "files": [
+                {
+                    "path": "components/ui/notify-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/notify-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "use-notify-store"]
+        },
+        {
+            "name": "notify",
+            "type": "registry:component",
+            "title": "Notify 消息通知",
+            "description": "模式 C + 双轨 API：H5 顶部通栏横幅单例（新通知替换旧的）/ PC 右上角圆角卡片栈（多条并存、带关闭按钮）；导出 NotifyHost、showNotify、closeNotify、updateNotify。",
+            "files": [
+                {
+                    "path": "components/responsive/notify.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/notify.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "portal",
+                "notify-parts",
+                "use-notify-store",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-loading-store",
+            "type": "registry:hook",
+            "title": "Loading 状态存储",
+            "description": "跨模式共用的 Loading 生命周期：默认常驻须显式 hideLoading、可选 duration 自动关闭、hideLoading(id?) 与 updateLoading 语义。",
+            "files": [
+                {
+                    "path": "hooks/use-loading-store.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-loading-store.ts"
+                }
+            ]
+        },
+        {
+            "name": "loading-parts",
+            "type": "registry:component",
+            "title": "Loading 共用零件",
+            "description": "全屏遮罩 + 居中转圈与可选文案；forbidClick=false（默认）容器不阻断下层，对齐 Vant Toast 语义。",
+            "files": [
+                {
+                    "path": "components/ui/loading-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/loading-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "use-loading-store"]
+        },
+        {
+            "name": "loading",
+            "type": "registry:component",
+            "title": "Loading 加载",
+            "description": "模式 A/B + 双轨 API：两端同为全屏遮罩 + 居中转圈（仅遮罩浓度随模式 token 不同），遮罩点击不关闭；导出 LoadingHost、showLoading、hideLoading、updateLoading 与声明式 Loading。",
+            "files": [
+                {
+                    "path": "components/responsive/loading.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/loading.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "portal",
+                "loading-parts",
+                "use-loading-store",
+                "imperative-host",
+                "use-device-mode",
+                "responsive-provider",
+                "tokens"
+            ]
         }
     ]
 }
