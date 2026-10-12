@@ -884,6 +884,64 @@ const area = [
 
 ---
 
+### Calendar
+
+日历选择（对齐 Vant Calendar 的能力面）。支持单选 / 区间 / 多选，值恒为 `'YYYY-MM-DD'` 字符串：single 是字符串，range 是有序二元组，multiple 是升序数组。
+
+```tsx
+// 单选：H5 点一天即关；PC 点选即生效
+<Calendar ariaLabel="日期" onChange={(v) => console.log(v)} />
+// '2026-10-12'
+
+// 区间（最多 7 天，含首尾）
+<Calendar type="range" maxRange={7} onOverRange={({ maxRange }) => toast(`最多选 ${maxRange} 天`)} />
+// ['2026-10-12', '2026-10-18']
+
+// 多选
+<Calendar type="multiple" defaultValue={['2026-10-01', '2026-10-03']} />
+// ['2026-10-01', '2026-10-03']
+
+// formatter：给日期加标注或禁用（两端表现一致）；今天默认标「今天」，可覆盖
+const disableWeekend: CalendarFormatter = ({ parts }) => {
+  const day = new Date(parts.year, parts.month - 1, parts.day).getDay();
+  return day === 0 || day === 6 ? { disabled: true } : { topInfo: '周末' };
+};
+<Calendar type="range" formatter={disableWeekend} />
+```
+
+H5 形态下组件**不带触发器**（全屏日历通常由业务自定义入口唤起），自己控开合即可；不需要弹层时传 `poppable={false}` 可内嵌常驻。
+
+```tsx
+const [open, setOpen] = useState(false);
+<Cell title="选择日期" isLink onClick={() => setOpen(true)} />
+<Calendar open={open} onOpenChange={setOpen} />
+```
+
+| prop | 说明 |
+| --- | --- |
+| `type` | `'single'`（默认）/ `'range'` / `'multiple'` |
+| `value` / `defaultValue` / `onChange` | 受控值；single 为字符串，range 为 `[start, end]`，multiple 为升序字符串数组 |
+| `onConfirm(value)` | 与 `onChange` 同值，最终选定额外触发一次，便于统一接埋点 |
+| `min` / `max` | 可选下界 / 上界（含），默认**今天 ~ 6 个月后月末**；传入的值超出边界会被夹紧 |
+| `firstDayOfWeek` | 星期表头起始，`0`=周日 … `6`=周六，默认 `0` |
+| `maxRange` | 区间最多跨多少天（含端点）；拖选超限时窗口向前滑动，轻点超限触发 `onOverRange` |
+| `allowSameDay` | 区间是否允许起止同日，默认 `false` |
+| `formatter({parts, isStart, isEnd, selected, inRange})` | 返回 `{text?, topInfo?, bottomInfo?, disabled?, className?}`，用于节日/价格/禁选等 |
+| `showMark` | 今天是否标「今天」，默认 `true`（formatter 可覆盖该标注） |
+| `poppable` | **仅 H5**：是否以全屏弹层呈现，默认 `true`；`false` 时内嵌常驻。PC 恒内嵌 |
+| `open` / `defaultOpen` / `onOpenChange` | 弹层开合（受控/非受控，仅 H5 poppable 形态消费） |
+| `title` / `showTitle` / `confirmText` / `confirmDisabledText` / `footer` | H5 弹层文案与自定义底部区 |
+| `readonly` | 只读：不可选、H5 不显示确定条 |
+| `onOverRange({date, maxRange})` | 轻点（非拖选）超出区间上限时触发 |
+| `forceMode` | 逃生舱：强制 `'mobile'` / `'desktop'` |
+
+两端是两套交互范式（模式 C）：
+
+- **H5**：**全屏弹层**，min→max 的所有月份纵向连续排列，月份网格进入视口附近才挂载（IntersectionObserver，环境不支持时降级全量渲染）；区间可**按住跨日拖动**（触摸拖动不劫持页面滚动），也支持两次点选；range / multiple 在底部确定条暂存，取消整体丢弃，确定才提交，single 点一天即完成。
+- **PC**：**内嵌常驻月历**（range 并排双月），鼠标按住拖选或两次点选即生效，悬停有区间预览；完整键盘支持——`←→` 换日、`↑↓` 换周、`PgUp/PgDn` 换月、`Home/End` 到周首尾、`Enter` 选定，巡航自动跳过禁用日。
+
+---
+
 ## 四、两端差异由谁决定
 
 优先级从高到低：

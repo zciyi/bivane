@@ -41,7 +41,7 @@
 | **DatePicker**                | 底部弹层 + 三列滚轮（年/月/日，5 行制居中），惯性 + scroll-snap，工具条；`columnsType` 可裁列；区间为「开始/结束」两段式入口，两端选齐才可用         | 锚定浮层 + 月历面板（6×7 网格），上下月 + 键盘巡航，触发器可直接输入；区间并排双月，点起点、悬停预览区间带                                                                  | **C**   | 日期值计算（解析/格式化/min-max 逐字段夹紧/区间排序）、滚轮列模型 | ✅ P2 |
 | **TimePicker**                | 底部弹层 + N 列滚轮（时/分/秒，5 行制居中），惯性 + scroll-snap，顶部工具条；`columnsType` 可裁列；区间两段式                                        | Radix Popover 锚定浮层 + **与 H5 同源的 N 列滚轮**（仅换外壳），面板级键盘驾驶滚轮（↑↓ 改值 / ←→ 换列 / Home·End / PgUp·PgDn / Enter 确定 / Esc 取消），底部「取消/确定」条 | **B**   | 时间值计算（同日期族）、滚轮列模型                                | ✅ P2 |
 | **DateTimePicker**            | 底部弹层 + N 列滚轮（年/月/日 + 时·分·秒三档精度，4/5/6 列），顶部工具条；单值，恒走暂存→确定                                                        | 左月历网格（« < 年月 > » + 星期头 + 6×7 定高网格）选日期 + 右侧时/分/秒 1~3 条居中双横线滚轮列（▲▼ 按住连发），顶部回显草稿时间，底部「此刻 / 确定」；键盘分区驾驶          | **C**   | 6 字段值模型、跨日期时刻的逐字段夹紧、月历网格、时间滚轮列        | ✅ P2 |
-| **Calendar**                  | 全屏弹层，月份列表纵向滚动加载，range 拖选                                                                                                           | 内嵌面板（非弹层）可常驻，range 拖选 + 键盘移动                                                                                                                             | **C**   | 月网格计算、区间逻辑                                              | ⬜    |
+| **Calendar**                  | 全屏弹层，月份列表纵向滚动加载，range 拖选                                                                                                           | 内嵌面板（非弹层）可常驻，range 拖选 + 键盘移动                                                                                                                             | **C**   | 月网格计算、区间逻辑                                              | ✅    |
 | **Picker（通用滚轮）**        | 底部弹层 + 多列滚轮联动，列宽随内容                                                                                                                  | 锚定浮层 + 多列面板（可滚动/搜索），或降级为多个 Select                                                                                                                     | **C**   | 列联动、级联数据                                                  | ⬜    |
 | **Cascader / Area**           | 底部弹层 + 滚轮级联（选一级推入二级）                                                                                                                | 锚定浮层 + 多列面板 + 面包屑路径，支持搜索定位                                                                                                                              | **C**   | 级联索引、路径回显                                                | ⬜    |
 | **Slider**                    | 触摸拖拽，禁页面滚动（`touch-action: none`），热区放大到 44px                                                                                        | 点轨道跳转 + 拖拽 + 方向键微调（±step）                                                                                                                                     | **C**   | 值换算、步长、区间                                                | ⬜    |
@@ -86,6 +86,7 @@
 | Popover        | C    | 容器范式不同：H5 ≤3 行轻量气泡 / >3 行降级 Popup 底部抽屉（打开瞬间按实测高度定形态）vs PC Radix 锚定浮层；面板内容（自定义区 + actions 行）两端同源                                                               |
 | Picker         | C    | 多列独立选择的容器范式不同：H5 N 列吸附滚轮（底部弹层）vs PC N 列纵向面板（锚定浮层，各列独立滚动/键盘巡航）；列间互不影响，两端都暂存→确定；滚轮件两端同款但 PC 不用（`PickerWheelRow` 仅 H5 + Cascader H5 复用） |
 | Cascader       | C    | 树的走法不同：H5 联动滚轮（省市区三列，换父列子列重算）vs PC 面包屑 + 逐级右展多列面板（点叶子即生效）+ 路径全文搜索；值恒为根→叶子完整路径                                                                        |
+| Calendar       | C    | 日历范式不同：H5 全屏弹层 + 月份纵向滚动懒挂载 + 触摸拖选（range/multiple 确定条暂存）vs PC 内嵌常驻月历（range 双月）+ 鼠标拖选 + 键盘巡航（点选即生效）；single/range/multiple，值恒为 'YYYY-MM-DD'              |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -383,6 +384,35 @@ H5 = Popup 底部弹层 + **联动滚轮**（不做 Vant Cascader 的下钻面�
 - **规则 7：禁止在 `onCloseAutoFocus` 里无条件 `preventDefault + focus 自己的触发器`。** Radix FocusScope 的卸载还焦在 unmount cleanup **内再排一个 `setTimeout(0)`** 执行（比新浮层挂载 passive effect 更晚一拍）。跨实例点击时旧层若在这个延迟回调里抢焦，新浮层的 focusin 监听已经就位且没有 deferred pointerdown 标志压制 → 新浮层被判 focusOutside 立即关闭（真机症状「B 展开后直接关闭」，100% 复现）。做法：**不传 `onCloseAutoFocus`**，用 Radix NonModal 默认逻辑——外部交互关闭（`hasInteractedOutsideRef`）不还焦，Esc/选中关闭才 focus 已登记的 trigger；自写的 `document.activeElement !== node` 守卫挡不住（此刻焦点已被新浮层拿走，条件恰好成立）。唯一例外是 DatePicker（要还焦到内部 input 而非外层 div），它用 `skipCloseAutoFocusRef`：外部 pointerdown/focusoutside 时置位，延迟还焦回调里读到就跳过。
 - **唯一例外：H5 Popover** 保留 Anchor + 自管 click（bubble/drawer 双形态共用外层 open，Trigger 的内部 toggle 会错位；触屏也没有 mousedown 迁焦竞态），理由见 `components/h5/popover.tsx` 文件头。
 - 回归测试：`tests/anchor-switch.test.tsx` —— 用完整真实手势（pointerdown→迁焦→mousedown→pointerup→mouseup→click），末尾**连排两个 `setTimeout(0)`**（第一个 flush passive effects，旧层 cleanup 在其中再排一个 setTimeout；第二个才跑到旧层的延迟还焦）；jsdom 只派 click 或只等一个 tick 都会漏掉「旧层抢焦关掉新层」。断言跨实例同一手势关旧开新且延迟还焦后新层仍在、同实例反复点击稳定、清除按钮不关层、disabled 不开、Esc 关闭还焦触发器。
+
+### 3.12 Calendar（模式 C，日历）
+
+Vant Calendar 的能力面：single / range / multiple，值恒为 `'YYYY-MM-DD'`（single 字符串、range 有序二元组、multiple 升序数组）。**不内置农历**（按需在 formatter 外挂数据）。H5 = Popup **fullscreen** + min→max 月份纵向连续排列 + 触摸拖选；PC = **内嵌常驻** rdp（react-day-picker v10）月历，range 并排双月 + 鼠标拖选 + 键盘巡航。组件**不带触发器**（H5 由业务 Cell 等入口受控唤起，`poppable={false}` 可内嵌）。
+
+**定死取值**
+
+| 项       | H5                                                                                               | PC                                                                                                                                                    | token / 纯函数                                                          |
+| -------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 容器     | Popup `position="fullscreen"`（新增位置，与 bottom 同走 translateY 出场，强制无圆角）            | 内嵌面板，恒不挂 Popup（`effectivePoppable` 在 PC 被钉死 false）                                                                                      | `--bv-calendar-h5-*` / `-pc-*`                                          |
+| 月历引擎 | 自研 `buildMonthGrid`（前置补位 + trailing 补 7 倍数），全部月份纵向连续排列                     | rdp v10（`fixedWeeks` + `showOutsideDays`，range `numberOfMonths=2`），月格纯计算仍共用 hooks 层                                                      | use-calendar-state.ts                                                   |
+| 挂载     | IntersectionObserver 懒挂载（`rootMargin 600px`，挂载后不卸载）；无 IO 环境（jsdom）降级全量渲染 | 全部常驻                                                                                                                                              | —                                                                       |
+| 行/格    | 行高 **64px**、日期圆钮 54px；未挂载月份用 `行数×64` 占位保证 scrollTop/定位正确                 | 格高 **40px**、端点圆 **34px**（< 格宽，邻选不粘连）、面板宽 300px、双月 gap 0                                                                        | `--bv-calendar-h5-row-height` / `-pc-cell-height` / `-pc-cell-day-size` |
+| 区间     | 按住拖动选区间（窗口超 maxRange 起点前滑），也可两次点选；底部确定条暂存                         | **蓝底白字整段连通**：34px 定高色带（中间全幅/起点右半幅/终点左半幅）与端点圆同色 primary，中间日白字；鼠标拖选松手提交、悬停预览（悬停夹终点不滑窗） | `resolveDragRange` / `applyRangeDay`                                    |
+| 提交时机 | single 点一天即提交即关；range/multiple 确定条暂存 → 确定                                        | 三种类型都**点选即生效**（multiple 点一项即时回写，无确认条）                                                                                         | 分发层收 H5 草稿，PC anchor 留实现层                                    |
+
+**关键规则**
+
+- **默认边界**：min=今天、max=**6 个月后月末**（`DEFAULT_CALENDAR_MONTH_SPAN`，`resolveCalendarBounds`）；值只撑开默认侧（值早于今天则 min 下沉），min/max 写反自动交换；归一化两轮（粗算 bounds → normalize 值 → 再算），种子月 `resolveCalendarSeed` 用 `clampParts` 逐字段夹紧。
+- **range 两段式状态机**（`applyRangeDay`）：无起点=定起点；有起点点更晚=完成；点更早=**反向重置**为新起点（不是交换）；同日按 `allowSameDay`（默认 false）重置；轻点超 `maxRange` 触发 `onOverRange({date,maxRange})` 且不改值。
+- **拖选滑窗**：`resolveDragRange` 中触点与起点 delta ≥ maxRange 时，起点 = 触点 −(maxRange−1) 天，区间长度恒定、窗口跟手前滑；H5 触摸用 `document.elementFromPoint` 找 `[data-slot='calendar-h5-day']`、**全程不 preventDefault**（页面纵向滚动与拖选共存，对齐 Vant touchmove），纯鼠标退化为 pointerenter 逐格；pointerup 挂 window，`suppressClick` + rAF 吞掉拖选尾的合成 click。
+- **rdp v10 不转发自定义 pointer 事件**：PC 格子通过模块级 CustomComponents 渲染，拖选入口走 React Context（`DayContext.resolve/beginDrag`），rdp 的 `onSelect` 给空函数拨到受控侧，避免其内部模式逻辑抢状态；模块级组件 props 必须解构吃掉 rdp 注入的自定义字段（如 `displayIndex`），防止泄漏到 DOM。
+- **PC 视觉分层（圆 + 带，禁止整格填色）**：日期格分两层——色带层（与端点圆同高 34px、垂直居中；中间格全幅、起点格右半幅、终点格左半幅，跨周自然断带）与端点圆层（34px 圆浮于色带断点）。**配色整段蓝底白字**：色带与端点圆同为 `--bv-calendar-range-background`（primary），中间日数字用 `--bv-calendar-selected-color`（白），区间内禁用日由 opacity 统一弱化不退回灰字；hover 圆不进入区间中间格（会打断色带）。**今天只给 primary 文字、不画圈**——「今天」标注已由 showMark 承担，圆环只属于选中/焦点语义。**半截起点**（已点开始、等终点且未悬停）立即渲染为实心圆 +「开始」，但**不伸出色带**（`ranged=false`），色带只在出现终点/悬停预览时出现。键盘焦点环（2px）仅当面板处于 `:focus-visible` 时落在光标圆上（选择器 `.bv-calendar-pc-root:focus-visible &`），初始挂载/鼠标点选不显示。邻月网格里重复出现的区间日（rdp outside）**只补全幅色带、不画端点圆、不给 hover 圆**；邻月日用 text-3。同日起止（`both`）不画带。
+- **PC 拖选与点选的手势分界（pointerdown 不得抢状态）**：`beginDrag` 在 pointerdown 时**只记录手势锚点**，绝不清 `anchor`/预览——真机上 click 前必有 pointerdown，若按下即清两段式起点，第二次点终点会被误判成"重置起点"，表现为区间只能长按拖动选、两次点选永远选不满（jsdom `fireEvent.click` 不派发 pointerdown，必须用 pointerdown→pointerup(window)→click 真实序列测试）。只有 pointermove 确认离开按下日（`moved=true`）才清 anchor/hover、改走拖选预览；滑窗每次由 `resolveDragRange` 以按下日为锚纯算，不依赖上一帧 preview。
+- **PC 键盘焦点模型**：面板 `tabIndex=0`、格子恒 `tabIndex=-1`（日格 `onMouseDown preventDefault` 不夺焦），方向键移动单一光标：←→±1 日、↑↓±7 日、PgUp/PgDn±1 月、Home/End 周首尾、Enter 选定；`moveCursor` 夹紧边界后逐日找下一可选日（`ENABLED_SEARCH_LIMIT=60`，跳禁用不回绕）并同步翻月；激活格 `data-active="true"`。
+- **H5 草稿归属分发层**：弹层 `draft` 在 open 翻转时用已提交值播种（selected 故意不入 effect deps——开层时外部值变化不能冲掉用户正在选的草稿），取消/关闭整体丢弃、半截不复活；PC 无暂存语义，anchor/光标/视图月属实现层状态（架构 §6.5）。
+- **打开定位**：播种优先级 = 草稿终点（区间拖到一半）> 已选值 > 今天；H5 `useLayoutEffect` 在 active 翻转一次时把播种月滚到 sticky 星期行下沿（`offsetTop - 44`），拖选跨月不重新拽视图；滚动时 rAF 更新副标题月份。
+- **formatter 契约两端一致**：`resolveDayMeta({parts,isStart,isEnd,selected,inRange})` → `{text,topInfo,bottomInfo,disabled,className}`；越界与 formatter.disabled 都不可点；`showMark` 今天默认 topInfo「今天」，formatter 同字段可覆盖；结果经 metaMap useMemo 缓存。
+- 槽名：H5 `calendar-h5-panel/month/day/day-band/day-shape/confirm/close`；PC `calendar-pc-panel/month-panel/cell/cell-band/cell-shape`；共用件在 `ui/calendar-parts.tsx`（Header/WeekdayHeader/DayContent/ConfirmBar）。
 
 ## 4. 测试要求
 
