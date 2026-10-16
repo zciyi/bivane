@@ -3,6 +3,10 @@ import { ResponsiveProvider } from "@/components/providers/responsive-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Cell, CellGroup } from "@/components/ui/cell";
+import { Field } from "@/components/ui/field";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox, CheckboxGroup } from "@/components/ui/checkbox";
+import { Radio, RadioGroup } from "@/components/ui/radio";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
 import { Tag } from "@/components/ui/tag";
@@ -384,6 +388,343 @@ const CALENDAR_DEMOS: Array<{
         formatter: disableWeekendCalendarDay,
     },
 ];
+
+/** 验证码输入：发送后倒计时，避免重复发送（Field action 区的典型用法） */
+function SmsField() {
+    const [left, setLeft] = React.useState(0);
+
+    React.useEffect(() => {
+        if (left <= 0) return;
+        const timer = window.setTimeout(() => setLeft((v) => v - 1), 1000);
+        return () => window.clearTimeout(timer);
+    }, [left]);
+
+    return (
+        <Field
+            label="验证码"
+            type="digit"
+            placeholder="请输入 6 位验证码"
+            maxlength={6}
+            clearable
+            action={
+                <Button
+                    size="small"
+                    type={left > 0 ? "default" : "primary"}
+                    disabled={left > 0}
+                    onClick={() => setLeft(60)}
+                >
+                    {left > 0 ? `${left}s 后重发` : "发送验证码"}
+                </Button>
+            }
+        />
+    );
+}
+
+/**
+ * 点击是否来自选择件自身：Checkbox/Radio 的 label 已能切换 input，
+ * 外层 Cell 的整行 onClick 需跳过这类点击，否则会「label + 行」双触发。
+ */
+function isChoiceTarget(event: React.MouseEvent<HTMLDivElement>): boolean {
+    return (
+        (event.target as HTMLElement).closest(
+            "[data-slot='checkbox'], [data-slot='radio']",
+        ) !== null
+    );
+}
+
+function SwitchDemos() {
+    const [notice, setNotice] = React.useState(true);
+    const [digest, setDigest] = React.useState(false);
+    const [enumValue, setEnumValue] = React.useState<"yes" | "no">("no");
+
+    return (
+        <Section title="P3 · Switch 开关（模式 A：两端同视觉，PC 多键盘焦点环）">
+            <Block>
+                <Row>
+                    <Switch
+                        checked={notice}
+                        aria-label="基础开关"
+                        onChange={(v) => setNotice(v === true)}
+                    />
+                    <span className="text-bv-text-2">
+                        基础开关：{notice ? "开" : "关"}
+                    </span>
+                    <Switch disabled aria-label="禁用关" />
+                    <Switch defaultChecked disabled aria-label="禁用开" />
+                    <Switch loading aria-label="加载关" />
+                    <Switch loading defaultChecked aria-label="加载开" />
+                    <Switch
+                        size={24}
+                        activeColor="#07c160"
+                        defaultChecked
+                        aria-label="小尺寸绿色"
+                    />
+                    <Switch
+                        size={36}
+                        activeColor="#ee0a24"
+                        inactiveColor="#ebedf0"
+                        aria-label="大尺寸自定义色"
+                    />
+                </Row>
+            </Block>
+            <Block className="p-0">
+                <CellGroup inset className="mx-0">
+                    <Cell
+                        center
+                        title="消息推送"
+                        rightIcon={
+                            <Switch
+                                checked={notice}
+                                aria-label="消息推送"
+                                onChange={(v) => setNotice(v === true)}
+                            />
+                        }
+                    />
+                    <Cell
+                        center
+                        title="每日摘要（禁用）"
+                        rightIcon={<Switch disabled aria-label="每日摘要" />}
+                    />
+                    <Cell
+                        center
+                        title="开启前二次确认"
+                        rightIcon={
+                            <Switch
+                                checked={digest}
+                                aria-label="开启前二次确认"
+                                onChange={(v) => setDigest(v === true)}
+                                beforeChange={() =>
+                                    new Promise<boolean>((resolve) => {
+                                        showConfirmDialog({
+                                            title: "开启每日摘要？",
+                                            message:
+                                                "开启后每天 9:00 推送一次，等待期间开关显示 loading。",
+                                            confirmText: "开启",
+                                            cancelText: "取消",
+                                            onConfirm: () => resolve(true),
+                                            onCancel: () => resolve(false),
+                                        });
+                                    })
+                                }
+                            />
+                        }
+                    />
+                    <Cell
+                        center
+                        title={`枚举值开关（当前 ${enumValue}）`}
+                        rightIcon={
+                            <Switch
+                                value={enumValue}
+                                activeValue="yes"
+                                inactiveValue="no"
+                                aria-label="枚举值开关"
+                                onChange={(v) =>
+                                    setEnumValue(v as "yes" | "no")
+                                }
+                            />
+                        }
+                    />
+                </CellGroup>
+            </Block>
+        </Section>
+    );
+}
+
+const FRUIT_OPTIONS: ReadonlyArray<{
+    name: string;
+    label: string;
+    disabled?: boolean;
+}> = [
+    { name: "apple", label: "苹果" },
+    { name: "banana", label: "香蕉" },
+    { name: "orange", label: "橙子（缺货）", disabled: true },
+];
+
+function CheckboxDemos() {
+    // Cell 整行点击演示：组受控 + max=2，行点击与组内 Checkbox 走同一份更新逻辑
+    const [fruits, setFruits] = React.useState<string[]>(["apple"]);
+    const [hobbies, setHobbies] = React.useState<string[]>(["reading"]);
+    const [plans, setPlans] = React.useState<string[]>(["a"]);
+
+    const toggleFruit = (name: string) => {
+        setFruits((prev) => {
+            const has = prev.includes(name);
+            // 上限只约束新增，与 CheckboxGroup max 语义一致
+            if (!has && prev.length >= 2) return prev;
+            return has ? prev.filter((item) => item !== name) : [...prev, name];
+        });
+    };
+
+    const allChecked = plans.length === 3;
+    const partial = plans.length > 0 && !allChecked;
+
+    return (
+        <Section title="P3 · Checkbox 复选框（模式 A：H5 整行可点 / PC 键盘焦点环）">
+            <Block>
+                <Row>
+                    <Checkbox defaultChecked>圆形（默认）</Checkbox>
+                    <Checkbox shape="square" defaultChecked>
+                        方形
+                    </Checkbox>
+                    <Checkbox checked={false} indeterminate>
+                        半选态
+                    </Checkbox>
+                    <Checkbox labelPosition="left">文字在左</Checkbox>
+                    <Checkbox labelDisabled>文字不可点</Checkbox>
+                    <Checkbox disabled>禁用</Checkbox>
+                    <Checkbox disabled defaultChecked>
+                        禁用选中
+                    </Checkbox>
+                </Row>
+            </Block>
+            <Block className="p-0">
+                <CellGroup inset className="mx-0">
+                    <CheckboxGroup
+                        value={fruits}
+                        max={2}
+                        onChange={(names) => setFruits(names as string[])}
+                    >
+                        {FRUIT_OPTIONS.map((item) => (
+                            <Cell
+                                key={item.name}
+                                center
+                                title={item.label}
+                                onClick={(event) => {
+                                    if (item.disabled || isChoiceTarget(event))
+                                        return;
+                                    toggleFruit(item.name);
+                                }}
+                                rightIcon={
+                                    <Checkbox
+                                        name={item.name}
+                                        disabled={item.disabled}
+                                        ariaLabel={item.label}
+                                    />
+                                }
+                            />
+                        ))}
+                    </CheckboxGroup>
+                </CellGroup>
+                <p className="px-bv-md py-bv-sm text-bv-sm text-bv-text-2">
+                    已选 {fruits.length}/2：{fruits.join("、") || "无"}
+                    （整行可点；达到上限后其余项自动禁用）
+                </p>
+            </Block>
+            <Block>
+                <CheckboxGroup
+                    direction="horizontal"
+                    value={hobbies}
+                    onChange={(names) => setHobbies(names as string[])}
+                >
+                    <Checkbox name="reading">阅读</Checkbox>
+                    <Checkbox name="music">音乐</Checkbox>
+                    <Checkbox name="sports">运动</Checkbox>
+                    <Checkbox name="travel">旅行</Checkbox>
+                </CheckboxGroup>
+            </Block>
+            <Block>
+                <div className="flex flex-col gap-bv-gutter">
+                    <Checkbox
+                        checked={allChecked}
+                        indeterminate={partial}
+                        onChange={(checked) =>
+                            setPlans(checked ? ["a", "b", "c"] : [])
+                        }
+                    >
+                        全选{partial ? "（部分）" : ""}
+                    </Checkbox>
+                    <CheckboxGroup
+                        direction="horizontal"
+                        value={plans}
+                        onChange={(names) => setPlans(names as string[])}
+                    >
+                        <Checkbox name="a">方案 A</Checkbox>
+                        <Checkbox name="b">方案 B</Checkbox>
+                        <Checkbox name="c">方案 C</Checkbox>
+                    </CheckboxGroup>
+                </div>
+            </Block>
+        </Section>
+    );
+}
+
+const PAYMENT_OPTIONS: ReadonlyArray<{
+    name: string;
+    label: string;
+    disabled?: boolean;
+}> = [
+    { name: "wechat", label: "微信支付" },
+    { name: "alipay", label: "支付宝" },
+    { name: "bank", label: "银行卡（维护中）", disabled: true },
+];
+
+function RadioDemos() {
+    const [pay, setPay] = React.useState<string>("wechat");
+    const [gender, setGender] = React.useState<string>("secret");
+
+    return (
+        <Section title="P3 · Radio 单选框（模式 A：H5 整行触发 / PC 空格与方向键）">
+            <Block className="p-0">
+                <CellGroup inset className="mx-0">
+                    <RadioGroup
+                        value={pay}
+                        onChange={(name) => setPay(name as string)}
+                    >
+                        {PAYMENT_OPTIONS.map((item) => (
+                            <Cell
+                                key={item.name}
+                                center
+                                title={item.label}
+                                onClick={(event) => {
+                                    if (item.disabled || isChoiceTarget(event))
+                                        return;
+                                    setPay(item.name);
+                                }}
+                                rightIcon={
+                                    <Radio
+                                        name={item.name}
+                                        disabled={item.disabled}
+                                        ariaLabel={item.label}
+                                    />
+                                }
+                            />
+                        ))}
+                    </RadioGroup>
+                </CellGroup>
+                <p className="px-bv-md py-bv-sm text-bv-sm text-bv-text-2">
+                    当前支付方式：
+                    {PAYMENT_OPTIONS.find((item) => item.name === pay)?.label}
+                    （整行点击触发，这是 H5 的典型用法）
+                </p>
+            </Block>
+            <Block>
+                <div className="flex flex-col gap-bv-gutter">
+                    <RadioGroup
+                        direction="horizontal"
+                        value={gender}
+                        onChange={(name) => setGender(name as string)}
+                    >
+                        <Radio name="male">男</Radio>
+                        <Radio name="female">女</Radio>
+                        <Radio name="secret">保密</Radio>
+                    </RadioGroup>
+                    <Row>
+                        <Radio
+                            name="left-label"
+                            labelPosition="left"
+                            defaultChecked
+                        >
+                            文字在左
+                        </Radio>
+                        <Radio name="disabled" disabled>
+                            禁用项
+                        </Radio>
+                    </Row>
+                </div>
+            </Block>
+        </Section>
+    );
+}
 
 function Playground() {
     const [loading, setLoading] = React.useState(false);
@@ -2091,6 +2432,104 @@ function Playground() {
                         </p>
                     </Block>
                 </Section>
+
+                {/* ---------- P3 Field / Input / Textarea（模式 A） ---------- */}
+                <Section title="P3 · Field 输入框（模式 A：两端同形，PC 仅多键盘焦点环）">
+                    <Block className="p-0">
+                        <CellGroup inset className="mx-0">
+                            <Field
+                                label="文本"
+                                placeholder="请输入文本"
+                                clearable
+                            />
+                            <Field
+                                label="手机号"
+                                type="tel"
+                                maxlength={11}
+                                placeholder="请输入手机号"
+                                clearable
+                            />
+                            <Field
+                                label="整数"
+                                type="digit"
+                                placeholder="digit：只允许数字"
+                            />
+                            <Field
+                                label="数值"
+                                type="number"
+                                min={0}
+                                max={99}
+                                placeholder="number：失焦夹紧到 0~99"
+                            />
+                            <Field
+                                label="密码"
+                                type="password"
+                                placeholder="密码输入"
+                            />
+                        </CellGroup>
+                    </Block>
+                    <Block className="p-0">
+                        <CellGroup inset className="mx-0">
+                            <Field
+                                label="昵称"
+                                required
+                                leftIcon={<Icon name="success" />}
+                                placeholder="聚焦时 label 与左图标转 primary"
+                                clearable
+                            />
+                            <SmsField />
+                            <Field
+                                label="留言"
+                                type="textarea"
+                                rows={1}
+                                autosize={{ maxHeight: 120 }}
+                                maxlength={50}
+                                showWordLimit
+                                placeholder="多行自适应高度（上限 120px）+ 字数"
+                            />
+                            <Field
+                                label="邮箱"
+                                clearable
+                                placeholder="失焦触发 rules 校验"
+                                rules={[
+                                    { required: true, message: "请输入邮箱" },
+                                    {
+                                        pattern: /^\S+@\S+\.\S+$/,
+                                        message: "邮箱格式不正确",
+                                    },
+                                ]}
+                            />
+                            <Field
+                                label="金额"
+                                type="digit"
+                                inputAlign="right"
+                                placeholder="0.00（右对齐）"
+                            />
+                        </CellGroup>
+                    </Block>
+                    <Block className="p-0">
+                        <CellGroup inset className="mx-0">
+                            <Field
+                                label="顶部标签"
+                                labelAlign="top"
+                                placeholder="labelAlign=top，标题独占一行"
+                            />
+                            <Field
+                                label="所在城市"
+                                readOnly
+                                isLink
+                                value="杭州"
+                                onClickInput={() =>
+                                    showToast("这里内嵌 Select / Picker 触发器")
+                                }
+                            />
+                        </CellGroup>
+                    </Block>
+                </Section>
+
+                <SwitchDemos />
+                <CheckboxDemos />
+                <RadioDemos />
 
                 {/* ---------- P1 弹层实例（都通过 portal 渲染到 body） ---------- */}
 

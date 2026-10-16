@@ -211,6 +211,96 @@
             "registryDependencies": ["utils", "icon", "tokens"]
         },
         {
+            "name": "use-field-state",
+            "type": "registry:hook",
+            "title": "Field 输入逻辑",
+            "description": "Field/Input/Textarea 共享纯逻辑：digit/number 按键过滤与正则、失焦 min/max 夹紧、rules 顺序校验（required/pattern/validator，支持异步）、textarea autosize 测量 hook。",
+            "files": [
+                {
+                    "path": "hooks/use-field-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-field-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "input",
+            "type": "registry:component",
+            "title": "Input / Textarea 输入基础件",
+            "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search/Stepper 等组件复用。",
+            "files": [
+                {
+                    "path": "components/ui/input.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/input.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "tokens", "use-field-state"]
+        },
+        {
+            "name": "field",
+            "type": "registry:component",
+            "title": "Field 输入框（含 Input / Textarea）",
+            "description": "对齐 Vant <van-field>（模式 A）：Cell 行外壳，label/必填星/冒号、左右图标、clearable 清除、错误态与错误文案、字数统计、formatter、rules 轻量校验（ref 暴露 validate/resetValidation）、textarea autosize、min/max 失焦夹紧、自定义控件体（children）与 action 区。",
+            "files": [
+                {
+                    "path": "components/ui/field.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/field.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens",
+                "input",
+                "use-field-state"
+            ]
+        },
+        {
+            "name": "switch",
+            "type": "registry:component",
+            "title": "Switch 开关",
+            "description": "对齐 Vant <van-switch>（模式 A）：checked 布尔或 activeValue/inactiveValue 自定义值、loading、disabled、size 等比缩放、activeColor/inactiveColor、beforeChange 异步切换钩子（等待期内置 loading，异常按取消处理）。触屏 44px 热区，PC 键盘焦点环。",
+            "files": [
+                {
+                    "path": "components/ui/switch.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/switch.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"]
+        },
+        {
+            "name": "checkbox",
+            "type": "registry:component",
+            "title": "Checkbox 复选框（含 CheckboxGroup）",
+            "description": "对齐 Vant <van-checkbox>（模式 A）：round/square、indeterminate 半选、labelDisabled、labelPosition、iconSize、checkedColor；CheckboxGroup 值为 name 数组，支持 max 上限、横/竖排、整组 disabled，ref 暴露 toggleAll（含 skipDisabled）。触屏整行 44px 热区，PC 空格切换 + 图标焦点环。",
+            "files": [
+                {
+                    "path": "components/ui/checkbox.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/checkbox.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "icon", "tokens"]
+        },
+        {
+            "name": "radio",
+            "type": "registry:component",
+            "title": "Radio 单选框（含 RadioGroup）",
+            "description": "对齐 Vant <van-radio>（模式 A）：labelDisabled、labelPosition、iconSize、checkedColor；RadioGroup 单选 name，横/竖排、整组 disabled。原生 radio 共享 name，空格选中与方向键轮换由浏览器保证。触屏整行 44px 热区，PC 图标焦点环。",
+            "files": [
+                {
+                    "path": "components/ui/radio.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/radio.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "tokens"]
+        },
+        {
             "name": "tag",
             "type": "registry:component",
             "title": "Tag",

@@ -7,97 +7,522 @@
 /* ---------- 细边线（对应 Vant mixins/hairline.less）---------- */
 /* 原理：伪元素放大到 200% 后用 scale(0.5) 缩回，1px 边框渲染为 0.5px 物理像素 */
 .bv-hairline {
-  position: relative;
+    position: relative;
 }
 
 .bv-hairline::after {
-  position: absolute;
-  box-sizing: border-box;
-  content: "";
-  pointer-events: none;
-  top: -50%;
-  right: -50%;
-  bottom: -50%;
-  left: -50%;
-  border: 0 solid var(--bv-hairline-color, var(--bv-border));
-  transform: scale(0.5);
+    position: absolute;
+    box-sizing: border-box;
+    content: "";
+    pointer-events: none;
+    top: -50%;
+    right: -50%;
+    bottom: -50%;
+    left: -50%;
+    border: 0 solid var(--bv-hairline-color, var(--bv-border));
+    transform: scale(0.5);
 }
 
 .bv-hairline--top::after {
-  border-top-width: var(--bv-border-width);
+    border-top-width: var(--bv-border-width);
 }
 
 .bv-hairline--bottom::after {
-  border-bottom-width: var(--bv-border-width);
-  /* 缩放后视觉内缩 = 声明值 × 2 */
-  left: calc(var(--bv-hairline-inset-left, 0px) * 2);
-  right: calc(var(--bv-hairline-inset-right, 0px) * 2);
+    border-bottom-width: var(--bv-border-width);
+    /* 缩放后视觉内缩 = 声明值 × 2 */
+    left: calc(var(--bv-hairline-inset-left, 0px) * 2);
+    right: calc(var(--bv-hairline-inset-right, 0px) * 2);
 }
 
 .bv-hairline--left::after {
-  border-left-width: var(--bv-border-width);
+    border-left-width: var(--bv-border-width);
 }
 
 .bv-hairline--right::after {
-  border-right-width: var(--bv-border-width);
+    border-right-width: var(--bv-border-width);
 }
 
 .bv-hairline--all::after {
-  border-width: var(--bv-border-width);
+    border-width: var(--bv-border-width);
+}
+
+/* ---------- 键盘焦点环（模式 A 交互件共用：Field / Input / Textarea…）----------
+ * 为什么用 pointer 媒体查询而不是 [data-mode='pc']：
+ * ui 基础件可能渲染在没有 data-mode 祖先的任意位置（共用零件同理），
+ * 而「是否需要焦点环」的真实语义是设备指针能力——精确指针 + 键盘焦点才显示，
+ * 触屏（pointer: coarse）聚焦输入框仅靠变色提示，逐字对齐 Vant H5 行为。
+ * 与可配断点无关，不存在媒体查询与 Provider 失配的问题（架构 §3.3 禁的是断点媒体查询）。
+ */
+.bv-focus-ring:focus {
+    outline: none;
+}
+
+@media (pointer: fine) {
+    .bv-focus-ring:focus-visible {
+        outline: var(--bv-focus-ring-width) solid var(--bv-focus-ring-color);
+        outline-offset: var(--bv-focus-ring-offset);
+    }
+}
+
+/* ---------- Field / Input · PC 默认带边框（触屏保持 Vant 无框行样式）----------
+ * 桌面端语言逐一对齐各 *-pc-trigger：gray-4 描边、4px 圆角、32px 高，
+ * hover / 聚焦转 primary，错误转 danger，禁用灰底。判据沿用焦点环的
+ * pointer:fine——触屏永远拿不到框，与断点 / data-mode 均无关。
+ *
+ * 两种出框位置：
+ * 1. 裸用 Input/Textarea：控件自身出框；
+ * 2. Field 内：由 field-box 出框（框住输入区 + 清除键 + 右箭头，action 留框外），
+ *    盒内裸件的描边 / 内边距 / 焦点环全部让位给盒，避免双框双环。
+ * 本文件为未分层样式，特异性相同时天然压过 Tailwind 分层工具类（border-0/p-0 等）。
+ */
+@media (pointer: fine) {
+    /* 1) 裸件：自身即边框容器 */
+    [data-slot="input"],
+    [data-slot="textarea"] {
+        border: 1px solid var(--bv-field-pc-border-color);
+        border-radius: var(--bv-field-pc-border-radius);
+        background: var(--bv-surface);
+        padding-left: var(--bv-field-pc-control-padding-x);
+        padding-right: var(--bv-field-pc-control-padding-x);
+    }
+
+    [data-slot="input"] {
+        height: var(--bv-field-pc-control-height);
+    }
+
+    [data-slot="textarea"] {
+        padding-top: var(--bv-field-pc-textarea-padding-y);
+        padding-bottom: var(--bv-field-pc-textarea-padding-y);
+    }
+
+    [data-slot="input"]:hover,
+    [data-slot="textarea"]:hover {
+        border-color: var(--bv-primary);
+    }
+
+    [data-slot="input"]:focus-visible,
+    [data-slot="textarea"]:focus-visible {
+        border-color: var(--bv-primary);
+    }
+
+    [data-slot="input"][aria-invalid="true"],
+    [data-slot="textarea"][aria-invalid="true"] {
+        border-color: var(--bv-danger);
+    }
+
+    [data-slot="input"]:disabled,
+    [data-slot="textarea"]:disabled {
+        border-color: var(--bv-field-pc-disabled-border-color);
+        background: var(--bv-field-pc-disabled-background);
+    }
+
+    /* 2) Field 行底线让位给边框盒（框本身承担行间分隔） */
+    [data-slot="field"].bv-hairline::after {
+        display: none;
+    }
+
+    /* Field 边框盒：H5 下本盒无任何装饰，仅是几何容器 */
+    [data-slot="field-box"] {
+        box-sizing: border-box;
+        min-height: var(--bv-field-pc-control-height);
+        border: 1px solid var(--bv-field-pc-border-color);
+        border-radius: var(--bv-field-pc-border-radius);
+        background: var(--bv-surface);
+        padding-left: var(--bv-field-pc-box-padding-x);
+        padding-right: var(--bv-field-pc-box-padding-x);
+        transition:
+            border-color var(--bv-duration-fast),
+            box-shadow var(--bv-duration-fast);
+    }
+
+    /* textarea 盒高随内容（autosize），只留纵向呼吸 padding */
+    [data-slot="field-box"][data-textarea="true"] {
+        min-height: 0;
+        padding-top: var(--bv-field-pc-textarea-padding-y);
+        padding-bottom: var(--bv-field-pc-textarea-padding-y);
+    }
+
+    [data-slot="field-box"]:hover {
+        border-color: var(--bv-primary);
+    }
+
+    /* 聚焦：主色描边 + 1px 外扩光环，与 select-pc-trigger 的 ring 同款 */
+    [data-slot="field"][data-focused="true"] [data-slot="field-box"] {
+        border-color: var(--bv-primary);
+        box-shadow: 0 0 0 1px var(--bv-primary);
+    }
+
+    /* 错误优先：错误态下 hover / 聚焦都保持红框红环 */
+    [data-slot="field"][data-error="true"] [data-slot="field-box"] {
+        border-color: var(--bv-danger);
+        box-shadow: 0 0 0 1px var(--bv-danger);
+    }
+
+    [data-slot="field"][data-disabled="true"] [data-slot="field-box"] {
+        border-color: var(--bv-field-pc-disabled-border-color);
+        background: var(--bv-field-pc-disabled-background);
+    }
+
+    /* 盒内裸件让位：描边、圆角、底色、内边距、定高全部由盒承担 */
+    [data-slot="field-box"] [data-slot="input"],
+    [data-slot="field-box"] [data-slot="textarea"] {
+        height: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    [data-slot="field-box"] .bv-focus-ring:focus-visible {
+        outline: none;
+    }
+}
+
+/* ---------- Field 聚焦态：label 与左图标转 primary（逐字对齐 Vant .van-field--focus）----------
+ * 用槽名 + data-focused 选择器，避免在组件里堆 group-data 变体。
+ * 焦点环不在这里给——环只画在输入控件自身，label 变色是行级提示。 */
+[data-slot="field"][data-focused="true"] [data-slot="field-label"],
+[data-slot="field"][data-focused="true"] [data-slot="field-left-icon"] {
+    color: var(--bv-primary);
+}
+
+/* ---------- Switch / Checkbox / Radio（模式 A 选择件）----------
+ * 与 Field 同理：状态视觉全部沉到本文件的 data-slot 选择器，组件只写布局类，
+ * 双模式差异只靠 pointer 媒体查询——触屏逐字保持 Vant（20px 图标 + 44px 热区），
+ * pointer:fine 追加键盘焦点环、取消热区膨胀。组件自身不做模式判定（矩阵 §2.2）。
+ */
+
+/* Switch ****************************************************************** */
+[data-slot="switch"] {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    width: calc(
+        var(--bv-switch-width) + 2 * var(--bv-border-width)
+    ); /* 62px：节点 30px×2 + 两侧 1px 描边 */
+    height: calc(var(--bv-switch-height) + 2 * var(--bv-border-width));
+    background: var(--bv-switch-background);
+    border: var(--bv-border-width) solid var(--bv-switch-border-color);
+    border-radius: var(--bv-radius-max);
+    transition: background-color var(--bv-switch-transition-duration);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+[data-slot="switch-node"] {
+    position: absolute;
+    /* 轨道为 border-box：绝对定位的包含块是边框内沿（padding box），
+     * 0 即让圆点贴住边框内侧，四周留出的恰好是 1px 边框；
+     * 切勿再叠加 border-width 偏移，否则开态圆点会顶出轨道外沿。 */
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--bv-switch-node-size);
+    height: var(--bv-switch-node-size);
+    background: var(--bv-switch-node-background);
+    border-radius: 50%;
+    box-shadow: var(--bv-switch-node-shadow);
+    transition: transform var(--bv-switch-transition-duration);
+}
+
+/* 行程 = 节点宽度（1em）：起点/终点都距描边 1px */
+[data-slot="switch"][data-checked="true"] {
+    background: var(--bv-switch-on-background);
+}
+
+[data-slot="switch"][data-checked="true"] [data-slot="switch-node"] {
+    transform: translateX(100%);
+}
+
+[data-slot="switch-loading"] {
+    display: flex;
+    color: var(--bv-switch-loading-icon-color);
+    font-size: var(--bv-switch-loading-icon-size);
+}
+
+[data-slot="switch"][data-disabled="true"] {
+    cursor: not-allowed;
+    opacity: var(--bv-switch-disabled-opacity);
+}
+
+/* Checkbox / Radio 通用行结构 ********************************************** */
+[data-slot="checkbox"],
+[data-slot="radio"] {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    font-size: var(--bv-font-md);
+    line-height: var(--bv-line-md);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+[data-slot="checkbox"] {
+    color: var(--bv-checkbox-label-color);
+}
+
+[data-slot="radio"] {
+    color: var(--bv-radio-label-color);
+}
+
+/* Checkbox 图标盒 ********************************************************** */
+[data-slot="checkbox-icon"] {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    font-size: var(--bv-checkbox-size);
+    color: var(--bv-white); /* 勾/横杠色 */
+    background: var(--bv-surface);
+    border: var(--bv-border-width) solid var(--bv-checkbox-border-color);
+    border-radius: 50%;
+    transition:
+        background-color var(--bv-checkbox-transition-duration),
+        border-color var(--bv-checkbox-transition-duration);
+}
+
+[data-slot="checkbox"][data-shape="square"] [data-slot="checkbox-icon"] {
+    border-radius: var(--bv-radius-sm);
+}
+
+[data-slot="checkbox"][data-checked="true"] [data-slot="checkbox-icon"],
+[data-slot="checkbox"][data-indeterminate="true"] [data-slot="checkbox-icon"] {
+    background: var(--bv-checkbox-checked-icon-color);
+    border-color: var(--bv-checkbox-checked-icon-color);
+}
+
+[data-slot="checkbox-label"] {
+    margin-left: var(--bv-checkbox-label-margin);
+}
+
+[data-slot="checkbox"][data-label-position="left"]
+    [data-slot="checkbox-label"] {
+    margin-right: var(--bv-checkbox-label-margin);
+    margin-left: 0;
+}
+
+[data-slot="checkbox"][data-disabled="true"] {
+    cursor: not-allowed;
+    color: var(--bv-checkbox-disabled-label-color);
+}
+
+/* 禁用 + 选中：灰底灰勾（自定义 checkedColor 由组件在禁用时不写内联样式让位） */
+[data-slot="checkbox"][data-disabled="true"][data-checked="true"]
+    [data-slot="checkbox-icon"],
+[data-slot="checkbox"][data-disabled="true"][data-indeterminate="true"]
+    [data-slot="checkbox-icon"] {
+    background: var(--bv-checkbox-disabled-background);
+    border-color: var(--bv-checkbox-disabled-background);
+}
+
+[data-slot="checkbox"][data-disabled="true"] [data-slot="checkbox-icon"] {
+    border-color: var(--bv-checkbox-disabled-icon-color);
+}
+
+[data-slot="checkbox"][data-disabled="true"]
+    [data-slot="checkbox-icon"]
+    [data-slot="icon"] {
+    color: var(--bv-checkbox-disabled-icon-color);
+}
+
+[data-slot="checkbox"][data-label-disabled="true"]
+    [data-slot="checkbox-label"] {
+    cursor: default;
+}
+
+/* Radio 图标盒 ************************************************************ */
+[data-slot="radio-icon"] {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    font-size: var(--bv-radio-size);
+    background: var(--bv-surface);
+    border: var(--bv-border-width) solid var(--bv-radio-border-color);
+    border-radius: 50%;
+    transition: border-color var(--bv-radio-transition-duration);
+}
+
+[data-slot="radio-dot"] {
+    width: var(--bv-radio-dot-size);
+    height: var(--bv-radio-dot-size);
+    background: var(--bv-radio-checked-icon-color);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform var(--bv-radio-transition-duration);
+}
+
+[data-slot="radio"][data-checked="true"] [data-slot="radio-icon"] {
+    border-color: var(--bv-radio-checked-icon-color);
+}
+
+[data-slot="radio"][data-checked="true"] [data-slot="radio-dot"] {
+    transform: scale(1);
+}
+
+[data-slot="radio-label"] {
+    margin-left: var(--bv-radio-label-margin);
+}
+
+[data-slot="radio"][data-label-position="left"] [data-slot="radio-label"] {
+    margin-right: var(--bv-radio-label-margin);
+    margin-left: 0;
+}
+
+[data-slot="radio"][data-disabled="true"] {
+    cursor: not-allowed;
+    color: var(--bv-radio-disabled-label-color);
+}
+
+[data-slot="radio"][data-disabled="true"] [data-slot="radio-icon"] {
+    border-color: var(--bv-radio-disabled-icon-color);
+}
+
+[data-slot="radio"][data-disabled="true"] [data-slot="radio-dot"] {
+    background: var(--bv-radio-disabled-icon-color);
+}
+
+[data-slot="radio"][data-label-disabled="true"] [data-slot="radio-label"] {
+    cursor: default;
+}
+
+/* Group 布局 ************************************************************** */
+[data-slot="checkbox-group"],
+[data-slot="radio-group"] {
+    display: flex;
+}
+
+[data-slot="checkbox-group"][data-direction="vertical"],
+[data-slot="radio-group"][data-direction="vertical"] {
+    flex-direction: column;
+}
+
+[data-slot="checkbox-group"][data-direction="horizontal"],
+[data-slot="radio-group"][data-direction="horizontal"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+[data-slot="checkbox-group"][data-direction="horizontal"] > * {
+    margin-right: var(--bv-checkbox-horizontal-gap);
+}
+
+[data-slot="radio-group"][data-direction="horizontal"] > * {
+    margin-right: var(--bv-radio-horizontal-gap);
+}
+
+[data-slot="checkbox-group"][data-direction="horizontal"] > :last-child,
+[data-slot="radio-group"][data-direction="horizontal"] > :last-child {
+    margin-right: 0;
+}
+
+/* 触屏（pointer:coarse）：视觉尺寸不动，伪元素把热区外扩到 44px *************
+ * 竖排组整行承担热区（≥44px）；嵌在 Cell 里的项不是组的直接子节点，
+ * 不会与 Cell 的 44px 行双重撑高。 */
+@media (pointer: coarse) {
+    [data-slot="switch"]::after,
+    [data-slot="checkbox-icon"]::after,
+    [data-slot="radio-icon"]::after {
+        position: absolute;
+        content: "";
+    }
+
+    [data-slot="switch"]::after {
+        inset: calc(-1 * var(--bv-switch-touch-expand));
+    }
+
+    [data-slot="checkbox-icon"]::after {
+        inset: calc(-1 * var(--bv-checkbox-touch-expand));
+    }
+
+    [data-slot="radio-icon"]::after {
+        inset: calc(-1 * var(--bv-radio-touch-expand));
+    }
+
+    [data-slot="checkbox-group"][data-direction="vertical"]
+        > [data-slot="checkbox"],
+    [data-slot="radio-group"][data-direction="vertical"] > [data-slot="radio"] {
+        min-height: var(--bv-choice-row-min-height);
+    }
+}
+
+/* PC（pointer:fine）：原生 input 视觉隐藏，焦点环画在紧邻的图标盒上；
+ * Switch 的按钮自身挂 .bv-focus-ring。 */
+@media (pointer: fine) {
+    [data-slot="checkbox-input"]:focus-visible + [data-slot="checkbox-icon"],
+    [data-slot="radio-input"]:focus-visible + [data-slot="radio-icon"] {
+        outline: var(--bv-focus-ring-width) solid var(--bv-focus-ring-color);
+        outline-offset: var(--bv-focus-ring-offset);
+    }
 }
 
 /* ---------- 按压态蒙层（对应 Vant 按钮的 ::before 黑色蒙层）---------- */
 .bv-press {
-  position: relative;
+    position: relative;
 }
 
 .bv-press::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: var(--bv-black);
-  border-radius: inherit;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  content: "";
-  pointer-events: none;
-  transition: opacity var(--bv-duration-fast);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: var(--bv-black);
+    border-radius: inherit;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    content: "";
+    pointer-events: none;
+    transition: opacity var(--bv-duration-fast);
 }
 
 .bv-press:active::before {
-  opacity: var(--bv-press-overlay, 0.1);
+    opacity: var(--bv-press-overlay, 0.1);
 }
 
 .bv-press:disabled::before,
 .bv-press[data-disabled="true"]::before,
 .bv-press[data-loading="true"]::before {
-  display: none;
+    display: none;
 }
 
 /* ---------- 滚动锁定（弹层类共用）---------- */
 .bv-lock-scroll {
-  overflow: hidden;
-  touch-action: none;
+    overflow: hidden;
+    touch-action: none;
 }
 
 /* ---------- 安全区（贴边组件共用：Popup / Dialog / Tabbar / NavBar）----------
  * 用 constant() 兜底 iOS 11.0~11.2，env() 为现代标准；
  * 顺序不可颠倒，老浏览器会忽略不认识的后者。 */
 .bv-safe-area-top {
-  padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
 }
 
 .bv-safe-area-bottom {
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bv-safe-area-margin-bottom {
-  margin-bottom: constant(safe-area-inset-bottom);
-  margin-bottom: env(safe-area-inset-bottom);
+    margin-bottom: constant(safe-area-inset-bottom);
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
 /* ---------- 弹层进出场动画（PC 居中模态 / 遮罩）----------
@@ -106,59 +531,59 @@
  * [data-state] 上，而不是走 React 的 state 分支。
  * 时长取 --bv-popup-duration，随模式变化（H5 300ms / PC 200ms）。 */
 @keyframes bv-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes bv-fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes bv-modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes bv-modal-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
 }
 
 [data-slot="dialog-overlay"][data-state="open"] {
-  animation: bv-fade-in var(--bv-popup-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-popup-duration) var(--bv-ease-out);
 }
 
 [data-slot="dialog-overlay"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-popup-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-popup-duration) var(--bv-ease-in);
 }
 
 [data-slot="dialog"][data-variant="modal"][data-state="open"] {
-  animation: bv-modal-in var(--bv-popup-duration) var(--bv-ease-out);
+    animation: bv-modal-in var(--bv-popup-duration) var(--bv-ease-out);
 }
 
 [data-slot="dialog"][data-variant="modal"][data-state="closed"] {
-  animation: bv-modal-out var(--bv-popup-duration) var(--bv-ease-in);
+    animation: bv-modal-out var(--bv-popup-duration) var(--bv-ease-in);
 }
 
 /* PC 的锚定下拉浮层（Select / 后续 DropdownMenu、Popover 共用）。
@@ -167,11 +592,11 @@
  * 时长取 --bv-select-pc-duration（120ms）：锚定浮层离触发器很近，
  * 用弹层的 200~300ms 会显得拖沓。 */
 [data-slot="select-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-select-pc-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-select-pc-duration) var(--bv-ease-out);
 }
 
 [data-slot="select-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-select-pc-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-select-pc-duration) var(--bv-ease-in);
 }
 
 /* PC 的 DropdownMenu 浮层与二级浮层。
@@ -179,19 +604,19 @@
  * SubContent 走 keyframes 而不是 transition：Radix 的子菜单是「挂载/卸载」，
  * 没有可过渡的前一帧；动画则让 Presence 能等到播完再卸载。 */
 [data-slot="menu-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
 }
 
 [data-slot="menu-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
 }
 
 [data-slot="menu-subpanel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-menu-pc-duration) var(--bv-ease-out);
 }
 
 [data-slot="menu-subpanel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-menu-pc-duration) var(--bv-ease-in);
 }
 
 /* DatePicker 的 PC 月历浮层。槽名必须与 components/pc/date-picker.tsx 上的
@@ -199,11 +624,11 @@
  * 时长取 --bv-date-picker-pc-duration（160ms）：月历比单列浮层面积大，
  * 用 120ms 会显得「啪」地跳出来，用弹层的 300ms 又太慢。 */
 [data-slot="date-picker-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-date-picker-pc-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-date-picker-pc-duration) var(--bv-ease-out);
 }
 
 [data-slot="date-picker-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-date-picker-pc-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-date-picker-pc-duration) var(--bv-ease-in);
 }
 
 /* H5 滚轮列上下两端的渐隐遮罩。
@@ -211,82 +636,82 @@
  * 写进 `bg-[...]` 任意值会在逗号处被 Tailwind 的解析切开。
  * 下遮罩复用同一条规则并整体 `rotate-180` —— 旋转围绕中心，底边锚定的盒子转完仍在原位。 */
 [data-slot="date-picker-wheel-mask"] {
-  background: linear-gradient(
-    to bottom,
-    var(--bv-date-picker-wheel-mask-color),
-    transparent
-  );
+    background: linear-gradient(
+        to bottom,
+        var(--bv-date-picker-wheel-mask-color),
+        transparent
+    );
 }
 
 /* TimePicker 的 PC 浮层（可点击列表面板）。时长取 --bv-time-picker-pc-duration（160ms）。 */
 [data-slot="time-picker-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-time-picker-pc-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-time-picker-pc-duration) var(--bv-ease-out);
 }
 
 [data-slot="time-picker-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-time-picker-pc-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-time-picker-pc-duration) var(--bv-ease-in);
 }
 
 /* H5 滚轮列上下两端的渐隐遮罩（同 date-picker-wheel-mask 的来历）。 */
 [data-slot="time-picker-wheel-mask"] {
-  background: linear-gradient(
-    to bottom,
-    var(--bv-time-picker-wheel-mask-color),
-    transparent
-  );
+    background: linear-gradient(
+        to bottom,
+        var(--bv-time-picker-wheel-mask-color),
+        transparent
+    );
 }
 
 /* DateTimePicker PC 浮层（锚定滚轮面板，时长对齐 TimePicker）。 */
 [data-slot="datetime-picker-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-datetime-picker-pc-duration)
-    var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-datetime-picker-pc-duration)
+        var(--bv-ease-out);
 }
 
 [data-slot="datetime-picker-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-datetime-picker-pc-duration)
-    var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-datetime-picker-pc-duration)
+        var(--bv-ease-in);
 }
 
 /* DateTimePicker 滚轮列渐隐遮罩（来历同 date-picker-wheel-mask）。 */
 [data-slot="datetime-picker-wheel-mask"] {
-  background: linear-gradient(
-    to bottom,
-    var(--bv-datetime-picker-wheel-mask-color),
-    transparent
-  );
+    background: linear-gradient(
+        to bottom,
+        var(--bv-datetime-picker-wheel-mask-color),
+        transparent
+    );
 }
 
 /* Tooltip 跟随指针的小气泡（两端共用；只淡入淡出，位移由 JS transform 接管，
  * 不能用 bv-modal-in 的 scale —— 会与定位 transform 互相顶掉）。 */
 [data-slot="tooltip-bubble"][data-state="open"] {
-  animation: bv-fade-in var(--bv-tooltip-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-tooltip-duration) var(--bv-ease-out);
 }
 
 [data-slot="tooltip-bubble"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-tooltip-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-tooltip-duration) var(--bv-ease-in);
 }
 
 /* Popover 的锚定气泡（H5 轻量气泡与 PC 浮层共用同一槽名与时长；
  * H5 的底部抽屉形态走 Popup 自己的滑入动画）。 */
 [data-slot="popover-panel"][data-state="open"] {
-  animation: bv-fade-in var(--bv-popover-duration) var(--bv-ease-out);
+    animation: bv-fade-in var(--bv-popover-duration) var(--bv-ease-out);
 }
 
 [data-slot="popover-panel"][data-state="closed"] {
-  animation: bv-fade-out var(--bv-popover-duration) var(--bv-ease-in);
+    animation: bv-fade-out var(--bv-popover-duration) var(--bv-ease-in);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="dialog-overlay"],
-  [data-slot="dialog"][data-variant="modal"],
-  [data-slot="menu-panel"],
-  [data-slot="menu-subpanel"],
-  [data-slot="select-panel"],
-  [data-slot="date-picker-panel"],
-  [data-slot="time-picker-panel"],
-  [data-slot="datetime-picker-panel"],
-  [data-slot="tooltip-bubble"],
-  [data-slot="popover-panel"] {
-    animation: none;
-  }
+    [data-slot="dialog-overlay"],
+    [data-slot="dialog"][data-variant="modal"],
+    [data-slot="menu-panel"],
+    [data-slot="menu-subpanel"],
+    [data-slot="select-panel"],
+    [data-slot="date-picker-panel"],
+    [data-slot="time-picker-panel"],
+    [data-slot="datetime-picker-panel"],
+    [data-slot="tooltip-bubble"],
+    [data-slot="popover-panel"] {
+        animation: none;
+    }
 }

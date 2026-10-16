@@ -844,3 +844,162 @@
     --bv-calendar-pc-radius: var(--bv-radius-md);
     --bv-calendar-pc-border-color: var(--bv-border);
 }
+
+/* ---------- 组件级 token：Field / Input / Textarea ----------
+ * 逐字移植 Vant 4 packages/vant/src/field/index.less 的 CSS 变量。
+ * Field 是 Cell 行外壳（行节奏直接复用 --bv-cell-*，不在此重写），
+ * 本组只定义 Field 独有部分：label、输入控件、图标、错误文案、字数、textarea。
+ *
+ * 不新增颜色 token（架构 §3.4③）：文字/错误/图标全部引用既有语义色，
+ * 因此 theme.css 的 @theme inline 与 lib/utils.ts 的 BV_COLORS 都无需改动。
+ */
+:root,
+:host {
+    /* label（左标题） */
+    --bv-field-label-width: 6.2em;
+    --bv-field-label-margin-right: var(--bv-padding-md);
+    --bv-field-label-vertical-padding: 0px;
+    --bv-field-label-color: var(--bv-text);
+    --bv-field-label-font: var(--bv-font-md);
+    --bv-field-label-line-height: var(--bv-line-md);
+    /* label-align=top 时，标题独占一行，与输入区间距 8px */
+    --bv-field-label-top-margin-bottom: var(--bv-padding-xs);
+
+    /* 输入控件本体 */
+    --bv-field-input-text-color: var(--bv-text);
+    --bv-field-input-font: var(--bv-font-md);
+    --bv-field-input-line-height: var(--bv-line-md);
+    --bv-field-placeholder-text-color: var(--bv-gray-5);
+    --bv-field-input-error-text-color: var(--bv-danger);
+    --bv-field-input-disabled-text-color: var(--bv-gray-5);
+    /* 只读与可编辑视觉一致（Vant 不加灰，readonly 仍展示原值），不另立 token */
+
+    /* 图标：左图标 16px；右侧功能图标同尺寸，清除灰 5、右图标灰 6 */
+    --bv-field-icon-size: 16px;
+    --bv-field-icon-gap: var(
+        --bv-padding-xs
+    ); /* body 内各图标/按钮与输入区的间距 8px */
+    --bv-field-clear-icon-size: 16px;
+    --bv-field-clear-icon-color: var(--bv-gray-5);
+    --bv-field-right-icon-color: var(--bv-gray-6);
+    /* 必填红星（与 Cell required 同色，Vant field 变量本身也是 red） */
+    --bv-field-required-mark-color: var(--bv-danger);
+
+    /* 错误文案：12px / 18px，与输入区左对齐，上间距 8px */
+    --bv-field-error-message-color: var(--bv-danger);
+    --bv-field-error-message-font: var(--bv-font-sm);
+    --bv-field-error-message-line-height: var(--bv-line-sm);
+    --bv-field-error-message-margin-top: var(--bv-padding-xs);
+
+    /* textarea */
+    --bv-field-text-area-min-height: 60px;
+
+    /* 字数：右下角 12px 灰 5，上间距 8px；超限数字转 danger */
+    --bv-field-word-limit-color: var(--bv-gray-5);
+    --bv-field-word-limit-full-color: var(--bv-danger);
+    --bv-field-word-limit-font: var(--bv-font-sm);
+    --bv-field-word-limit-line-height: var(--bv-line-sm);
+    --bv-field-word-limit-margin-top: var(--bv-padding-xs);
+
+    /* PC（精确指针）：控件默认带边框，语言对齐各 *-pc-trigger。
+       只引既有灰阶/圆角，不新增颜色命名空间（架构 §3.4③） */
+    --bv-field-pc-border-color: var(--bv-gray-4);
+    --bv-field-pc-border-radius: var(--bv-radius-md);
+    /* 框高对齐 select-pc-trigger，保证同页输入框与选择器并排齐平 */
+    --bv-field-pc-control-height: 32px;
+    /* 裸 Input/Textarea：文字距框 12px */
+    --bv-field-pc-control-padding-x: var(--bv-padding-sm);
+    /* Field 框内含清除热区/箭头，盒 padding 收 8px */
+    --bv-field-pc-box-padding-x: var(--bv-padding-xs);
+    --bv-field-pc-textarea-padding-y: var(--bv-padding-xs);
+    --bv-field-pc-disabled-border-color: var(--bv-gray-3);
+    --bv-field-pc-disabled-background: var(--bv-gray-2);
+}
+
+/* ---------- 公共 token：键盘焦点环（模式 A 交互件共用） ----------
+ * Field / Input / Textarea 先行使用，后续 Switch / Checkbox / Radio 复用。
+ * 只在精确指针设备（鼠标/触控板）+ :focus-visible（键盘焦点）时由
+ * utilities.css 的 .bv-focus-ring 消费；触屏 pointer:coarse 永不显示。
+ * 颜色复用 primary，不新增颜色命名空间。
+ */
+:root,
+:host {
+    --bv-focus-ring-color: var(--bv-primary);
+    --bv-focus-ring-width: 2px;
+    --bv-focus-ring-offset: 1px;
+}
+
+/* ---------- 组件级 token：Switch（逐字移植 Vant 4 switch/index.less）----------
+ * 尺寸全部走绝对 px 变量（节点基准 30px，轨道 = 节点×2 + 两侧边框），
+ * size prop 通过覆盖 --bv-switch-size 整体等比缩放。
+ * 刻意不使用「自定义属性里写 em、在 var() 使用处再解析 font-size」的链路，
+ * 避免继承/工具链分歧导致轨道退化成正方形、圆点悬出轨道。
+ * 不新增颜色命名空间（架构 §3.4③）：轨道/节点引语义色，自定义色走 props 内联。
+ */
+:root,
+:host {
+    --bv-switch-size: 30px;
+    --bv-switch-width: calc(var(--bv-switch-size) * 2);
+    --bv-switch-height: var(--bv-switch-size);
+    --bv-switch-node-size: var(--bv-switch-size);
+    --bv-switch-background: var(--bv-surface);
+    --bv-switch-on-background: var(--bv-primary);
+    /* 关态描边：轻黑描边，在白底/深色底都成立 */
+    --bv-switch-border-color: rgba(0, 0, 0, 0.1);
+    --bv-switch-node-background: var(--bv-white);
+    --bv-switch-node-shadow:
+        0 3px 1px 0 rgba(0, 0, 0, 0.05), 0 2px 2px 0 rgba(0, 0, 0, 0.1),
+        0 3px 3px 0 rgba(0, 0, 0, 0.05);
+    --bv-switch-transition-duration: var(--bv-duration-fast);
+    --bv-switch-disabled-opacity: var(--bv-disabled-opacity);
+    /* loading 转菊画在白色节点内，故用 gray-6 而非白色 */
+    --bv-switch-loading-icon-size: 16px;
+    --bv-switch-loading-icon-color: var(--bv-gray-6);
+    /* 触屏热区外扩量（视觉 30px → 热区 44px），pointer:fine 下归零 */
+    --bv-switch-touch-expand: 7px;
+}
+
+/* ---------- 组件级 token：Checkbox（逐字移植 Vant 4 checkbox/index.less）---------- */
+:root,
+:host {
+    --bv-checkbox-size: 20px;
+    --bv-checkbox-border-color: var(--bv-gray-5);
+    --bv-checkbox-checked-icon-color: var(--bv-primary);
+    --bv-checkbox-label-color: var(--bv-text);
+    --bv-checkbox-label-margin: var(--bv-padding-xs);
+    --bv-checkbox-transition-duration: var(--bv-duration-fast);
+    /* 勾/横杠在图标盒内的字号占比（Vant 为 0.8em） */
+    --bv-checkbox-glyph-size: 0.8em;
+    /* 禁用：勾选框灰底 + 灰勾，未勾选框灰边，文字 gray-5 */
+    --bv-checkbox-disabled-background: var(--bv-border);
+    --bv-checkbox-disabled-icon-color: var(--bv-gray-5);
+    --bv-checkbox-disabled-label-color: var(--bv-gray-5);
+    /* 横排组内各项右间距（Vant checkbox-group--horizontal） */
+    --bv-checkbox-horizontal-gap: var(--bv-padding-md);
+    /* 触屏图标热区外扩量（视觉 20px → 热区 44px），pointer:fine 下归零 */
+    --bv-checkbox-touch-expand: 12px;
+}
+
+/* ---------- 组件级 token：Radio（逐字移植 Vant 4 radio/index.less）---------- */
+:root,
+:host {
+    --bv-radio-size: 20px;
+    --bv-radio-border-color: var(--bv-gray-5);
+    --bv-radio-checked-icon-color: var(--bv-primary);
+    --bv-radio-label-color: var(--bv-text);
+    --bv-radio-label-margin: var(--bv-padding-xs);
+    --bv-radio-transition-duration: var(--bv-duration-fast);
+    /* 选中内圆占外框比例（Vant success 字形约 0.625em） */
+    --bv-radio-dot-size: 0.625em;
+    --bv-radio-disabled-icon-color: var(--bv-gray-5);
+    --bv-radio-disabled-label-color: var(--bv-gray-5);
+    --bv-radio-horizontal-gap: var(--bv-padding-md);
+    --bv-radio-touch-expand: 12px;
+}
+
+/* 触屏竖排组的行高：整行可点时不小于触控热区（Cell 内使用时由 Cell 44px 行承接，
+ * 直接子选择器不会命中嵌在 Cell 里的项，不会双重撑高）。 */
+:root,
+:host {
+    --bv-choice-row-min-height: 44px;
+}

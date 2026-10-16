@@ -917,28 +917,279 @@ const [open, setOpen] = useState(false);
 <Calendar open={open} onOpenChange={setOpen} />
 ```
 
-| prop | 说明 |
-| --- | --- |
-| `type` | `'single'`（默认）/ `'range'` / `'multiple'` |
-| `value` / `defaultValue` / `onChange` | 受控值；single 为字符串，range 为 `[start, end]`，multiple 为升序字符串数组 |
-| `onConfirm(value)` | 与 `onChange` 同值，最终选定额外触发一次，便于统一接埋点 |
-| `min` / `max` | 可选下界 / 上界（含），默认**今天 ~ 6 个月后月末**；传入的值超出边界会被夹紧 |
-| `firstDayOfWeek` | 星期表头起始，`0`=周日 … `6`=周六，默认 `0` |
-| `maxRange` | 区间最多跨多少天（含端点）；拖选超限时窗口向前滑动，轻点超限触发 `onOverRange` |
-| `allowSameDay` | 区间是否允许起止同日，默认 `false` |
-| `formatter({parts, isStart, isEnd, selected, inRange})` | 返回 `{text?, topInfo?, bottomInfo?, disabled?, className?}`，用于节日/价格/禁选等 |
-| `showMark` | 今天是否标「今天」，默认 `true`（formatter 可覆盖该标注） |
-| `poppable` | **仅 H5**：是否以全屏弹层呈现，默认 `true`；`false` 时内嵌常驻。PC 恒内嵌 |
-| `open` / `defaultOpen` / `onOpenChange` | 弹层开合（受控/非受控，仅 H5 poppable 形态消费） |
-| `title` / `showTitle` / `confirmText` / `confirmDisabledText` / `footer` | H5 弹层文案与自定义底部区 |
-| `readonly` | 只读：不可选、H5 不显示确定条 |
-| `onOverRange({date, maxRange})` | 轻点（非拖选）超出区间上限时触发 |
-| `forceMode` | 逃生舱：强制 `'mobile'` / `'desktop'` |
+| prop                                                                     | 说明                                                                               |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `type`                                                                   | `'single'`（默认）/ `'range'` / `'multiple'`                                       |
+| `value` / `defaultValue` / `onChange`                                    | 受控值；single 为字符串，range 为 `[start, end]`，multiple 为升序字符串数组        |
+| `onConfirm(value)`                                                       | 与 `onChange` 同值，最终选定额外触发一次，便于统一接埋点                           |
+| `min` / `max`                                                            | 可选下界 / 上界（含），默认**今天 ~ 6 个月后月末**；传入的值超出边界会被夹紧       |
+| `firstDayOfWeek`                                                         | 星期表头起始，`0`=周日 … `6`=周六，默认 `0`                                        |
+| `maxRange`                                                               | 区间最多跨多少天（含端点）；拖选超限时窗口向前滑动，轻点超限触发 `onOverRange`     |
+| `allowSameDay`                                                           | 区间是否允许起止同日，默认 `false`                                                 |
+| `formatter({parts, isStart, isEnd, selected, inRange})`                  | 返回 `{text?, topInfo?, bottomInfo?, disabled?, className?}`，用于节日/价格/禁选等 |
+| `showMark`                                                               | 今天是否标「今天」，默认 `true`（formatter 可覆盖该标注）                          |
+| `poppable`                                                               | **仅 H5**：是否以全屏弹层呈现，默认 `true`；`false` 时内嵌常驻。PC 恒内嵌          |
+| `open` / `defaultOpen` / `onOpenChange`                                  | 弹层开合（受控/非受控，仅 H5 poppable 形态消费）                                   |
+| `title` / `showTitle` / `confirmText` / `confirmDisabledText` / `footer` | H5 弹层文案与自定义底部区                                                          |
+| `readonly`                                                               | 只读：不可选、H5 不显示确定条                                                      |
+| `onOverRange({date, maxRange})`                                          | 轻点（非拖选）超出区间上限时触发                                                   |
+| `forceMode`                                                              | 逃生舱：强制 `'mobile'` / `'desktop'`                                              |
 
 两端是两套交互范式（模式 C）：
 
 - **H5**：**全屏弹层**，min→max 的所有月份纵向连续排列，月份网格进入视口附近才挂载（IntersectionObserver，环境不支持时降级全量渲染）；区间可**按住跨日拖动**（触摸拖动不劫持页面滚动），也支持两次点选；range / multiple 在底部确定条暂存，取消整体丢弃，确定才提交，single 点一天即完成。
 - **PC**：**内嵌常驻月历**（range 并排双月），鼠标按住拖选或两次点选即生效，悬停有区间预览；完整键盘支持——`←→` 换日、`↑↓` 换周、`PgUp/PgDn` 换月、`Home/End` 到周首尾、`Enter` 选定，巡航自动跳过禁用日。
+
+### Field / Input / Textarea
+
+表单输入行，三件分层：`Field` 是 Cell 行外壳（label、必填星、错误文案、字数、清除、箭头都在它身上），`Input` / `Textarea` 是无壳基础控件。API 对齐 Vant `<van-field>`。装 `field` 会自动带上 `input` 与 `use-field-state`：
+
+```bash
+npx shadcn@latest add @bivane/field
+```
+
+绝大多数场景只用 `Field`；需要不带行壳的裸输入框（搜索框、步进器内嵌）时再直接用 `Input`。
+
+受控 / 非受控与普通输入框一致，`onChange` 给的始终是字符串（传入数字 `value` 会归一化展示）：
+
+```tsx
+<Field label="昵称" placeholder="请输入昵称" value={name} onChange={setName} />
+<Field label="签名" defaultValue="初始签名" />
+```
+
+`type` 支持 `text`（默认）· `digit`（纯数字，唤起数字键盘）· `number`（允许小数/负号）· `password` · `tel` · `email` · `url` · `search`，另有 `'textarea'` 渲染多行框。`digit` 的非法按键不会产生变更；`number` / `digit` 传 `min` / `max` 后**失焦自动夹紧**：
+
+```tsx
+<Field label="短信验证码" type="digit" maxlength={6} clearable />
+<Field label="数量" type="number" min={0} max={99} inputAlign="right" />
+
+{/* 多行：autosize 自适应高度，可给 minHeight/maxHeight 封顶，配合字数统计 */}
+<Field label="备注" type="textarea" autosize={{ maxHeight: 120 }} maxlength={50} showWordLimit rows={2} />
+```
+
+常用行配置：`required` 只画红星（是否真必填交给 rules）、`colon` 冒号、`labelWidth` / `labelAlign`（含 `'top'` 标题独占一行）、`leftIcon` / `rightIcon`、`clearable`（`clearTrigger="always"` 常显）、`isLink` + `readOnly` 做选择器入口、`action` 是右侧动作区（对应 Vant `#button` 插槽，如发送验证码）：
+
+```tsx
+{
+    /* action 区：发送验证码 + 倒计时 */
+}
+<Field
+    label="手机号"
+    type="digit"
+    maxlength={11}
+    clearable
+    action={
+        <Button
+            size="small"
+            type={counting ? "default" : "primary"}
+            disabled={counting > 0}
+            onClick={sendSms}
+        >
+            {counting > 0 ? `${counting}s 后重发` : "发送验证码"}
+        </Button>
+    }
+/>;
+
+{
+    /* 只读 + 箭头：整行当选择器触发器，点击由 onClickInput 接管 */
+}
+<Field
+    label="所在地区"
+    readOnly
+    isLink
+    value={region}
+    placeholder="请选择"
+    onClickInput={() => setOpen(true)}
+/>;
+```
+
+需要完全自定义控件体时传 `children`，此时 Field 不再渲染原生输入框（Vant `#input` 插槽语义），`rules` 仍按 `value` 字符串校验：
+
+```tsx
+<Field
+    label="规格"
+    value={spec}
+    rules={[{ required: true, message: "请选择规格" }]}
+>
+    <button type="button" onClick={openSpecPicker}>
+        {spec || "请选择"}
+    </button>
+</Field>
+```
+
+内置轻量校验，不必引表单库：`required` / `pattern` / `validator`（可异步，返回字符串即错误文案）+ `message`，默认失焦触发，`validateTrigger="onChange"` 改为变更即校验。受控的 `error` / `errorMessage` 优先级高于规则结果，便于外部表单统一控错。ref 暴露 Vant 同款实例方法：
+
+```tsx
+const fieldRef = useRef<FieldInstance>(null);
+
+<Field
+    ref={fieldRef}
+    label="邮箱"
+    rules={[
+        { required: true, message: "请填写邮箱" },
+        { pattern: /^.+@.+$/, message: "邮箱格式不正确" },
+    ]}
+/>;
+
+// 提交前手动校验，再聚到第一个不合法字段
+const valid = await fieldRef.current?.validate();
+fieldRef.current?.resetValidation();
+fieldRef.current?.focus();
+```
+
+| prop                                                                            | 说明                                                                                                 |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `value` / `defaultValue` / `onChange`                                           | 受控 / 非受控；`onChange(value: string)`，数字 value 归一化展示                                      |
+| `type`                                                                          | `text`（默认）/ `digit` / `number` / `password` / `tel` / `email` / `url` / `search` / `textarea`    |
+| `label` / `labelWidth` / `labelAlign` / `colon` / `required` / `labelClassName` | 左侧标题；`labelAlign="top"` 时标题独占一行                                                          |
+| `inputAlign`                                                                    | 内容对齐 `left`（默认）/ `center` / `right`                                                          |
+| `min` / `max`                                                                   | `number` / `digit` 失焦夹紧边界（含端点）                                                            |
+| `rows` / `autosize`                                                             | textarea 行数；`autosize` 传 `{minHeight, maxHeight}` 限定高度区间                                   |
+| `maxlength` / `showWordLimit`                                                   | 原生字数上限 + 「当前/上限」统计                                                                     |
+| `clearable` / `clearTrigger`                                                    | 清除按钮；`'focus'`（默认，聚焦且有值才出现）/ `'always'`                                            |
+| `leftIcon` / `rightIcon` / `isLink` / `arrowDirection`                          | 左右图标与方向箭头（`left` / `up` / `down` / `right`）                                               |
+| `formatter` / `formatTrigger`                                                   | 值格式化器；触发时机 `onChange`（默认）/ `onBlur`，均在失焦夹紧之后                                  |
+| `error` / `errorMessage` / `errorMessageAlign`                                  | 受控错误态，优先级高于 rules 结果                                                                    |
+| `rules` / `validateTrigger`                                                     | `{required?, pattern?, validator?, message?, trigger?}`；时机 `onBlur`（默认）/ `onChange`           |
+| `action`                                                                        | 右侧动作区（Vant `#button` 插槽）                                                                    |
+| `children`                                                                      | 自定义控件体（Vant `#input` 插槽），传入后不渲染原生框                                               |
+| `disabled` / `readOnly` / `center` / `border` / `size`                          | 禁用 / 只读 / 垂直居中（默认开）/ 下边框（默认开；PC 自动隐藏让位边框盒）/ `normal`（默认）· `large` |
+| ref：`focus()` / `blur()` / `validate()` / `resetValidation()`                  | 实例方法，对齐 Vant Field                                                                            |
+
+模式 A：两端同一套 DOM、同一种交互，没有 h5/pc 分叉，双端差异全部由 `@media (pointer: fine)` 按指针能力自动给出（与断点无关）：
+
+- **触屏**：Vant 原样——无框 Cell 行，底部 hairline 分隔，聚焦仅靠 label / 左图标变主色提示。
+- **鼠标 / 键盘设备**：控件默认带**边框盒**（1px gray-4 描边、4px 圆角、32px 高，与 Select 等桌面触发器同款），hover / 聚焦描边转 primary、聚焦另有 1px 主色光环，错误态整体转 danger，禁用灰底；Field 的行底线在 PC 下隐藏，由边框盒承担分隔，`action`（如发送验证码按钮）始终在边框盒外侧。裸用 `Input` / `Textarea` 时边框画在控件自身。
+- 此外精确指针设备聚焦时还有 2px 主色**键盘焦点环**，触屏永不出现。
+
+### Switch
+
+开关，对齐 Vant `<van-switch>`。模式 A，两端同一视觉（30px 轨道），触屏把热区外扩到 44px，PC 键盘聚焦有焦点环：
+
+```bash
+npx shadcn@latest add @bivane/switch
+```
+
+布尔场景用 `checked` 快捷受控即可；需要绑定字符串/数字枚举时用 `value` + `activeValue` / `inactiveValue`，`onChange` 回传切换后的值：
+
+```tsx
+<Switch checked={notice} onChange={(v) => setNotice(v === true)} />
+<Switch defaultValue={true} disabled />
+<Switch loading />
+<Switch size={24} activeColor="#07c160" inactiveColor="#ebedf0" />
+
+{/* 枚举值：value === activeValue 即为开 */}
+<Switch value={enumVal} activeValue="yes" inactiveValue="no" onChange={setEnumVal} />
+```
+
+`beforeChange` 用于切换前确认（危险操作、异步校验）：返回 `false` / `Promise<false>` / 抛异常都会放弃切换；Promise 等待期间开关自动进入 loading 并锁定，防止重复点击：
+
+```tsx
+<Switch
+    checked={enabled}
+    onChange={(v) => setEnabled(v === true)}
+    beforeChange={() =>
+        new Promise<boolean>((resolve) => {
+            showConfirmDialog({
+                title: "确认开启？",
+                onConfirm: () => resolve(true),
+                onCancel: () => resolve(false),
+            });
+        })
+    }
+/>
+```
+
+| Prop                                              | 说明                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| `checked` / `value`·`defaultValue` / `onChange`   | 布尔受控快捷方式；或自定义值模式（与 `activeValue` 全等即为开） |
+| `activeValue` / `inactiveValue`                   | 开 / 关对应的值，默认 `true` / `false`                          |
+| `disabled` / `loading`                            | 禁用；加载态（节点内转菊且拒绝切换）                            |
+| `size`                                            | 节点基准尺寸（px 数字或 CSS 长度），默认 30px，轨道按 2:1 等比  |
+| `activeColor` / `inactiveColor`                   | 轨道颜色，默认 primary / 白底轻黑边                             |
+| `beforeChange`                                    | `() => boolean \| Promise<boolean>`，切换前钩子                 |
+| `onClick` 及其余 `button` 属性（`aria-label` 等） | 透传根按钮（`role="switch"`）                                   |
+
+嵌在 `Cell` 行尾时放 `rightIcon` 槽（不是 `value`），开关才会贴齐 Cell 右边缘并垂直居中：
+
+```tsx
+<Cell center title="消息推送" rightIcon={<Switch aria-label="消息推送" />} />
+```
+
+### Checkbox / CheckboxGroup
+
+复选框，对齐 Vant `<van-checkbox>`。模式 A：触屏图标热区外扩到 44px、竖排组整行 ≥44px，PC 空格切换、键盘聚焦在图标盒上画焦点环。
+
+```bash
+npx shadcn@latest add @bivane/checkbox
+```
+
+单个是布尔受控；放进 `CheckboxGroup` 后值模型变成「已选 `name` 数组」，组负责互斥关系以外的多选状态：
+
+```tsx
+{/* 单个 */}
+<Checkbox defaultChecked>圆形（默认）</Checkbox>
+<Checkbox shape="square" defaultChecked>方形</Checkbox>
+<Checkbox checked={all} indeterminate={partial} onChange={setAll}>
+  全选
+</Checkbox>
+<Checkbox labelPosition="left">文字在左</Checkbox>
+<Checkbox labelDisabled>只有图标可点</Checkbox>
+
+{/* 组：value 是已选 name 数组 */}
+<CheckboxGroup value={fruits} max={2} onChange={setFruits}>
+  <Checkbox name="apple">苹果</Checkbox>
+  <Checkbox name="banana">香蕉</Checkbox>
+  <Checkbox name="orange" disabled>
+    橙子
+  </Checkbox>
+</CheckboxGroup>
+```
+
+- **`max`**：达到上限后未选项自动 `disabled`（已选项仍可取消，否则永远无法减员）。
+- **`direction="horizontal"`**：横排自动换行，项间距 16px；默认竖排。
+- **整行可点（H5 典型用法）**：把 `Checkbox`（不传文字、给 `ariaLabel`）放进 `Cell` 的 `rightIcon` 槽（不要放 `value`——value 与 title 各占一半宽，控件悬不到右边缘），行点击走同一份更新逻辑；Cell 的 `onClick` 里用 `event.target.closest("[data-slot='checkbox']")` 跳过来自 label 的点击，避免双触发。
+- **全选 / 半选联动**：组没有内置「全选」概念，由外部一个 `Checkbox` 派生 `checked = 全选`、`indeterminate = 部分选`，组 ref 提供命令式写法。
+
+```tsx
+const groupRef = useRef<CheckboxGroupInstance>(null);
+// 全选（禁用项也进值）/ 全不选
+groupRef.current?.toggleAll();
+groupRef.current?.toggleAll(false);
+// 跳过禁用项：禁用项保持现状，启用项全选 / 全不选
+groupRef.current?.toggleAll({ checked: true, skipDisabled: true });
+```
+
+组的 `disabled` / `shape` / `iconSize` / `checkedColor` 会向子项透传，子项同名 props 可覆盖。`bindGroup={false}` 可让单个 Checkbox 脱离外层组。
+
+### Radio / RadioGroup
+
+单选框，对齐 Vant `<van-radio>`。模式 A，热区与焦点环规则同 Checkbox；键盘交互直接复用**原生 radio**：组内 input 共享一个 name，空格选中、方向键在组内轮换由浏览器保证，无需自造键盘状态机。
+
+```bash
+npx shadcn@latest add @bivane/radio
+```
+
+```tsx
+<RadioGroup value={pay} onChange={(name) => setPay(name as string)}>
+    <Radio name="wechat">微信支付</Radio>
+    <Radio name="alipay">支付宝</Radio>
+    <Radio name="bank" disabled>
+        银行卡
+    </Radio>
+</RadioGroup>;
+
+{
+    /* 横排 */
+}
+<RadioGroup direction="horizontal" defaultValue="secret">
+    <Radio name="male">男</Radio>
+    <Radio name="female">女</Radio>
+    <Radio name="secret">保密</Radio>
+</RadioGroup>;
+```
+
+`Cell` 整行点击写法同 Checkbox（控件放 `rightIcon` 槽；行 `onClick` 内 `closest("[data-slot='radio']")` 判重）。通用 props：`name` / `disabled` / `labelDisabled` / `labelPosition`（`left`·`right`）/ `iconSize` / `checkedColor`；组支持 `value`·`defaultValue`·`onChange(name)` / `direction` / `disabled` / `iconSize` / `checkedColor`。
 
 ---
 

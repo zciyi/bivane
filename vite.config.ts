@@ -10,6 +10,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./', import.meta.url)),
     },
   },
+  server: {
+    port: 5170,
+    host: true,
+  },
   build: {
     /**
      * dist 是**验证台**产物（src/App.tsx 把所有组件都挂了一遍），不是要发布的

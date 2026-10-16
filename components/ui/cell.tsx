@@ -123,7 +123,7 @@ export const Cell = React.forwardRef<HTMLDivElement, CellProps>(function Cell(
       {rightIcon ?? isLink ? (
         <span
           data-slot="cell-right-icon"
-          className="ml-[var(--bv-padding-base)] h-[var(--bv-cell-line-height)] text-[length:var(--bv-cell-icon-size)] leading-[var(--bv-cell-line-height)] text-bv-gray-6"
+          className="ml-[var(--bv-padding-base)] inline-flex h-[var(--bv-cell-line-height)] items-center text-[length:var(--bv-cell-icon-size)] leading-[var(--bv-cell-line-height)] text-bv-gray-6"
         >
           {rightIcon ?? <Icon name="arrow" />}
         </span>

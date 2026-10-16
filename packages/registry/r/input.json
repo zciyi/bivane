@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input",
+  "type": "registry:component",
+  "title": "Input / Textarea 输入基础件",
+  "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search/Stepper 等组件复用。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/tokens",
+    "@bivane/use-field-state"
+  ],
+  "files": [
+    {
+      "path": "components/ui/input.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport {\n  filterFieldInput,\n  resolveInputMode,\n  resolveNativeInputType,\n  useFieldAutosize,\n  type FieldAutosizeConfig,\n  type FieldType,\n} from '@/hooks/use-field-state';\n\n/**\n * Bivane Input / Textarea · 无外壳输入基础件（模式 A）\n *\n * 与 Field 的分工：本文件只负责「一个能打字的控件」——原生属性透传、Vant token\n * 排版、digit/number 按键过滤、textarea autosize、键盘焦点环。\n * label / 清除图标 / 错误文案 / 字数等 Cell 行结构归 components/ui/field.tsx。\n * Search、Stepper 等后续组件直接复用本件，不再自绘 input。\n */\n\nconst CONTROL_BASE =\n  'm-0 w-full min-w-0 border-0 bg-transparent p-0 appearance-none outline-none ' +\n  'text-[length:var(--bv-field-input-font)] leading-[var(--bv-field-input-line-height)] ' +\n  'text-[var(--bv-field-input-text-color)] placeholder:text-[var(--bv-field-placeholder-text-color)] ' +\n  'disabled:cursor-not-allowed disabled:text-[var(--bv-field-input-disabled-text-color)]';\n\nexport interface InputProps\n  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {\n  /** 输入类型；digit = 纯数字键盘且按键即过滤（Vant 语义） */\n  type?: FieldType;\n  /** 错误态：输入文字转 danger（Field 内部受控，也可单独使用） */\n  invalid?: boolean;\n}\n\nexport const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(\n  { type = 'text', invalid = false, inputMode, className, onChange, ...props },\n  ref,\n) {\n  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {\n    // 受控下拒绝非法输入：不向上传事件，消费者 value 不变，DOM 被 React 拉回旧值\n    if (filterFieldInput(event.target.value, type) === null) return;\n    onChange?.(event);\n  };\n\n  return (\n    <input\n      ref={ref}\n      data-slot=\"input\"\n      aria-invalid={invalid || undefined}\n      type={resolveNativeInputType(type)}\n      inputMode={resolveInputMode(type, inputMode)}\n      onChange={handleChange}\n      className={cn(\n        CONTROL_BASE,\n        'bv-focus-ring rounded-bv-sm',\n        invalid && 'text-[var(--bv-field-input-error-text-color)]',\n        className,\n      )}\n      {...props}\n    />\n  );\n});\n\nexport interface TextareaProps\n  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {\n  /** 自适应高度；可给 minHeight/maxHeight 钳制区间 */\n  autosize?: boolean | FieldAutosizeConfig;\n  /** 错误态：输入文字转 danger */\n  invalid?: boolean;\n}\n\nexport const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(\n  { autosize = false, invalid = false, className, onChange, value, defaultValue, ...props },\n  forwardedRef,\n) {\n  const innerRef = React.useRef<HTMLTextAreaElement | null>(null);\n  const ref = React.useCallback(\n    (node: HTMLTextAreaElement | null) => {\n      innerRef.current = node;\n      if (typeof forwardedRef === 'function') forwardedRef(node);\n      else if (forwardedRef) forwardedRef.current = node;\n    },\n    [forwardedRef],\n  );\n\n  // 非受控下也要跟随输入重测高度：镜像一份内部文本驱动 autosize effect\n  const [innerText, setInnerText] = React.useState(() =>\n    String(value ?? defaultValue ?? ''),\n  );\n  const currentText = value !== undefined ? String(value) : innerText;\n  useFieldAutosize(innerRef, autosize, currentText);\n\n  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {\n    setInnerText(event.target.value);\n    onChange?.(event);\n  };\n\n  return (\n    <textarea\n      ref={ref}\n      data-slot=\"textarea\"\n      aria-invalid={invalid || undefined}\n      value={value}\n      defaultValue={value === undefined ? defaultValue : undefined}\n      onChange={handleChange}\n      className={cn(\n        CONTROL_BASE,\n        'bv-focus-ring block min-h-[var(--bv-field-text-area-min-height)] resize-none rounded-bv-sm',\n        invalid && 'text-[var(--bv-field-input-error-text-color)]',\n        className,\n      )}\n      {...props}\n    />\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/ui/input.tsx"
+    }
+  ]
+}

@@ -6,8 +6,8 @@ import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
   defaultFormatForColumns,
   formatParts,
-  nowDateTimeParts,
   resolveColumns,
+  resolveCursor,
   useDateTimeValue,
   type DateTimeColumnKey,
   type DateTimePickerValue,
@@ -127,19 +127,25 @@ export const DateTimePicker = React.forwardRef<
 
   React.useEffect(() => {
     if (!open) return;
-    setDraft([
-      selected[0] ?? formatParts(nowDateTimeParts(), resolvedFormat),
-    ]);
-  }, [open, selected, resolvedFormat]);
+    // 播种必须与面板光标同口径：resolveCursor 无值落「此刻」并按 min/max
+    // 逐字段夹紧。若直接播原值，越界已选值（或落在界外的「此刻」）会让面板
+    // 展示夹回值、草稿却仍是越界原值，用户不改直接「确定」就把越界值提交了。
+    const seed = resolveCursor(selected[0], columns, minParts, maxParts);
+    setDraft([formatParts(seed, resolvedFormat)]);
+  }, [open, selected, columns, minParts, maxParts, resolvedFormat]);
 
   const handleSubmit = React.useCallback(
     (next: string[]) => {
       if (!next[0]) return;
-      setValue(next[0]);
-      onConfirm?.(next[0]);
+      // 防御：草稿只可能来自播种或面板内夹紧路径，提交前再夹一次，
+      // 保证落库值恒在边界内（契约：越界选中夹回范围内）
+      const parts = resolveCursor(next[0], columns, minParts, maxParts);
+      const value = formatParts(parts, resolvedFormat);
+      setValue(value);
+      onConfirm?.(value);
       setOpen(false);
     },
-    [setValue, onConfirm],
+    [columns, minParts, maxParts, resolvedFormat, setValue, onConfirm],
   );
 
   const handleOpenChange = React.useCallback(
