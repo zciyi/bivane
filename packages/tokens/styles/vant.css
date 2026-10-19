@@ -1003,3 +1003,63 @@
 :host {
     --bv-choice-row-min-height: 44px;
 }
+
+/* ---------- 组件级 token：InputNumber（逐字移植 Vant 4 stepper/index.less）----------
+ * 命名不叫 Stepper：避免与「步骤条 Steps」混淆。值语义仍逐字对齐 van-stepper。 */
+:root,
+:host {
+    --bv-input-number-background: var(--bv-active-color);
+    --bv-input-number-button-icon-color: var(--bv-text);
+    --bv-input-number-button-disabled-color: var(--bv-background);
+    --bv-input-number-button-disabled-icon-color: var(--bv-gray-5);
+    --bv-input-number-button-round-theme-color: var(--bv-primary);
+    --bv-input-number-input-width: 32px;
+    --bv-input-number-input-height: 28px;
+    --bv-input-number-input-font: var(--bv-font-md);
+    --bv-input-number-input-line-height: normal;
+    --bv-input-number-input-text-color: var(--bv-text);
+    --bv-input-number-input-disabled-text-color: var(--bv-text-3);
+    --bv-input-number-input-disabled-background: var(--bv-active-color);
+    --bv-input-number-radius: var(--bv-radius-md);
+    /* 输入框与两侧按钮的 2px 间隙（Vant：margin 0 2px） */
+    --bv-input-number-gap: 2px;
+    /* 触屏热区外扩：视觉 28px → 44px；pointer:fine 下不消费 */
+    --bv-input-number-touch-expand: 8px;
+    /* PC 竖排 ▲▼ 微调列宽（仅桌面壳消费的结构值，命名期固定，不进 modes.css） */
+    --bv-input-number-pc-spin-width: 22px;
+    /* PC 微调列箭头字号 */
+    --bv-input-number-pc-spin-icon-size: 12px;
+    /* 长按连发：首拍 400ms（Vant LONG_PRESS_START_TIME），之后每 200ms 一步 */
+    --bv-input-number-long-press-start: 400ms;
+    --bv-input-number-long-press-interval: 200ms;
+}
+
+/* ---------- 组件级 token：Rate（逐字移植 Vant 4 rate/index.less）---------- */
+:root,
+:host {
+    --bv-rate-icon-size: 20px;
+    --bv-rate-icon-gutter: 4px;
+    /* 星黄（Vant 4 rate var.less @rate-icon-full-color = @yellow #ffd21e） */
+    --bv-rate-icon-full-color: #ffd21e;
+    --bv-rate-icon-void-color: var(--bv-gray-5);
+    --bv-rate-icon-disabled-color: var(--bv-gray-5);
+    /* 触屏热区外扩：视觉 20px → 44px；pointer:fine 下不消费 */
+    --bv-rate-touch-expand: 12px;
+}
+
+/* ---------- 组件级 token：Slider（逐字移植 Vant 4 slider/index.less）---------- */
+:root,
+:host {
+    --bv-slider-bar-height: 2px;
+    --bv-slider-button-size: 24px;
+    /* 滑块主色（Vant 4 @slider-active-background = @blue） */
+    --bv-slider-active-background: var(--bv-primary);
+    /* 轨道底色（Vant 4 @slider-inactive-background = @gray-3 #ebedf0） */
+    --bv-slider-inactive-background: var(--bv-gray-3);
+    --bv-slider-button-background: var(--bv-background-2);
+    --bv-slider-button-border-color: var(--bv-border);
+    --bv-slider-button-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --bv-slider-disabled-opacity: var(--bv-disabled-opacity);
+    /* 触屏热区外扩：视觉 24px → 44px；pointer:fine 下不消费 */
+    --bv-slider-touch-expand: 10px;
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "slider",
+  "type": "registry:component",
+  "title": "Slider 滑块",
+  "description": "模式 C 分发层：H5 触摸拖拽 / PC 点轨 + 拖拽 + 键盘。支持单值/区间（range）、reverse 反向、vertical 竖直、禁用/只读、onDragStart/onDragEnd。值语义逐字对齐 Vant 4 van-slider。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-device-mode",
+    "@bivane/responsive-provider",
+    "@bivane/use-slider-state",
+    "@bivane/slider-parts",
+    "@bivane/slider-h5",
+    "@bivane/slider-pc"
+  ],
+  "files": [
+    {
+      "path": "components/responsive/slider.tsx",
+      "content": "import * as React from \"react\";\nimport { H5Slider } from \"@/components/h5/slider\";\nimport { PcSlider } from \"@/components/pc/slider\";\nimport type { SliderRenderProps } from \"@/components/ui/slider-parts\";\nimport { useDeviceMode, type DeviceMode } from \"@/hooks/use-device-mode\";\nimport { useSliderValue, type SliderValue } from \"@/hooks/use-slider-state\";\n\n/**\n * Bivane Slider · 分发层（模式 C）\n * 交互定义见 bivane-responsive-matrix.md §2.2\n *\n * ┌ H5 ── 触摸拖拽（touch-action:none），热区 44px，不进 Tab 流\n * └ PC ── 点轨跳转 + 鼠标拖拽 + 键盘方向键（±step / Home/End / PgUp·PgDn）\n *\n * 值语义（量化、夹紧、range 保序、拖拽手势）在 hooks/use-slider-state 与\n * use-slider-drag，两端同义 → 本层。滑块钮视觉与轨道两端共用（slider-parts）。\n * 颜色走 props（var token），不新增工具类（无需改 theme.css / BV_COLORS）。\n */\nexport interface SliderProps {\n    /** 受控值；range 时为 [number, number] */\n    value?: SliderValue;\n    /** 初始值，默认 0（range 默认 [min, max]） */\n    defaultValue?: SliderValue;\n    min?: number;\n    max?: number;\n    step?: number;\n    /** 轨道/填充条厚度，数字按 px，默认 2 */\n    barHeight?: number | string;\n    /** 滑块钮边长，数字按 px，默认 24 */\n    buttonSize?: number | string;\n    /** 填充条颜色，默认 primary token */\n    activeColor?: string;\n    /** 轨道底色，默认 gray-3 token */\n    inactiveColor?: string;\n    /** 双拇指区间，默认 false */\n    range?: boolean;\n    /** 反向（右/上为最小值），默认 false */\n    reverse?: boolean;\n    /** 竖直滑块，默认 false */\n    vertical?: boolean;\n    disabled?: boolean;\n    readonly?: boolean;\n    /** 值变化回调 */\n    onChange?: (value: SliderValue) => void;\n    /** 拖拽开始（受控值变更前触发） */\n    onDragStart?: (value: SliderValue) => void;\n    /** 拖拽结束 */\n    onDragEnd?: (value: SliderValue) => void;\n    /** 无障碍标签（渲染到每个滑块钮上），与全库其余组件一致用 ariaLabel */\n    ariaLabel?: string;\n    className?: string;\n    style?: React.CSSProperties;\n    id?: string;\n    forceMode?: DeviceMode;\n}\n\nfunction toPx(size: number | string | undefined, fallback: string): string {\n    if (size === undefined) return fallback;\n    return typeof size === \"number\" ? `${size}px` : size;\n}\n\nexport const Slider = React.forwardRef<HTMLDivElement, SliderProps>(\n    function Slider(\n        {\n            value,\n            defaultValue,\n            min = 0,\n            max = 100,\n            step = 1,\n            barHeight = 2,\n            buttonSize = 24,\n            activeColor = \"var(--bv-slider-active-background)\",\n            inactiveColor = \"var(--bv-slider-inactive-background)\",\n            range = false,\n            reverse = false,\n            vertical = false,\n            disabled = false,\n            readonly = false,\n            onChange,\n            onDragStart,\n            onDragEnd,\n            ariaLabel,\n            className,\n            style,\n            id,\n            forceMode,\n        },\n        ref,\n    ) {\n        const mode = useDeviceMode(forceMode);\n        const { current, apply } = useSliderValue({\n            value,\n            defaultValue,\n            min,\n            max,\n            step,\n            range,\n            disabled,\n            readonly,\n            onChange,\n        });\n\n        const common: SliderRenderProps = {\n            current,\n            min,\n            max,\n            step,\n            range,\n            reverse,\n            vertical,\n            disabled,\n            readonly,\n            barHeightPx: toPx(barHeight, \"2px\"),\n            buttonSizePx: toPx(buttonSize, \"24px\"),\n            activeColor,\n            inactiveColor,\n            ariaLabel,\n            className,\n            style,\n            id,\n            onApply: apply,\n            onDragStart,\n            onDragEnd,\n        };\n\n        return mode === \"mobile\" ? (\n            <H5Slider ref={ref} {...common} />\n        ) : (\n            <PcSlider ref={ref} {...common} />\n        );\n    },\n);\n",
+      "type": "registry:component",
+      "target": "components/responsive/slider.tsx"
+    }
+  ]
+}

@@ -45,12 +45,12 @@
 | **Calendar**                  | 全屏弹层，月份列表纵向滚动加载，range 拖选                                                                                                                                                                   | 内嵌面板（非弹层）可常驻，range 拖选 + 键盘移动                                                                                                                                                               | **C**   | 月网格计算、区间逻辑                                              | ✅    |
 | **Picker（通用滚轮）**        | 底部弹层 + 多列滚轮联动，列宽随内容                                                                                                                                                                          | 锚定浮层 + 多列面板（可滚动/搜索），或降级为多个 Select                                                                                                                                                       | **C**   | 列联动、级联数据                                                  | ⬜    |
 | **Cascader / Area**           | 底部弹层 + 滚轮级联（选一级推入二级）                                                                                                                                                                        | 锚定浮层 + 多列面板 + 面包屑路径，支持搜索定位                                                                                                                                                                | **C**   | 级联索引、路径回显                                                | ⬜    |
-| **Slider**                    | 触摸拖拽，禁页面滚动（`touch-action: none`），热区放大到 44px                                                                                                                                                | 点轨道跳转 + 拖拽 + 方向键微调（±step）                                                                                                                                                                       | **C**   | 值换算、步长、区间                                                | ⬜    |
-| **Stepper**                   | 输入框唤起数字键盘，加减按钮热区 44px                                                                                                                                                                        | 输入框 + 上下箭头 + 键盘微调                                                                                                                                                                                  | **A/B** | 边界与步长                                                        | ⬜    |
+| **Slider**                    | 触摸拖拽，禁页面滚动（`touch-action: none`），热区放大到 44px                                                                                                                                                | 点轨道跳转 + 拖拽 + 方向键微调（±step）                                                                                                                                                                       | **C**   | 值换算、步长、区间                                                | ✅    |
+| **InputNumber**               | 输入框唤起数字键盘，加减按钮热区 44px                                                                                                                                                                        | 输入框 + 竖排 ▲▼ 微调列 + 键盘微调                                                                                                                                                                            | **B**   | 边界与步长                                                        | ✅    |
 | **NumberKeyboard**            | 自定义数字键盘弹层（含「完成」键）                                                                                                                                                                           | 不渲染，直接用系统键盘                                                                                                                                                                                        | **C**   | 输入格式化                                                        | ⬜    |
 | **Uploader**                  | 点击唤起相机/相册（`capture`），压缩上传，宫格预览                                                                                                                                                           | 拖拽上传区 + 文件选择器，多选/粘贴，列表视图                                                                                                                                                                  | **C**   | 上传队列、进度、校验                                              | ⬜    |
 | **Search**                    | 全屏搜索页，返回退出，历史记录                                                                                                                                                                               | 内联输入框 + 建议浮层，快捷键聚焦                                                                                                                                                                             | **C**   | 防抖、历史/建议源                                                 | ⬜    |
-| **Rate**                      | 点击/滑动选择，热区 44px                                                                                                                                                                                     | 点击/悬停预览 + 键盘方向键                                                                                                                                                                                    | **C**   | 值语义                                                            | ⬜    |
+| **Rate**                      | 点击/滑动选择，热区 44px                                                                                                                                                                                     | 点击/悬停预览 + 键盘方向键                                                                                                                                                                                    | **C**   | 值语义                                                            | ✅    |
 | **Checkbox / Radio / Switch** | 行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）                                                                                                                                                            | 标准控件 16~20px，label 可点，键盘空格                                                                                                                                                                        | **A**   | 受控状态                                                          | ✅    |
 
 ### 2.3 导航、列表与文本类
@@ -89,6 +89,7 @@
 | Picker         | C    | 多列独立选择的容器范式不同：H5 N 列吸附滚轮（底部弹层）vs PC N 列纵向面板（锚定浮层，各列独立滚动/键盘巡航）；列间互不影响，两端都暂存→确定；滚轮件两端同款但 PC 不用（`PickerWheelRow` 仅 H5 + Cascader H5 复用）                   |
 | Cascader       | C    | 树的走法不同：H5 联动滚轮（省市区三列，换父列子列重算）vs PC 面包屑 + 逐级右展多列面板（点叶子即生效）+ 路径全文搜索；值恒为根→叶子完整路径                                                                                          |
 | Calendar       | C    | 日历范式不同：H5 全屏弹层 + 月份纵向滚动懒挂载 + 触摸拖选（range/multiple 确定条暂存）vs PC 内嵌常驻月历（range 双月）+ 鼠标拖选 + 键盘巡航（点选即生效）；single/range/multiple，值恒为 'YYYY-MM-DD'                                |
+| InputNumber   | B    | 离散数量录入（− 输入框 ＋）：H5 横排 ±（数字键盘、44px 热区、长按连发）/ PC 输入框 + 竖排 ▲▼（↑↓/Home/End 键盘），同一份值模型换壳（§6.5-2 模式 B），值语义逐字对齐 Vant van-stepper |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -420,7 +421,7 @@ Vant Calendar 的能力面：single / range / multiple，值恒为 `'YYYY-MM-DD'
 
 Vant 没有独立 Input/Textarea——`<van-field>` 一个组件覆盖单行/多行/数字全部场景（多行 = `type="textarea"`，数字 = `type="digit" | "number"`）。Bivane 拆成**三件分层**：
 
-- `components/ui/input.tsx` 导出 `Input` / `Textarea`：无 Cell 外壳的基础控件，负责原生属性透传、token 排版、digit/number 输入过滤；供 Field 内部使用，也对外公开（Search、Stepper 等后续组件复用）。
+- `components/ui/input.tsx` 导出 `Input` / `Textarea`：无 Cell 外壳的基础控件，负责原生属性透传、token 排版、digit/number 输入过滤；供 Field 内部使用，也对外公开（Search、InputNumber 等后续组件复用）。
 - `components/ui/field.tsx` 导出 `Field`：Cell 行外壳（label、必填星、左右图标、清除、错误文案、字数、action 插槽、自定义控件 children），内部按 `type` 渲染 Input 或 Textarea。
 - 逻辑下沉 `hooks/use-field-state.ts`：过滤/夹紧/校验/字数全部纯函数，React 绑定只薄薄一层。
 
@@ -460,6 +461,52 @@ Vant 没有独立 Input/Textarea——`<van-field>` 一个组件覆盖单行/多
 - **自定义控件体**：传 `children` 时不渲染原生 input/textarea（Vant 的 `#input` 插槽语义）——readonly Field 内嵌 Select/DatePicker 触发器的标准用法，点击整行仍通过 `onClickInput` 透出。此时 rules 校验 `value` 字符串形态，调用方也可用 ref.validate 手动触发。
 - **action 区**：右侧 action prop（Vant `#button` 插槽，如「发送验证码」）是 `field-control` 下与 `field-box` 平级的兄弟节点，渲染在边框盒**外侧**（盒内顺序：输入区 → 清除 → 右图标/箭头；action 不与 clear 图标争位）。
 - 槽名：`field / field-label / field-control / field-box（PC 边框盒，H5 零装饰）/ field-body / field-left-icon / field-right-icon / field-clear / field-error / field-word-limit / field-action`；基础件 `input` / `textarea`。
+
+### 3.14 Rate（模式 C，评分）
+
+Vant 把评分做成一个 `van-rate`，两端同一套「星 + 点击/滑动」语义，但交互范式不同（H5 滑动连续选、PC hover 预览 + 键盘），故 Bivane 判为**模式 C**——`ui/rate-parts.tsx` 共用单颗星视觉，`h5/rate.tsx` / `pc/rate.tsx` 各写交互，分发层 `responsive/rate.tsx` 按 `useDeviceMode` 选边。
+
+**定死取值**（逐字移植 Vant `rate/index.less`，token 组 `--bv-rate-*`）
+
+| 项                     | 取值                                                                             | token                                        |
+| ---------------------- | -------------------------------------------------------------------------------- | -------------------------------------------- |
+| 星尺寸 / 间距          | 20px / 4px                                                                       | `--bv-rate-icon-size` / `-icon-gutter`       |
+| 实心星色 / 空星色 / 禁用星色 | `#ffd21e` / gray-5（`#c8c9cc`）/ gray-5                                          | `--bv-rate-icon-full-color` / `-icon-void-color` / `-icon-disabled-color` |
+| 触屏命中               | **按坐标算分**（`buildRateHitRanges` + `rateScoreFromX`），**不做热区外扩**       | —                                            |
+
+**关键规则**
+
+- **模式 C，两端同视觉不同交互**：`rate-parts` 的 `RateStar` = 空星（outline）+ 其上 `width: fraction×100%` 裁切的实心星叠层，半星由裁切宽度自然得到（不另画半星 glyph）；默认五角星 path，允许 `icon`/`voidIcon` 传 ReactNode（Vant 原是 iconfont 名，本库无 iconfont 故改为节点）。
+- **H5**：`pointerdown` 在星上即选；`touchable`（默认 true）下 `pointermove` 用**当前布局的星矩形现算命中区间**（`buildRateHitRanges`）再按 x 反查分数（`rateScoreFromX`，对齐 Vant `getScoreByPosition`：从后往前扫 + 严格 `>`）；`allowHalf` 时每颗星拆成两条区间（左半 `i+0.5` / 右半 `i+1`）。**不**写 `touch-action:none`，不劫持纵向滚动。布局退化（容器隐藏 / jsdom 无布局，所有矩形 0 宽）时返回 null，由调用方按事件所在星序兜底。
+- **PC**：点击选择；`onPointerEnter` 设本地 `preview`（移出 `onPointerLeave` 还原，**只改本地预览态、不动受控值**），渲染用 `display = preview ?? current`；键盘容器 `role="slider"`，←→↑↓ ±1（allowHalf 时 ±0.5）、Home/End 跳 0/count，`tabIndex` 受 disabled/readonly 控制为 -1。
+- **值语义下沉 hook**：`hooks/use-rate-state.ts` 的 `clampRateValue`（allowHalf 对 0.5 取整、否则整数取整、夹 0~count）、`resolveStarFraction`（第 i 颗星填充比例）、`selectRateTarget`（落点→分值）、`useRateValue`（clearable 同值清零、受控/非受控）——全部纯函数，两端同义归分发层。
+- a11y：`role="slider"` + `aria-valuenow/min/max/valuetext` + `aria-disabled`/`aria-readonly`，两端一致；`aria-label` 默认「评分」。
+- 颜色走 props 默认 `var(--bv-rate-*)`，**不新增工具类、不改 theme.css / BV_COLORS**。
+
+### 3.15 Slider（模式 C，滑块）
+
+Vant `van-slider` 支持单值/区间、reverse 反向、vertical 竖直，H5 触摸拖拽、PC 键盘微调，交互范式不同 → **模式 C**。`ui/slider-parts.tsx` 共用轨道 + 填充条 + 按钮，`h5/slider.tsx` / `pc/slider.tsx` 各自手势/键盘，分发层 `responsive/slider.tsx` 选边。
+
+**定死取值**（逐字移植 Vant `slider/index.less`，token 组 `--bv-slider-*`）
+
+| 项                     | 取值                                                                       | token                                          |
+| ---------------------- | -------------------------------------------------------------------------- | ---------------------------------------------- |
+| 轨道/填充条厚          | 2px                                                                       | `--bv-slider-bar-height`                       |
+| 按钮边长               | 24px                                                                      | `--bv-slider-button-size`                      |
+| 已选色 / 轨道底        | primary / gray-3（`#ebedf0`）                                              | `--bv-slider-active-background` / `-inactive-background` |
+| 按钮底/边/阴影         | background-2 / border / `0 1px 2px rgba(0,0,0,.5)`                         | `--bv-slider-button-background` / `-button-border-color` / `-button-shadow` |
+| 禁用透明 / 热区外扩    | `--bv-disabled-opacity` / 10px                                             | `--bv-slider-disabled-opacity` / `-touch-expand` |
+
+**关键规则**
+
+- **模式 C，视觉共用、手势/键盘分写**：`SliderTrack` = rail（底色）+ bar（active 色，横：左起宽、竖：下起高）+ 按钮（绝对定位 `left/top%` + `translate(-50%,-50%)` 居中）；方向由 `vertical` 决定，不写两套 CSS。按钮默认 `touch-none`。
+- **值逻辑纯函数**：`hooks/use-slider-state.ts` 的 `quantizeValue`（按 step 量化，浮点修正 `Math.round(next*1e10)/1e10` 防 0.1+0.2 误差）、`valueToRatio`/`ratioToValue`、`normalizeRange`（lo≤hi 保序并量化）；`useSliderValue` 受控/非受控统一入口，非受控边界变化重夹。
+- **拖拽手势共用 hook**：`hooks/use-slider-drag.ts` 把「轨道 ref + 落点坐标」换算比例（vertical 用 `1-(y-top)/h`、`reverse` 翻转），全程 window 级 pointermove/up（Pointer Capture 思路），卸载清理监听。
+- **H5**：根 `touch-action:none`（防拖拽时页面滚动），`onPointerDown` 在轨道：抓到已有按钮则不跳变（range 记 `activeThumb`），否则按落点比例 `applyRatio`；`pointermove` 随触点更新；按钮 `tabIndex=-1`（不进 Tab 流）。range 拖近不交叉（`Math.min(val,hi)`/`Math.max(val,lo)`）。
+- **PC**：点轨道跳转 + 拖拽（同 hook）；按钮可聚焦，键盘 →/↑ +step、←/↓ -step、PageUp/Down ±10step、Home/End 到界（range 感知当前拇指），焦点环。`dragging` 态按钮边框转 active 色。
+- 几何换算 `resolveSliderGeometry`：`reverse` 翻转所有比例、`vertical` 转 `top%`；bar 起止由 `min(disp)*100`/`max(disp)*100` 给出。
+- a11y：根 `role="group"` + 每颗按钮 `role="slider"` + `aria-valuenow` + `aria-label`（range 区分「起始/结束」）；`aria-disabled`。
+- 颜色走 props 默认 `var(--bv-slider-*)`，**不新增工具类**。
 
 ## 4. 测试要求
 

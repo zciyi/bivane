@@ -36,6 +36,9 @@ import {
 import { Tooltip } from "@/components/responsive/tooltip";
 import { Ellipsis } from "@/components/ui/ellipsis";
 import { Popover } from "@/components/responsive/popover";
+import { InputNumber } from "@/components/responsive/input-number";
+import { Rate } from "@/components/responsive/rate";
+import { Slider } from "@/components/responsive/slider";
 import type { MenuItem, MenuValue } from "@/hooks/use-menu-state";
 import {
     ToastHost,
@@ -525,6 +528,169 @@ function SwitchDemos() {
                         }
                     />
                 </CellGroup>
+            </Block>
+        </Section>
+    );
+}
+
+function InputNumberDemos() {
+    const [value, setValue] = React.useState<number | null>(1);
+    return (
+        <Section title="P3 · InputNumber 数量步进器（模式 B：H5 横排 ± / PC 竖排 ▲▼）">
+            <Block>
+                <Row>
+                    <InputNumber
+                        value={value}
+                        min={0}
+                        max={10}
+                        onChange={(v) => setValue(v)}
+                        aria-label="基础步进器"
+                    />
+                    <span className="text-bv-text-2">当前：{String(value)}</span>
+                    <InputNumber
+                        defaultValue={1}
+                        min={1}
+                        max={5}
+                        integer
+                        aria-label="整数"
+                    />
+                    <InputNumber
+                        defaultValue={1}
+                        min={1}
+                        max={5}
+                        disabled
+                        aria-label="禁用"
+                    />
+                    <InputNumber
+                        defaultValue={3}
+                        min={0}
+                        max={5}
+                        disableInput
+                        aria-label="禁输入"
+                    />
+                    <InputNumber
+                        defaultValue={1}
+                        min={0}
+                        max={5}
+                        step={0.5}
+                        decimalLength={2}
+                        aria-label="小数步长"
+                    />
+                    <InputNumber
+                        defaultValue={1}
+                        min={0}
+                        max={5}
+                        allowEmpty
+                        aria-label="可清空"
+                    />
+                    <InputNumber
+                        defaultValue={1}
+                        min={0}
+                        max={5}
+                        theme="round"
+                        aria-label="圆角主题"
+                    />
+                    <InputNumber
+                        defaultValue={1}
+                        min={1}
+                        max={5}
+                        beforeChange={() => false}
+                        aria-label="禁止变更"
+                    />
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+function RateDemos() {
+    const [value, setValue] = React.useState(3);
+    return (
+        <Section title="P3 · Rate 评分（模式 C：H5 滑动连续选 / PC 点击+hover 预览+键盘）">
+            <Block>
+                <Row>
+                    <Rate
+                        value={value}
+                        onChange={(v) => setValue(v)}
+                        ariaLabel="基础评分"
+                    />
+                    <span className="text-bv-text-2">当前：{value}</span>
+                    <Rate defaultValue={2} ariaLabel="默认 2" />
+                    <Rate defaultValue={3} count={3} ariaLabel="三星" />
+                    <Rate defaultValue={2.5} allowHalf ariaLabel="半星" />
+                    <div><span className="text-bv-text-2">只读</span>
+                    <Rate defaultValue={3} readonly ariaLabel="只读" /></div>
+                    <Rate defaultValue={2} disabled ariaLabel="禁用" />
+                    <Rate defaultValue={3} clearable ariaLabel="可清零" />
+                    <Rate
+                        defaultValue={2}
+                        color="#ffd21e"
+                        voidColor="#ee0a24"
+                        ariaLabel="自定义色"
+                    />
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+function SliderDemos() {
+    const [value, setValue] = React.useState(40);
+    const [range, setRange] = React.useState<[number, number]>([20, 60]);
+    return (
+        <Section title="P3 · Slider 滑块（模式 C：H5 触摸拖拽 / PC 点轨+拖拽+键盘）">
+            <Block>
+                <Row>
+                    <div className="w-[240px]">
+                        <Slider
+                            value={value}
+                            onChange={(v) => setValue(v as number)}
+                            ariaLabel="基础滑块"
+                        />
+                    </div>
+                    <span className="text-bv-text-2">当前：{value}</span>
+                </Row>
+            </Block>
+            <Block>
+                <Row>
+                    <div className="w-[240px]">
+                        <Slider
+                            range
+                            value={range}
+                            onChange={(v) =>
+                                setRange(v as [number, number])
+                            }
+                            ariaLabel="区间滑块"
+                        />
+                    </div>
+                    <span className="text-bv-text-2">
+                        当前：[{range.join(", ")}]
+                    </span>
+                </Row>
+            </Block>
+            <Block>
+                <Row>
+                    <div className="w-[240px]">
+                        <Slider defaultValue={50} disabled ariaLabel="禁用" />
+                    </div>
+                    <div className="w-[240px]">
+                        <Slider defaultValue={50} readonly ariaLabel="只读" />
+                    </div>
+                    <div className="w-[240px]">
+                        <Slider defaultValue={30} reverse ariaLabel="反向" />
+                    </div>
+                </Row>
+            </Block>
+            <Block>
+                <Row>
+                    <div className="flex h-[180px] items-center">
+                        <Slider
+                            defaultValue={40}
+                            vertical
+                            ariaLabel="竖直滑块"
+                        />
+                    </div>
+                </Row>
             </Block>
         </Section>
     );
@@ -2530,6 +2696,9 @@ function Playground() {
                 <SwitchDemos />
                 <CheckboxDemos />
                 <RadioDemos />
+                <InputNumberDemos />
+                <RateDemos />
+                <SliderDemos />
 
                 {/* ---------- P1 弹层实例（都通过 portal 渲染到 body） ---------- */}
 

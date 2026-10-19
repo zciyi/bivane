@@ -3,7 +3,7 @@
   "name": "input",
   "type": "registry:component",
   "title": "Input / Textarea 输入基础件",
-  "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search/Stepper 等组件复用。",
+  "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search、InputNumber 等组件复用。",
   "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [

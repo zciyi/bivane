@@ -1108,6 +1108,239 @@ function probeTime(label) {
 }
 
 /**
+ * Rate 探针（模式 C，两端同形、差异只在交互）。
+ *
+ * 判据要点：
+ *   - 实心星是**按比例裁切**的（`rate-star-fill` 宽度 / 星宽 = fraction），
+ *     所以半星必须量到 ≈0.5 而不是「画了半个 glyph」；
+ *   - `aria-valuenow` 在 PC 上跟随 **hover 预览值**（不只跟随受控值），
+ *     移出后应还原 —— 这是 PC 独有的交互，两端探针输出不同属预期；
+ *   - H5 的 `rate-hit` 热区应把可点区域从 20px 外扩到 ≈44px。
+ */
+function probeRate(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    // 触摸热区靠 pointer:coarse 媒体查询，而 mobile:true 只改视口宽度、
+    // 不会让这条媒体查询成立 —— 不显式量出来就会「模式对、热区静默失效」。
+    out.pointerCoarse = matchMedia('(pointer: coarse)').matches;
+
+    // allowHalf 只能从渲染结果反推：半星会让某颗 fill 恰好占 0.5。
+    const allowHalfOf = (items) =>
+      items.some((it) => {
+        const f = it.querySelector('[data-slot="rate-star-fill"]');
+        const sw = it.querySelector('[data-slot="rate-star"]');
+        if (!f || !sw) return false;
+        const a = f.getBoundingClientRect().width;
+        const b = sw.getBoundingClientRect().width;
+        return b > 0 && Math.abs(a / b - 0.5) < 0.02;
+      });
+
+    out.rates = [...document.querySelectorAll('[data-slot="rate"]')].map(root => {
+      const r = root.getBoundingClientRect();
+      const cs = getComputedStyle(root);
+      const items = [...root.querySelectorAll('[data-slot="rate-item"]')];
+      return {
+        mode: root.dataset.mode,
+        ariaLabel: root.getAttribute('aria-label'),
+        role: root.getAttribute('role'),
+        valueNow: root.getAttribute('aria-valuenow'),
+        valueMax: root.getAttribute('aria-valuemax'),
+        valueText: root.getAttribute('aria-valuetext'),
+        disabled: root.dataset.disabled === 'true',
+        readonly: root.dataset.readonly === 'true',
+        // 键盘面：PC 容器可聚焦，H5 不可（触屏没有键盘）
+        tabIndex: root.tabIndex,
+        w: px(r.width), h: px(r.height),
+        gap: cs.gap,
+        itemCount: items.length,
+        // 每颗星的填充比例（裁切宽度 / 星宽）
+        fractions: items.map(it => {
+          const star = it.querySelector('[data-slot="rate-star"]');
+          const fill = it.querySelector('[data-slot="rate-star-fill"]');
+          if (!star || !fill) return null;
+          return px(fill.getBoundingClientRect().width / star.getBoundingClientRect().width);
+        }),
+        // 每颗星 5 点采样（最左/左半/正中/右半/最右）各自的**期望分数**。
+        // ⚠️ 2026-10-19 补的真回归：先前用 44px 热区 + elementFromPoint，
+        // 星间距只有 24px → 相邻热区重叠 20px，后一颗抢走前一颗的右半
+        // （实测点第 1 颗的 x=55 / 右边缘 59.5 → 命中 star#2）。
+        // 现已改为按坐标算分（Vant 同款），这条把命中边界钉死。
+        // 半星模式下「正中」那一像素归左半是 Vant 同款的刻意行为（标 midline），
+        // 核对时按 midline 放行，别当回归。
+        hitSamples: (() => {
+          const half = allowHalfOf(items);
+          return items.map((it, i) => {
+            const star = it.querySelector('[data-slot="rate-star"]').getBoundingClientRect();
+            if (!(star.width > 0)) return null;
+            return {
+              i,
+              left: px(star.left),
+              width: px(star.width),
+              pts: [
+                ['L', star.left + 0.5],
+                ['ML', star.left + star.width * 0.25],
+                ['C', star.left + star.width * 0.5],
+                ['MR', star.left + star.width * 0.75],
+                ['R', star.left + star.width - 0.5],
+              ].map(([tag, x]) => {
+                const frac = (x - star.left) / star.width;
+                return {
+                  tag,
+                  x: px(x),
+                  expect: half ? (frac < 0.5 ? i + 0.5 : i + 1) : i + 1,
+                  midline: Math.abs(frac - 0.5) < 0.02,
+                };
+              }),
+            };
+          });
+        })(),
+        tokens: (() => {
+          const s = getComputedStyle(document.documentElement);
+          return {
+            iconSize: s.getPropertyValue('--bv-rate-icon-size').trim(),
+            gutter: s.getPropertyValue('--bv-rate-icon-gutter').trim(),
+            touchExpand: s.getPropertyValue('--bv-rate-touch-expand').trim(),
+          };
+        })(),
+      };
+    });
+    return JSON.stringify(out);
+  })()`);
+}
+
+/**
+ * Slider 探针（模式 C）。
+ *
+ * 判据要点：
+ *   - 填充条必须**真的有宽度** —— 早期实现用 `Math.min(...disp)` 当起端，
+ *     单值滑块 size 恒为 0，整条轨道看上去是空的（类型/单测/build 三门全绿）；
+ *   - 填充条起端是「锚端」不是拇指：单值时锚端在轨道零点，reverse 时改到对端；
+ *   - 拇指的left% 应等于 `value/max`（reverse 取 1−r，竖直取 1−r 且落成 top%）。
+ */
+function probeSlider(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    out.pointerCoarse = matchMedia('(pointer: coarse)').matches;
+
+    out.sliders = [...document.querySelectorAll('[data-slot="slider"]')].map(root => {
+      const line = root.querySelector('[data-slot="slider-line"]');
+      const rail = root.querySelector('[data-slot="slider-rail"]');
+      const bar = root.querySelector('[data-slot="slider-bar"]');
+      const thumbs = [...root.querySelectorAll('[data-slot="slider-button"]')];
+      const lr = line ? line.getBoundingClientRect() : null;
+      const vertical = root.dataset.orientation === 'vertical';
+      return {
+        mode: root.dataset.mode,
+        orientation: root.dataset.orientation,
+        ariaLabel: root.getAttribute('aria-label'),
+        role: root.getAttribute('role'),
+        disabled: root.dataset.disabled === 'true',
+        readonly: root.dataset.readonly === 'true',
+        trackW: lr ? px(lr.width) : null,
+        trackH: lr ? px(lr.height) : null,
+        // 填充条用实测量而非读内联 style：能同时抓住「宽度算错」与「样式没落地」
+        barW: bar ? px(bar.getBoundingClientRect().width) : null,
+        barH: bar ? px(bar.getBoundingClientRect().height) : null,
+        barVisible: bar ? bar.getBoundingClientRect().width > 0 || bar.getBoundingClientRect().height > 0 : false,
+        railBg: rail ? getComputedStyle(rail).backgroundColor : null,
+        barBg: bar ? getComputedStyle(bar).backgroundColor : null,
+        thumbs: thumbs.map(t => {
+          const cs = getComputedStyle(t);
+          const tr = t.getBoundingClientRect();
+          return {
+            idx: t.getAttribute('data-thumb'),
+            ariaLabel: t.getAttribute('aria-label'),
+            valueNow: t.getAttribute('aria-valuenow'),
+            tabIndex: t.tabIndex,
+            w: px(tr.width), h: px(tr.height),
+            // 相对轨道的归一化位置（0~1），与方向无关
+            pos: lr && (vertical
+              ? px(lr.height ? 1 - (tr.top + tr.height / 2 - lr.top) / lr.height : 0)
+              : px(lr.width ? (tr.left + tr.width / 2 - lr.left) / lr.width : 0)),
+            bg: cs.backgroundColor,
+            radius: cs.borderTopLeftRadius,
+            // 触屏 44px 热区靠 ::after 外扩，hover 时才量得到 content 不变
+            touchAction: cs.touchAction,
+          };
+        }),
+      };
+    });
+    out.tokens = (() => {
+      const s = getComputedStyle(document.documentElement);
+      return {
+        barHeight: s.getPropertyValue('--bv-slider-bar-height').trim(),
+        buttonSize: s.getPropertyValue('--bv-slider-button-size').trim(),
+        touchExpand: s.getPropertyValue('--bv-slider-touch-expand').trim(),
+      };
+    })();
+    return JSON.stringify(out);
+  })()`);
+}
+
+/**
+ * 真实悬停（CDP Input 的mouseMoved）。
+ *
+ * 为什么不能派发合成事件：Rate PC 的 hover 预览挂在 `onPointerEnter` 上，
+ * 而 hover 预览的核心断言是「预览值不同于受控值、移出后还原」——
+ * 合成事件走完React 事件系统但不会触发浏览器的 hover 状态链，
+ * 探针会量到「预览=受控值」而看起来一切正常。
+ */
+async function hoverSelector(selector, dxRatio = 0.5) {
+  const raw = await evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return JSON.stringify({ error: 'NOT_FOUND:' + ${JSON.stringify(selector)} });
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({
+      x: Math.round(r.x + r.width * ${dxRatio}),
+      y: Math.round(r.y + r.height / 2),
+    });
+  })()`);
+  const info = JSON.parse(raw);
+  if (info.error) return info.error;
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: info.x, y: info.y });
+  return `OK @${info.x},${info.y}`;
+}
+
+/**
+ * 在轨道上按下 → 横向拖到目标比例 → 松开（真实鼠标事件）。
+ * `ratio` 是相对轨道起点的 0~1 位置；竖直轨道按纵向算。
+ */
+async function dragOnTrack(selector, ratio, vertical = false) {
+  const raw = await evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return JSON.stringify({ error: 'NOT_FOUND:' + ${JSON.stringify(selector)} });
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({
+      x: Math.round(r.x + r.width / 2),
+      y: Math.round(r.y + r.height / 2),
+      tx: Math.round(r.x + r.width * ${ratio}),
+      ty: Math.round(r.y + r.height * ${ratio}),
+    });
+  })()`);
+  const info = JSON.parse(raw);
+  if (info.error) return info.error;
+  const from = { x: info.x, y: info.y };
+  const to = vertical ? { x: info.x, y: info.ty } : { x: info.tx, y: info.y };
+  const base = { button: 'left', clickCount: 1 };
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...from });
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', ...base, ...from });
+  // 分两步移动：单步直达时 React 的 pointermove 合并可能漏掉中间态
+  const mid = { x: Math.round((from.x + to.x) / 2), y: Math.round((from.y + to.y) / 2) };
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...base, ...mid });
+  await sleep(80);
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...base, ...to });
+  await sleep(120);
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...base, ...to });
+  return `OK ${from.x},${from.y} -> ${to.x},${to.y}`;
+}
+
+/**
  * 在**第一个月历面板**里点/悬停第 k 个「本月可用」格子（真实鼠标事件）。
  *
  * 用序号而不是日期文本：日期取决于「今天」在哪个月，脚本跑在任何月份都要能用；
@@ -1148,6 +1381,20 @@ async function setViewport(width, height, mobile) {
     height,
     deviceScaleFactor: 2,
     mobile,
+  });
+  // ⚠️ 必须显式开触摸模拟：`mobile: true` 只改视口宽度，**不会**让
+  // `matchMedia('(pointer: coarse)')` 成立。缺这一步，H5 场里所有
+  // `@media (pointer: coarse)` 规则（Rate 的 rate-hit、Slider 的
+  // slider-button::after 44px 热区）在真机上从未生效 —— 探针量到的
+  // `pointerCoarse: false` 就是这条线索，而组件本身没任何问题。
+  // 模式判定走的是视口宽度，所以缺这步时「模式对、热区错」，最难发现。
+  //
+  // ⚠️ 只开 `setTouchEmulationEnabled`，**不要**再叠 `setEmitTouchEventsForMouse`：
+  // 后者会把后续所有 `Input.dispatchMouseEvent` 转成触摸事件，菜单那几场
+  // （Radix 在 pointerdown 上开合）直接 `timeout Input.dispatchMouseEvent` 挂掉。
+  await send('Emulation.setTouchEmulationEnabled', {
+    enabled: mobile,
+    maxTouchPoints: mobile ? 5 : 0,
   });
 }
 
@@ -1490,6 +1737,70 @@ async function run() {
     await sleep(600);
     await shot(`${cfg.name}-9d-time-picker-committed`);
     reports.push(await probeTime(`${cfg.name} / time 提交后`));
+
+    // --- 10. Rate（模式 C：H5 滑动连续选 / PC 点击 + hover 预览 + 键盘） ---
+    // 判据核心是「实心星是按比例裁切的」：量rate-star-fill 宽度 / 星宽，
+    // 半星必须是 ≈0.5。H5 额外的判据是 rate-hit 把 20px 撑到≈44px；
+    // PC 额外的判据是 hover 时 aria-valuenow 跟随预览、移出后还原。
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · Rate'));
+    await shot(`${cfg.name}-10-rate`);
+    reports.push(await probeRate(`${cfg.name} / rate 初始`));
+
+    // 点第 4颗星（半星那颗，allowHalf）—— 走 pointerdown 链路，两端都吃
+    console.log('  hover :', await hoverSelector('[data-slot="rate"][aria-label="基础评分"] [data-index="3"]', 0.25));
+    await sleep(300);
+    await shot(`${cfg.name}-10b-rate-hover`);
+    reports.push(await probeRate(`${cfg.name} / rate hover 预览`));
+
+    // 键盘：PC 容器 tabIndex=0，→ 加 1 步（半星是 0.5）；H5 tabIndex=-1，按键无效
+    if (!cfg.mobile) {
+      await evaluate(`(() => {
+        const el = document.querySelector('[data-slot="rate"][aria-label="基础评分"]');
+        el.focus();
+        return el.tabIndex;
+      })()`);
+      await pressKey(KEYS.ArrowRight);
+      await sleep(250);
+      await shot(`${cfg.name}-10c-rate-keyboard`);
+      reports.push(await probeRate(`${cfg.name} / rate → 键 +1`));
+    }
+
+    // --- 11. Slider（模式 C：H5 触摸拖拽 / PC 点轨 + 拖拽 + 键盘） ---
+    // 最关键的一条：填充条必须有宽度。早期实现把起端算成 min(disp)，
+    // 单值滑块 size 恒 0 —— 类型、单测、build 三门全绿，轨道看上去是空的。
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · Slider'));
+    await shot(`${cfg.name}-11-slider`);
+    reports.push(await probeSlider(`${cfg.name} / slider 初始`));
+
+    // 单值拖到 ~70%：两端都走 pointerdown/move/up
+    console.log('  drag  :', await dragOnTrack('[data-slot="slider"][aria-label="基础滑块"] [data-slot="slider-line"]', 0.7));
+    await sleep(300);
+    await shot(`${cfg.name}-11b-slider-dragged`);
+    reports.push(await probeSlider(`${cfg.name} / slider 拖到 70%`));
+
+    // 区间：两端拇指 + 填充条夹在中间
+    console.log('  drag  :', await dragOnTrack('[data-slot="slider"][aria-label="区间滑块"] [data-slot="slider-line"]', 0.8));
+    await sleep(300);
+    await shot(`${cfg.name}-11c-slider-range`);
+    reports.push(await probeSlider(`${cfg.name} / slider 区间拖到 80%`));
+
+    // 竖直：thumb 位置应落成 top%，轨道高度由容器给
+    reports.push(await probeSlider(`${cfg.name} / slider 竖直`));
+
+    // PC 键盘：聚焦拇指后 → 加一个 step
+    if (!cfg.mobile) {
+      await evaluate(`(() => {
+        const b = document.querySelector('[data-slot="slider"][aria-label="基础滑块"] [data-slot="slider-button"]');
+        b.focus();
+        return b.getAttribute('aria-valuenow');
+      })()`);
+      await pressKey(KEYS.ArrowRight);
+      await sleep(250);
+      await shot(`${cfg.name}-11d-slider-keyboard`);
+      reports.push(await probeSlider(`${cfg.name} / slider → 键 +step`));
+    }
   }
 
   fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(reports, null, 2), 'utf8');

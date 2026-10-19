@@ -948,7 +948,7 @@ const [open, setOpen] = useState(false);
 npx shadcn@latest add @bivane/field
 ```
 
-绝大多数场景只用 `Field`；需要不带行壳的裸输入框（搜索框、步进器内嵌）时再直接用 `Input`。
+绝大多数场景只用 `Field`；需要不带行壳的裸输入框（搜索框、InputNumber 内嵌）时再直接用 `Input`。
 
 受控 / 非受控与普通输入框一致，`onChange` 给的始终是字符串（传入数字 `value` 会归一化展示）：
 
@@ -1192,6 +1192,104 @@ npx shadcn@latest add @bivane/radio
 `Cell` 整行点击写法同 Checkbox（控件放 `rightIcon` 槽；行 `onClick` 内 `closest("[data-slot='radio']")` 判重）。通用 props：`name` / `disabled` / `labelDisabled` / `labelPosition`（`left`·`right`）/ `iconSize` / `checkedColor`；组支持 `value`·`defaultValue`·`onChange(name)` / `direction` / `disabled` / `iconSize` / `checkedColor`。
 
 ---
+
+### InputNumber
+
+离散数量录入（Vant `van-stepper`）。**注意**：本组件名是 `InputNumber` 而不是 `Stepper`——刻意避开与「步骤条 Steps」的歧义。
+
+H5 是横排 `−` 数字 `＋`，PC 是竖排微调列 + 可输入框 + 键盘。值语义（`min`/`max`/`step` 夹紧与量化、超界回调）两端逐字一致。
+
+```tsx
+<InputNumber defaultValue={1} />   {/* 默认 min=1 */}
+<InputNumber min={0} max={10} step={2} />
+<InputNumber value={n} onChange={setN} onOverlimit={(d) => console.log(d)} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+|---|---|---|---|
+| `value` / `defaultValue` | `number \| string \| null` | `min` | `allowEmpty` 时清空得到 `null` |
+| `min` / `max` | `number` | `1` / `Infinity` | 夹紧区间（逐字对齐 Vant） |
+| `step` | `number` | `1` | 步长，浮点走尾差修正（`0.1+0.2=0.3`） |
+| `theme` | `'default' \| 'round'` | `'default'` | `round` 为圆形按钮 |
+| `inputWidth` / `buttonSize` | `number \| string` | 走 token | 数字按 px |
+| `decimalLength` | `number` | — | 固定小数位 |
+| `integer` / `allowEmpty` | `boolean` | `false` | 只收整数 / 允许清空为 `null` |
+| `longPress` | `boolean` | `true` | H5 长按连发（400ms 起，200ms/步） |
+| `autoFixed` | `boolean` | `true` | 失焦时按 step 收口 |
+| `disableInput` / `disablePlus` / `disableMinus` | `boolean` | `false` | |
+| `showInput` / `showPlus` / `showMinus` | `boolean` | `true` | |
+| `disabled` | `boolean` | `false` | |
+| `beforeChange` | `(v) => boolean \| Promise<boolean>` | — | 返回 `false` 拦截本次变更 |
+| `onOverlimit` | `(dir) => void` | — | 已在边界仍按同方向点击时触发 |
+| `onPlus` / `onMinus` | `() => void` | — | |
+| `forceMode` | `'mobile' \| 'desktop'` | — | |
+
+> **触屏为什么没有 44px 热区。** Rate 的选星是**按落点坐标算分**的（与 Vant 一致），
+> 不是「每颗星各挂一块 44px 热区再`elementFromPoint` 找 DOM」。
+> 后者在星间距只有 `size + gutter = 24px` 时会让相邻热区重叠 20px，
+> 后一颗的兄弟节点赢者通吃 —— 表现为**每颗星的右半 10px 都会选中下一颗**。
+> 坐标算分没有这个问题，且天然支持半星。
+
+### Rate
+
+评分。**模式 C**：两端视觉同形（同一套星形零件），差异只在手势与键盘 —— H5 可横向滑动连续选值，PC 是悬停预览 + 方向键微调。容器带 `role="slider"` 与 `aria-valuenow`。
+
+```tsx
+<Rate defaultValue={3} />
+<Rate allowHalf defaultValue={2.5} />
+<Rate count={10} defaultValue={7} />
+<Rate defaultValue={3} clearable />   {/* 再次点击当前分值清零 */}
+<Rate icon={<HeartIcon />} voidIcon={<HeartOutline />} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+|---|---|---|---|
+| `value` / `defaultValue` | `number` | `0` | 分值，越界会被夹取 |
+| `count` | `number` | `5` | 星数 |
+| `allowHalf` | `boolean` | `false` | 半星（按触点/鼠标落在左半还是右半判定） |
+| `clearable` | `boolean` | `false` | 再次点击当前分值清零 |
+| `touchable` | `boolean` | `true` | 触屏滑动选择；**PC 忽略此 prop** |
+| `size` / `gutter` | `number \| string` | `20` / `4` | 数字按 px |
+| `color` / `voidColor` / `disabledColor` | `string` | 走 token 的 `var()` | 不新增工具类，直接写颜色值即可覆盖 |
+| `icon` / `voidIcon` | `ReactNode` | 内置五角星 | 传 ReactNode，**不是 Vant 的 iconfont 名** |
+| `readonly` / `disabled` | `boolean` | `false` | `disabled` 时 PC 不进 Tab 流 |
+| `onChange` | `(v: number) => void` | — | |
+
+### Slider
+
+滑块。**模式 C**：两端共用轨道与滑块钮零件，差异在键盘（H5 不进 Tab 流、PC 支持方向键 / PageUp/Down / Home / End）。
+
+```tsx
+<Slider defaultValue={40} />
+<Slider range defaultValue={[20, 60]} />
+<Slider vertical defaultValue={30} />          {/* 竖直：值越大越靠上 */}
+<Slider reverse defaultValue={30} />           {/* 反向：右/上为最小值 */}
+<Slider defaultValue={30} step={5} activeColor="#ee0a24" />
+<Slider value={v} onChange={setV} onDragStart={...} onDragEnd={...} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+|---|---|---|---|
+| `value` / `defaultValue` | `number \| [number, number]` | `min` / `[min, max]` | `range` 时是二元组 |
+| `min` / `max` | `number` | `0` / `100` | |
+| `step` | `number` | `1` | 量化步长；`<=0` 时只夹紧不量化 |
+| `range` | `boolean` | `false` | 双拇指区间 |
+| `reverse` | `boolean` | `false` | 反向：填充条从对端连到拇指 |
+| `vertical` | `boolean` | `false` | 竖直 |
+| `barHeight` / `buttonSize` | `number \| string` | `2` / `24` | 数字按 px |
+| `activeColor` / `inactiveColor` | `string` | 走 token 的 `var()` | 填充条 / 轨道底色 |
+| `readonly` / `disabled` | `boolean` | `false` | |
+| `onChange` | `(v: SliderValue) => void` | — | |
+| `onDragStart` / `onDragEnd` | `(v: SliderValue) => void` | — | 与 Vant 同名同义 |
+| `ariaLabel` | `string` | — | 渲染到每个滑块钮上（`range` 时自动加「起始/结束」） |
+
+竖直形态要自己给容器高度，组件不会自己撑：
+
+```tsx
+<div style={{ height: 180 }}>
+  <Slider vertical defaultValue={40} />
+</div>
+```
 
 ## 四、两端差异由谁决定
 

@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REGISTRY_DIR = join(ROOT, 'packages/registry/r');
-const NODE_DIR = 'C:\\Users\\Administrator\\.workbuddy\\binaries\\node\\versions\\22.22.2-3';
+const NODE_DIR = 'C:\\Users\\Administrator\\.workbuddy\\binaries\\node\\versions\\22.22.2-6';
 const SHADCN_VERSION = '3.6.3';
 
 /** 必须落盘的消费者文件（相对消费者项目根） */
@@ -59,6 +59,17 @@ const EXPECTED = [
   'src/components/h5/time-picker.tsx',
   'src/components/pc/time-picker.tsx',
   'src/components/responsive/time-picker.tsx',
+  'src/hooks/use-rate-state.ts',
+  'src/components/ui/rate-parts.tsx',
+  'src/components/h5/rate.tsx',
+  'src/components/pc/rate.tsx',
+  'src/components/responsive/rate.tsx',
+  'src/hooks/use-slider-state.ts',
+  'src/hooks/use-slider-drag.ts',
+  'src/components/ui/slider-parts.tsx',
+  'src/components/h5/slider.tsx',
+  'src/components/pc/slider.tsx',
+  'src/components/responsive/slider.tsx',
 ];
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
@@ -203,6 +214,8 @@ import { Icon } from '@/components/ui/icon';
 import { Tag } from '@/components/ui/tag';
 import { DatePicker } from '@/components/responsive/date-picker';
 import { TimePicker } from '@/components/responsive/time-picker';
+import { Rate } from '@/components/responsive/rate';
+import { Slider } from '@/components/responsive/slider';
 import { Dialog, showConfirmDialog } from '@/components/responsive/dialog';
 import { DropdownMenu } from '@/components/responsive/dropdown-menu';
 import { Popup } from '@/components/responsive/popup';
@@ -357,6 +370,38 @@ export default function App() {
           value={<TimePicker ariaLabel="时分" columnsType={['hour', 'minute']} />}
         />
         <Cell title="禁用" value={<TimePicker ariaLabel="禁用时间" disabled />} />
+
+      <CellGroup title="Rate">
+        <Cell
+          title="基础评分"
+          value={
+            <Rate
+              ariaLabel="基础评分"
+              defaultValue={3}
+              onChange={(value) => showToast('评分：' + String(value))}
+            />
+          }
+        />
+        <Cell title="半星" value={<Rate ariaLabel="半星评分" allowHalf defaultValue={2.5} />} />
+        <Cell title="自定义数量" value={<Rate ariaLabel="十星评分" count={10} defaultValue={7} />} />
+        <Cell title="禁用" value={<Rate ariaLabel="禁用评分" disabled defaultValue={3} />} />
+      </CellGroup>
+
+      <CellGroup title="Slider">
+        <Cell
+          title="单值"
+          value={
+            <Slider
+              ariaLabel="单值滑块"
+              defaultValue={40}
+              onChange={(value) => showToast('滑块：' + String(value))}
+            />
+          }
+        />
+        <Cell title="区间" value={<Slider ariaLabel="区间滑块" range defaultValue={[20, 60]} />} />
+        <Cell title="自定义颜色与步长" value={<Slider ariaLabel="彩色滑块" defaultValue={30} step={5} activeColor="#ee0a24" />} />
+        <Cell title="禁用" value={<Slider ariaLabel="禁用滑块" disabled defaultValue={30} />} />
+      </CellGroup>
       </CellGroup>
 
       <Popup open={popupOpen} position="bottom" onOpenChange={setPopupOpen} closeable aria-label="示例弹层">
@@ -488,6 +533,8 @@ async function main() {
       '@bivane/dropdown-menu',
       '@bivane/date-picker',
       '@bivane/time-picker',
+      '@bivane/rate',
+      '@bivane/slider',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -539,6 +586,14 @@ async function main() {
           'data-slot=time-picker-panel',
           '--bv-time-picker-wheel-item-height',
           '--bv-time-picker-pc-panel-width',
+          'data-slot=rate',
+          'data-slot=rate-item',
+          '--bv-rate-icon-size',
+          'data-slot=slider',
+          // slider-bar / slider-rail / slider-line 没有任何 CSS 选择器引用，
+          // 只是运行期标记，按「只有被引用的槽名才该出现在产物里」不进清单
+          'data-slot=slider-button',
+          '--bv-slider-bar-height',
           'bv-fade-in',
         ];
         for (const probe of probes) {

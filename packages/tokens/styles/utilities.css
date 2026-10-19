@@ -471,6 +471,269 @@
     }
 }
 
+/* ---------- InputNumber 数量步进器（模式 B：同值模型换壳）----------
+ * H5 横排 [−][输入框][＋] 逐字移植 Vant .van-stepper；
+ * PC 竖排 [输入框][▲▼] 是桌面壳独有的结构（契约 17：壳差异走 JS 分支，
+ * H5 控件包在 h5-controls 内、PC 渲染 pc-spin，两套槽名互不串样式）。 */
+[data-slot="input-number"] {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    vertical-align: middle;
+    user-select: none;
+}
+
+[data-slot="input-number"][data-disabled="true"] {
+    cursor: not-allowed;
+}
+
+/* H5 控件包：display:contents 不产生盒子，子项保持根的 flex 布局，
+ * 只充当样式作用域，把 ± 的伪元素画法限定在 H5 壳 */
+[data-slot="input-number-h5-controls"] {
+    display: contents;
+}
+
+/* 输入框（两端共用，外观逐字对齐 .van-stepper__input） */
+[data-slot="input-number-input"] {
+    box-sizing: border-box;
+    flex: none;
+    width: var(--bv-input-number-input-width);
+    height: var(--bv-input-number-input-height);
+    min-width: 0;
+    margin: 0 var(--bv-input-number-gap);
+    padding: 0;
+    color: var(--bv-input-number-input-text-color);
+    font-size: var(--bv-input-number-input-font);
+    line-height: var(--bv-input-number-input-line-height);
+    text-align: center;
+    background: var(--bv-input-number-background);
+    border: 0;
+    border-radius: 0;
+    -webkit-appearance: none;
+}
+
+[data-slot="input-number-input"]:disabled {
+    color: var(--bv-input-number-input-disabled-text-color);
+    background-color: var(--bv-input-number-input-disabled-background);
+    /* iOS 下 disabled 文字会被系统刷成灰色，强制用 token 色 */
+    -webkit-text-fill-color: var(--bv-input-number-input-disabled-text-color);
+    opacity: 1;
+}
+
+[data-slot="input-number-input"]:read-only {
+    cursor: default;
+}
+
+/* 加减按钮（H5 方块 + PC 微调列共用底色/尺寸基类） */
+[data-slot="input-number-minus"],
+[data-slot="input-number-plus"] {
+    position: relative;
+    box-sizing: border-box;
+    flex: none;
+    width: var(--bv-input-number-input-height);
+    height: var(--bv-input-number-input-height);
+    margin: 0;
+    padding: 0;
+    color: var(--bv-input-number-button-icon-color);
+    vertical-align: middle;
+    background: var(--bv-input-number-background);
+    border: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* H5 的 ± 用伪元素画（逐字移植 Vant：横线 50%×1px，竖线 1px×50%） */
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-minus"]::before,
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"]::before,
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"]::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: currentColor;
+    transform: translate(-50%, -50%);
+    content: "";
+}
+
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-minus"]::before,
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"]::before {
+    width: 50%;
+    height: 1px;
+}
+
+[data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"]::after {
+    width: 1px;
+    height: 50%;
+}
+
+[data-slot="input-number-h5-controls"] > [data-slot="input-number-minus"] {
+    border-radius: var(--bv-input-number-radius) 0 0
+        var(--bv-input-number-radius);
+}
+
+[data-slot="input-number-h5-controls"] > [data-slot="input-number-plus"] {
+    border-radius: 0 var(--bv-input-number-radius) var(--bv-input-number-radius)
+        0;
+}
+
+/* 边界禁用：两按钮各自独立（到 min 只灰 −，＋仍可用） */
+[data-slot="input-number-minus"][data-disabled="true"],
+[data-slot="input-number-plus"][data-disabled="true"] {
+    color: var(--bv-input-number-button-disabled-icon-color);
+    background-color: var(--bv-input-number-button-disabled-color);
+    cursor: not-allowed;
+}
+
+/* round 圆钮主题（Vant .van-stepper--round，仅 H5 横排壳有意义） */
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-input"] {
+    background-color: transparent;
+}
+
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-minus"],
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"] {
+    border-radius: 100%;
+}
+
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"] {
+    color: var(--bv-white);
+    background: var(--bv-input-number-button-round-theme-color);
+}
+
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-minus"] {
+    color: var(--bv-input-number-button-round-theme-color);
+    background-color: var(--bv-surface);
+    border: 1px solid var(--bv-input-number-button-round-theme-color);
+}
+
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-minus"][data-disabled="true"],
+[data-slot="input-number"][data-theme="round"]
+    [data-slot="input-number-h5-controls"]
+    > [data-slot="input-number-plus"][data-disabled="true"] {
+    opacity: 0.3;
+}
+
+/* PC 竖排微调列：输入框补左圆角形成完整胶囊，右侧 ▲▼ 各占一半 */
+[data-slot="input-number"][data-mode="pc"] [data-slot="input-number-input"] {
+    border-radius: var(--bv-input-number-radius) 0 0
+        var(--bv-input-number-radius);
+}
+
+[data-slot="input-number-pc-spin"] {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: var(--bv-input-number-pc-spin-width);
+    background: var(--bv-input-number-background);
+    border-radius: 0 var(--bv-input-number-radius) var(--bv-input-number-radius)
+        0;
+}
+
+[data-slot="input-number-pc-spin"] > [data-slot="input-number-minus"],
+[data-slot="input-number-pc-spin"] > [data-slot="input-number-plus"] {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50%;
+    background: transparent;
+    border-radius: 0;
+    font-size: var(--bv-input-number-pc-spin-icon-size);
+}
+
+[data-slot="input-number-pc-spin"] > [data-slot="input-number-plus"] {
+    border-bottom: var(--bv-border-width) solid var(--bv-border);
+}
+
+/* 触屏：28px 视觉按钮借命中元素外扩到 44px 热区（与 switch/checkbox 同约定）。
+ * ± 自身的 ::before/::after 已用于画符号，第三条边不能再用伪元素。 */
+@media (pointer: coarse) {
+    [data-slot="input-number-hit"] {
+        position: absolute;
+        inset: calc(-1 * var(--bv-input-number-touch-expand));
+    }
+}
+
+/* ---------- Rate 评分（模式 C：两端同形，差异只在交互）----------
+ * 视觉共用（星 = 空星 + 按比例裁切的实心星叠层），颜色走 props（var token）。
+ * PC 焦点环画在容器上。
+ * ⚠️ 触屏不要给单颗星加 44px 热区：星间距只有 size+gutter=24px，
+ * 热区互相重叠会让后一颗星抢走前一颗的右半（点第 1颗却选中第 2 颗）。
+ * H5 靠「按坐标算分」（Vant 同款）而不是 elementFromPoint 找 DOM，天然无此问题。 */
+[data-slot="rate"] {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+[data-slot="rate"][data-disabled="true"] [data-slot="rate-item"] {
+    cursor: not-allowed;
+}
+
+/* PC 焦点环（键盘进入才显；鼠标点选不需要） */
+[data-slot="rate"][data-mode="pc"]:focus-visible {
+    outline: var(--bv-focus-ring-width) solid var(--bv-focus-ring-color);
+    outline-offset: var(--bv-focus-ring-offset);
+}
+
+/* ---------- Slider 滑块（模式 C：两端同形，差异只在手势/键盘）----------
+ * 轨道与滑块钮视觉两端共用（slider-parts），方向（横/竖）由 data-orientation 切换。
+ * 颜色走 props（var token），不新增工具类。 */
+[data-slot="slider"] {
+    position: relative;
+    user-select: none;
+}
+
+[data-slot="slider"][data-orientation="horizontal"] {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: var(--bv-slider-button-size);
+}
+
+[data-slot="slider"][data-orientation="vertical"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: var(--bv-slider-button-size);
+}
+
+[data-slot="slider"][data-disabled="true"] {
+    opacity: var(--bv-slider-disabled-opacity);
+    cursor: not-allowed;
+}
+
+/* PC 焦点环：键盘进入才显；鼠标拖拽不需要 */
+[data-slot="slider"][data-mode="pc"] [data-slot="slider-button"]:focus-visible {
+    outline: var(--bv-focus-ring-width) solid var(--bv-focus-ring-color);
+    outline-offset: var(--bv-focus-ring-offset);
+}
+
+/* 触屏：24px 滑块钮借 ::after 外扩到 44px 热区（与 rate/input-number 同约定）。
+ * 滑块钮自身未占用 ::before。 */
+@media (pointer: coarse) {
+    [data-slot="slider-button"]::after {
+        content: "";
+        position: absolute;
+        inset: calc(-1 * var(--bv-slider-touch-expand));
+    }
+}
+
 /* ---------- 按压态蒙层（对应 Vant 按钮的 ::before 黑色蒙层）---------- */
 .bv-press {
     position: relative;

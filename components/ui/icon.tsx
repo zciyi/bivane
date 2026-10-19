@@ -14,6 +14,7 @@ export const iconNames = [
     "arrow",
     "arrow-left",
     "arrow-down",
+    "arrow-up",
     "check",
     // Checkbox 半选（indeterminate）横杠
     "minus",
@@ -24,6 +25,8 @@ export const iconNames = [
     "fail",
     "info",
     "warning",
+    // Rate 的空星（outline）；实心星由 rate-parts 同一 path 改 fill 渲染
+    "star",
 ] as const;
 
 export type IconName = (typeof iconNames)[number];
@@ -33,6 +36,8 @@ const glyphs: Record<IconName, React.ReactNode> = {
     "arrow-left": <path d="m15 5-7 7 7 7" />,
     // 下拉指示器。Select / DatePicker 的触发器用它，语义是「展开候选」而非「前往下一页」
     "arrow-down": <path d="m5 9 7 7 7-7" />,
+    // 上箭头：InputNumber 的 PC 竖排微调列用它（与 arrow-down 成对）
+    "arrow-up": <path d="m5 15 7-7 7 7" />,
     // 选中态勾选。用细线勾（与 Vant 的 icon-success 不同：那是填充圆环，这里是纯勾）
     check: <path d="m5 12.5 4.5 4.5L19 7" />,
     minus: <path d="M5 12h14" />,
@@ -70,6 +75,7 @@ const glyphs: Record<IconName, React.ReactNode> = {
             <path d="M12 17.1h.01" />
         </>
     ),
+    star: <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />,
 };
 
 export interface IconProps extends Omit<React.SVGProps<SVGSVGElement>, "name"> {

@@ -228,7 +228,7 @@
             "name": "input",
             "type": "registry:component",
             "title": "Input / Textarea 输入基础件",
-            "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search/Stepper 等组件复用。",
+            "description": "无 Cell 外壳的输入控件（模式 A）：原生属性透传、Vant token 排版、digit 纯数字键盘与按键过滤、textarea autosize、精确指针设备的键盘焦点环。Field 内部使用，也供 Search、InputNumber 等组件复用。",
             "files": [
                 {
                     "path": "components/ui/input.tsx",
@@ -237,6 +237,41 @@
                 }
             ],
             "registryDependencies": ["utils", "tokens", "use-field-state"]
+        },
+        {
+            "name": "use-input-number-state",
+            "type": "registry:hook",
+            "title": "InputNumber 值逻辑",
+            "description": "InputNumber 跨模式共用的离散数量值模型：digit/decimal 按键过滤、step 量化（浮点安全 addNumber）、min/max 夹紧、小数位补零、allowEmpty 空值语义、beforeChange 闸门，全部为纯函数（不 import 任何组件，避免环形依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-input-number-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-input-number-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "input-number",
+            "type": "registry:component",
+            "title": "InputNumber 数量步进器",
+            "description": "模式 B 分发层：H5 横排 [−][输入框][＋]（数字键盘、44px 热区、长按连发）/ PC 输入框 + 竖排 ▲▼ 微调列（↑↓/Home/End 键盘）。值语义逐字对齐 Vant 4 van-stepper，同一份值模型换壳（§6.5-2 模式 B）。",
+            "files": [
+                {
+                    "path": "components/responsive/input-number.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/input-number.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "input",
+                "use-device-mode",
+                "responsive-provider",
+                "use-input-number-state"
+            ]
         },
         {
             "name": "field",
@@ -1590,6 +1625,186 @@
                 "use-device-mode",
                 "responsive-provider",
                 "tokens"
+            ]
+        },
+        {
+            "name": "use-rate-state",
+            "type": "registry:hook",
+            "title": "Rate 值逻辑",
+            "description": "Rating 跨模式共用的星级值模型：夹紧（allowHalf 半星取整）、半星叠层比例、clearable 同值清零，全部为纯函数（不含任何组件，避免环形依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-rate-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-rate-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "rate-parts",
+            "type": "registry:component",
+            "title": "Rate 共用视觉件",
+            "description": "两端共用的单颗星：空星 outline + 按比例裁切的实心星叠层（半星由裁切宽度自然得到），默认五角星 glyph，支持自定义 icon/voidIcon 节点。",
+            "files": [
+                {
+                    "path": "components/ui/rate-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/rate-parts.tsx"
+                }
+            ],
+            "registryDependencies": []
+        },
+        {
+            "name": "rate-h5",
+            "type": "registry:component",
+            "title": "Rate（H5 实现）",
+            "description": "点击 / 手指横向滑动连续选值：pointerdown 即选，touchable 下 pointermove 用 elementFromPoint 找触点下的星（不锁纵向滚动）；allowHalf 按触点落在左/右半判定半星。role=slider，触屏 44px 热区靠 rate-hit 外扩。",
+            "files": [
+                {
+                    "path": "components/h5/rate.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/rate.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "rate-parts", "use-rate-state", "tokens"]
+        },
+        {
+            "name": "rate-pc",
+            "type": "registry:component",
+            "title": "Rate（PC 实现）",
+            "description": "点击选择；hover 在星上临时预览（移出还原，只改本地预览态不动受控值）；键盘 ←→↑↓ ±1（allowHalf ±0.5）、Home/End 跳 0/count。role=slider，焦点环。",
+            "files": [
+                {
+                    "path": "components/pc/rate.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/rate.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "rate-parts", "use-rate-state", "tokens"]
+        },
+        {
+            "name": "rate",
+            "type": "registry:component",
+            "title": "Rate 评分",
+            "description": "模式 C 分发层：H5 触摸滑动连续选 / PC 点击 + hover 预览 + 键盘方向键。值语义逐字对齐 Vant 4 van-rate，星色用 props 默认走 token（var()），允许自定义 icon/voidIcon 节点与 voidColor/color。",
+            "files": [
+                {
+                    "path": "components/responsive/rate.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/rate.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-rate-state",
+                "rate-parts",
+                "rate-h5",
+                "rate-pc"
+            ]
+        },
+        {
+            "name": "use-slider-state",
+            "type": "registry:hook",
+            "title": "Slider 值逻辑",
+            "description": "Slider 跨模式共用的数值模型：比例↔值换算、按 step 量化（浮点安全）、min/max 夹紧、range 双拇指保序，全部为纯函数（不含任何组件，避免环形依赖）。",
+            "files": [
+                {
+                    "path": "hooks/use-slider-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-slider-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "use-slider-drag",
+            "type": "registry:hook",
+            "title": "Slider 拖拽手势",
+            "description": "两端共用的指针拖拽手势：把「轨道 ref + 落点坐标」换算成比例，全程 Pointer Capture 思路（window 级 pointermove/up），vertical/reverse 翻转；比例→数值与 thumb 选择由组件负责。",
+            "files": [
+                {
+                    "path": "hooks/use-slider-drag.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-slider-drag.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "slider-parts",
+            "type": "registry:component",
+            "title": "Slider 共用视觉件",
+            "description": "两端共用的轨道（rail）+ 填充条（bar）+ 滑块钮（button）；方向（横/竖）由 props 决定，不写两套 CSS。颜色走 props（var token）。",
+            "files": [
+                {
+                    "path": "components/ui/slider-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/slider-parts.tsx"
+                }
+            ],
+            "registryDependencies": ["utils", "use-slider-state", "tokens"]
+        },
+        {
+            "name": "slider-h5",
+            "type": "registry:component",
+            "title": "Slider（H5 实现）",
+            "description": "触摸拖拽（轨道 touch-action:none 防拖拽时页面滚动）；点轨道任意位置跳转；滑块钮不进 Tab 流；range 双拇指拖近不交叉。拖拽手势与 PC 共用 use-slider-drag。",
+            "files": [
+                {
+                    "path": "components/h5/slider.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/slider.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "slider-parts",
+                "use-slider-drag",
+                "use-slider-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "slider-pc",
+            "type": "registry:component",
+            "title": "Slider（PC 实现）",
+            "description": "点轨道跳转 + 鼠标拖拽（与 H5 共用 use-slider-drag）；滑块钮可聚焦，键盘 →/↑ +step、←/↓ -step、Home/End 到界、PgUp/PgDn 跨 10 步，焦点环。",
+            "files": [
+                {
+                    "path": "components/pc/slider.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/slider.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "slider-parts",
+                "use-slider-drag",
+                "use-slider-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "slider",
+            "type": "registry:component",
+            "title": "Slider 滑块",
+            "description": "模式 C 分发层：H5 触摸拖拽 / PC 点轨 + 拖拽 + 键盘。支持单值/区间（range）、reverse 反向、vertical 竖直、禁用/只读、onDragStart/onDragEnd。值语义逐字对齐 Vant 4 van-slider。",
+            "files": [
+                {
+                    "path": "components/responsive/slider.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/slider.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-slider-state",
+                "slider-parts",
+                "slider-h5",
+                "slider-pc"
             ]
         }
     ]

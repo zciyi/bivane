@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NODE_DIR = r"C:\Users\Administrator\.workbuddy\binaries\node\versions\22.22.2-3"
+NODE_DIR = r"C:\Users\Administrator\.workbuddy\binaries\node\versions\22.22.2-6"
 NPM = os.path.join(NODE_DIR, "npm.cmd")
 
 if __name__ == "__main__":

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rate",
+  "type": "registry:component",
+  "title": "Rate 评分",
+  "description": "模式 C 分发层：H5 触摸滑动连续选 / PC 点击 + hover 预览 + 键盘方向键。值语义逐字对齐 Vant 4 van-rate，星色用 props 默认走 token（var()），允许自定义 icon/voidIcon 节点与 voidColor/color。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-device-mode",
+    "@bivane/responsive-provider",
+    "@bivane/use-rate-state",
+    "@bivane/rate-parts",
+    "@bivane/rate-h5",
+    "@bivane/rate-pc"
+  ],
+  "files": [
+    {
+      "path": "components/responsive/rate.tsx",
+      "content": "import * as React from \"react\";\nimport { H5Rate } from \"@/components/h5/rate\";\nimport { PcRate } from \"@/components/pc/rate\";\nimport type { RateRenderProps } from \"@/components/ui/rate-parts\";\nimport { useDeviceMode, type DeviceMode } from \"@/hooks/use-device-mode\";\nimport { useRateValue } from \"@/hooks/use-rate-state\";\n\n/**\n * Bivane Rate · 分发层（模式 C）\n * 交互定义见 bivane-responsive-matrix.md §2.2\n *\n * ┌ H5 ── 点击 / 手指横向滑动连续选值，44px 热区\n * └ PC ── 点击 + hover 预览 + 键盘方向键（±1 / 半星 ±0.5 / Home/End）\n *\n * 值语义（夹紧、clearable 同值清零）在 hooks/use-rate-state，两端同义 → 本层。\n * 星色用 props 默认走 token（var()），不新增工具类（无需改 theme.css / BV_COLORS）。\n */\nexport interface RateProps {\n    /** 受控分值，默认 0 */\n    value?: number;\n    /** 初始分值，默认 0 */\n    defaultValue?: number;\n    /** 星数，默认 5 */\n    count?: number;\n    /** 允许半星，默认 false */\n    allowHalf?: boolean;\n    /** 只读：不可选 */\n    readonly?: boolean;\n    disabled?: boolean;\n    /** 星尺寸，数字按 px，默认 20 */\n    size?: number | string;\n    /** 星间距，数字按 px，默认 4 */\n    gutter?: number | string;\n    /** 实心星颜色，默认星黄 token */\n    color?: string;\n    /** 空星颜色，默认 gray-5 token */\n    voidColor?: string;\n    /** 禁用星颜色，默认 gray-5 token */\n    disabledColor?: string;\n    /** 再次点击当前分值清零（Vant clearable），默认 false */\n    clearable?: boolean;\n    /** 触屏滑动选择，默认 true（PC 忽略） */\n    touchable?: boolean;\n    /** 自定义实心星节点（覆盖默认五角星） */\n    icon?: React.ReactNode;\n    /** 自定义空星节点 */\n    voidIcon?: React.ReactNode;\n    /** 分值变化回调 */\n    onChange?: (value: number) => void;\n    className?: string;\n    style?: React.CSSProperties;\n    id?: string;\n    /** 无障碍标签（渲染到 role=\"slider\" 容器上），与全库其余组件一致用 ariaLabel */\n    ariaLabel?: string;\n    forceMode?: DeviceMode;\n}\n\nexport const Rate = React.forwardRef<HTMLDivElement, RateProps>(function Rate(\n    {\n        value,\n        defaultValue,\n        count = 5,\n        allowHalf = false,\n        readonly = false,\n        disabled = false,\n        size = 20,\n        gutter = 4,\n        color = \"var(--bv-rate-icon-full-color)\",\n        voidColor = \"var(--bv-rate-icon-void-color)\",\n        disabledColor = \"var(--bv-rate-icon-disabled-color)\",\n        clearable = false,\n        touchable = true,\n        icon,\n        voidIcon,\n        onChange,\n        className,\n        style,\n        id,\n        ariaLabel,\n        forceMode,\n    },\n    ref,\n) {\n    const mode = useDeviceMode(forceMode);\n    const { current, selectStar } = useRateValue({\n        value,\n        defaultValue,\n        count,\n        allowHalf,\n        disabled,\n        readonly,\n        clearable,\n        onChange,\n    });\n\n    const common: RateRenderProps = {\n        current,\n        count,\n        allowHalf,\n        readonly,\n        disabled,\n        size,\n        gutter,\n        color,\n        voidColor,\n        disabledColor,\n        icon,\n        voidIcon,\n        onSelect: selectStar,\n        touchable,\n        className,\n        style,\n        id,\n        ariaLabel,\n    };\n\n    return mode === \"mobile\" ? (\n        <H5Rate ref={ref} {...common} />\n    ) : (\n        <PcRate ref={ref} {...common} />\n    );\n});\n",
+      "type": "registry:component",
+      "target": "components/responsive/rate.tsx"
+    }
+  ]
+}
