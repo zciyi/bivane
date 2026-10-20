@@ -1291,6 +1291,100 @@ H5 是横排 `−` 数字 `＋`，PC 是竖排微调列 + 可输入框 + 键盘�
 </div>
 ```
 
+### Uploader
+
+文件上传。**模式 C**：两端共用队列 / 进度 / 校验逻辑，差异在「值展示载体」与入口 —— H5 是**宫格**预览 + 「+」唤起相机/相册（`capture`），PC 是**列表**预览 + **拖拽区** + **粘贴**。
+
+**传输两种驱动并存**（先 `afterRead` 后 `action`，都没有则仅本地预览）：
+
+```tsx
+// ① 业务自理上传（推荐）：resolve → 完成，reject → 失败（可重试）。
+//    想让进度条/百分比动起来，就用第二个参数 onProgress 上报你的真实进度。
+<Uploader multiple afterRead={async (item, onProgress) => {
+  const body = new FormData();
+  body.append("file", item.file!);
+  const xhr = new XMLHttpRequest();                       // 或 fetch + 进度流
+  // …把 xhr.upload.onprogress 的百分比喂给 onProgress(p)
+  onProgress(42);                                         // 0~100
+  await fetch("/api/upload", { method: "POST", body });
+}} />
+
+// ② 内置 XHR：传 action 即可，库负责 FormData 与进度（真实字节进度，自动显示百分比）
+<Uploader action="/api/upload" name="file" withCredentials multiple />
+
+// ③ 都不传：只做本地预览（status 直接 done）
+<Uploader multiple />
+```
+
+> **关于进度显示**：只有「有真实进度源」时才显示百分比 —— 即用了 `action`（XHR 自动上报），
+> 或在 `afterRead` 里主动调了 `onProgress`。两者都没有时上传中**只显示转圈、不显示 0%**
+> （避免「一直 0% 突然跳 100」的假进度）。
+
+#### App 桥回填（对接 JSBridge）
+
+App WebView 里 `<input type=file>` 常被禁用或体验差，此时可让**点击交给用户自己处理**：
+传 `onPickRequest` 后，点「+」/拖拽区**不再打开系统弹窗**，而是回调你；你在回调里调
+原生桥拿文件，再用命令句柄 `handle.addFiles()` **回填**进上传控件 —— 回填走的是与手动
+选择**完全一致**的校验（accept/maxSize/beforeRead）→ 压缩 → 入队 → 上传 → 进度流程。
+
+```tsx
+const up = React.useRef<UploaderHandle>(null);
+<Uploader
+  ref={up}
+  onPickRequest={async (handle) => {
+    const file = await window.myAppBridge.pickImage(); // 原生桥返回 File
+    if (file) handle.addFiles(file);                    // 回填 → 自动进队列并上传
+    // 或者 handle.open() 回退到系统 file input
+  }}
+/>
+```
+
+- 句柄 `UploaderHandle = { addFiles(files: File | File[]), open() }`，通过 **ref** 暴露（也可从
+  `onPickRequest` 回调参数直接拿）。`addFiles` 接受单个或数组。
+- 拖拽 / 粘贴不受 `onPickRequest` 影响（它们本就自带 File，仍直接进队列）。
+- 不传 `onPickRequest` 时行为与之前完全一致（照旧打开系统 file input）。
+
+H5 相机直唤 + 图片压缩（canvas，等比缩放到 `maxWidth` + `toBlob` 降质）：
+
+```tsx
+<Uploader capture="environment" compress={{ maxWidth: 1080, quality: 0.8 }} multiple />
+```
+
+校验钩子（语义对齐 Vant）：`beforeRead` 返回 false 拦截整批，`beforeDelete` 返回 false 拦截删除；超 `maxSize` 触发 `onOversize`，超 `maxCount` 触发 `onExceed`：
+
+```tsx
+<Uploader
+  accept="image/*"
+  multiple
+  maxCount={9}
+  maxSize={2 * 1024 * 1024}
+  beforeRead={(f) => (Array.isArray(f) ? f.length > 0 : true)}
+  beforeDelete={async (item) => confirm(`删除 ${item.name}？`)}
+  onOversize={(f) => toast("文件超过 2MB")}
+  onExceed={(f) => toast(`最多 9 个，多了 ${f.length} 个`)}
+/>
+```
+
+受控：`value` 收 `UploaderFileItem[]`（含 `status`/`percent`），上传中状态与进度变化也会触发 `onChange`。
+
+| prop | 类型 | 默认 | 说明 |
+|---|---|---|---|
+| `value` / `defaultValue` | `UploaderFileItem[]` | `[]` | 文件项：`key` / `file` / `url` / `status`(`uploading`\|`done`\|`failed`) / `percent` / `message` / `name` |
+| `onChange` | `(list) => void` | — | 入列 / 上传状态 / 进度 / 删除都会触发 |
+| `multiple` | `boolean` | `false` | |
+| `maxCount` / `maxSize` | `number` | — | `maxSize` 单位字节 |
+| `accept` | `string` | — | `'image/*'` 或 `'.jpg,.png'` |
+| `capture` | `boolean \| 'user' \| 'environment'` | — | H5 直接唤起相机，PC 忽略 |
+| `disabled` / `readonly` | `boolean` | `false` | `readonly` 不可增删/重试 |
+| `compress` | `boolean \| { maxWidth?, quality? }` | `false` | 仅图片；默认 `maxWidth:1080` `quality:0.8` |
+| `action` | `string` | — | 上传地址（内置 XHR），被 `afterRead` 优先覆盖 |
+| `method` / `headers` / `name` / `data` / `withCredentials` | — | `POST` / — / `'file'` / — / `false` | XHR 传输参数 |
+| `afterRead` | `(item, onProgress) => void \| Promise<void>` | — | resolve→完成，reject→失败；调 `onProgress(p)` 上报真实进度才有百分比 |
+| `onPickRequest` | `(handle: UploaderHandle) => void` | — | 自定义选文件触发；传了它点「+」/拖拽区不弹系统框，改为回调，回调里用 `handle.addFiles()` 回填 |
+| `beforeRead` / `beforeDelete` | `(x) => boolean \| Promise<boolean>` | — | 返回 false 拦截 |
+| `onOversize` / `onExceed` | `(f) => void` | — | 超大小 / 超个数回调 |
+| `ariaLabel` | `string` | — | 渲染到容器上，与全库一致用 `ariaLabel` |
+
 ## 四、两端差异由谁决定
 
 优先级从高到低：

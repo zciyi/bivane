@@ -1289,6 +1289,40 @@ function probeSlider(label) {
  * 合成事件走完React 事件系统但不会触发浏览器的 hover 状态链，
  * 探针会量到「预览=受控值」而看起来一切正常。
  */
+/**
+ * Uploader 探针（场景 12）。
+ * 量的是「静止态几何」：H5 应出现「+」宫格（uploader-add），
+ * PC 应出现拖拽区（uploader-dropzone，带虚线边框）。上传中的文件
+ * 需要 CDP setFileInputFiles 选真文件才能造出来，这里不覆盖；
+ * 队列状态机由 vitest 双模式用例覆盖，几何/样式落地由本探针覆盖。
+ */
+function probeUploader(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+    out.uploaders = [...document.querySelectorAll('[data-slot="uploader"]')].map(root => {
+      const add = root.querySelector('[data-slot="uploader-add"]');
+      const zone = root.querySelector('[data-slot="uploader-dropzone"]');
+      const ar = add ? add.getBoundingClientRect() : null;
+      const zr = zone ? zone.getBoundingClientRect() : null;
+      return {
+        mode: root.dataset.mode,
+        disabled: root.dataset.disabled === 'true',
+        hasAddTile: !!add,
+        hasDropZone: !!zone,
+        addW: ar ? px(ar.width) : null,
+        addH: ar ? px(ar.height) : null,
+        zoneW: zr ? px(zr.width) : null,
+        zoneH: zr ? px(zr.height) : null,
+        zoneBorder: zone ? getComputedStyle(zone).borderTopStyle : null,
+        gridCount: root.querySelectorAll('[data-slot="uploader-grid-item"]').length,
+        listCount: root.querySelectorAll('[data-slot="uploader-list-item"]').length,
+      };
+    });
+    return JSON.stringify(out);
+  })()`);
+}
+
 async function hoverSelector(selector, dxRatio = 0.5) {
   const raw = await evaluate(`(() => {
     const el = document.querySelector(${JSON.stringify(selector)});
@@ -1801,6 +1835,14 @@ async function run() {
       await shot(`${cfg.name}-11d-slider-keyboard`);
       reports.push(await probeSlider(`${cfg.name} / slider → 键 +step`));
     }
+
+    // --- 12. Uploader（模式 C：H5 宫格 + 相机 / PC 拖拽区 + 列表 + 粘贴） ---
+    // 静止态几何判据：H5 必须有「+」宫格（≈80px 方块），PC 必须有拖拽区
+    // （虚线边框、带内边距）。上传中的遮罩/进度需要真文件选择，不在本场景覆盖。
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · Uploader'));
+    await shot(`${cfg.name}-12-uploader`);
+    reports.push(await probeUploader(`${cfg.name} / uploader 初始`));
   }
 
   fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(reports, null, 2), 'utf8');

@@ -49,6 +49,9 @@
   --color-bv-black: var(--bv-black);
   --color-bv-gray-4: var(--bv-gray-4);
   --color-bv-gray-6: var(--bv-gray-6);
+  /* Uploader 上传中遮罩 / 删除按钮底色（结构色，随组件，不进 modes.css） */
+  --color-bv-uploader-mask-background: var(--bv-uploader-mask-background);
+  --color-bv-uploader-delete-background: var(--bv-uploader-delete-background);
   /* 遮罩浓度：随模式变化（H5 .7 / PC .45），定义在 modes.css。
      漏了这行会让 bg-bv-overlay 生成不出来，而 cn() 仍保留类名 —— 表现为遮罩静默全透明。 */
   --color-bv-overlay: var(--bv-overlay-background);

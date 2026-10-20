@@ -70,6 +70,11 @@ const EXPECTED = [
   'src/components/h5/slider.tsx',
   'src/components/pc/slider.tsx',
   'src/components/responsive/slider.tsx',
+  'src/hooks/use-uploader-state.ts',
+  'src/components/ui/uploader-parts.tsx',
+  'src/components/h5/uploader.tsx',
+  'src/components/pc/uploader.tsx',
+  'src/components/responsive/uploader.tsx',
 ];
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
@@ -216,6 +221,7 @@ import { DatePicker } from '@/components/responsive/date-picker';
 import { TimePicker } from '@/components/responsive/time-picker';
 import { Rate } from '@/components/responsive/rate';
 import { Slider } from '@/components/responsive/slider';
+import { Uploader } from '@/components/responsive/uploader';
 import { Dialog, showConfirmDialog } from '@/components/responsive/dialog';
 import { DropdownMenu } from '@/components/responsive/dropdown-menu';
 import { Popup } from '@/components/responsive/popup';
@@ -402,6 +408,14 @@ export default function App() {
         <Cell title="自定义颜色与步长" value={<Slider ariaLabel="彩色滑块" defaultValue={30} step={5} activeColor="#ee0a24" />} />
         <Cell title="禁用" value={<Slider ariaLabel="禁用滑块" disabled defaultValue={30} />} />
       </CellGroup>
+
+      <CellGroup title="Uploader">
+        <Cell title="基础（本地预览）" value={<Uploader ariaLabel="基础上传" />} />
+        <Cell title="多选 + 上限" value={<Uploader ariaLabel="多选上传" multiple maxCount={3} />} />
+        <Cell title="图片 + 压缩" value={<Uploader ariaLabel="图片上传" accept="image/*" compress multiple />} />
+        <Cell title="App 桥回填" value={<Uploader ariaLabel="桥接" onPickRequest={(h) => { void h.addFiles(new File([], "bridge.txt")); }} />} />
+        <Cell title="禁用" value={<Uploader ariaLabel="禁用上传" disabled />} />
+      </CellGroup>
       </CellGroup>
 
       <Popup open={popupOpen} position="bottom" onOpenChange={setPopupOpen} closeable aria-label="示例弹层">
@@ -535,6 +549,7 @@ async function main() {
       '@bivane/time-picker',
       '@bivane/rate',
       '@bivane/slider',
+      '@bivane/uploader',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -594,6 +609,11 @@ async function main() {
           // 只是运行期标记，按「只有被引用的槽名才该出现在产物里」不进清单
           'data-slot=slider-button',
           '--bv-slider-bar-height',
+          // uploader 令牌：宫格/遮罩（vant.css 变量应进消费者 CSS 产物）。
+          // 注意：uploader 的槽名（uploader-add / grid-item…）全是 Tailwind 工具类拼的，
+          // utilities.css 里没有 [data-slot=…] 规则引用它们，故不进探针（否则造假 MISS）。
+          '--bv-uploader-grid-size',
+          '--bv-uploader-mask-background',
           'bv-fade-in',
         ];
         for (const probe of probes) {

@@ -1063,3 +1063,33 @@
     /* 触屏热区外扩：视觉 24px → 44px；pointer:fine 下不消费 */
     --bv-slider-touch-expand: 10px;
 }
+
+/* ---------- 组件级 token：Uploader（对齐 Vant 4 uploader/index.less）---------- */
+:root,
+:host {
+    /* 宫格边长（H5 预览网格每格大小） */
+    --bv-uploader-grid-size: 80px;
+    /* 宫格间距 */
+    --bv-uploader-grid-gap: 8px;
+    /* 宫格 / 列表缩略图圆角（复用组件圆角 token，不另起一套） */
+    --bv-uploader-item-radius: var(--bv-radius-md);
+    /* 删除按钮字形尺寸（热区由 padding 撑到 ~24px） */
+    --bv-uploader-delete-size: 14px;
+    /* 上传中遮罩内的图标/进度环尺寸 */
+    --bv-uploader-mask-icon-size: 22px;
+    /* PC 列表行最小高 */
+    --bv-uploader-list-row-min-height: 48px;
+    /* PC 列表缩略图尺寸 */
+    --bv-uploader-thumb-size: 40px;
+    /* PC 拖拽区内边距 / 圆角 */
+    --bv-uploader-drag-padding: var(--bv-padding-lg);
+    --bv-uploader-drag-radius: var(--bv-radius-md);
+    /* 拖拽区虚线边框（复用 gray-4，非新颜色） */
+    --bv-uploader-drag-border: var(--bv-gray-4);
+    /* 拖拽高亮底色（复用 active-color，非新颜色） */
+    --bv-uploader-drag-active-background: var(--bv-active-color);
+    /* 上传中遮罩底色（新颜色，三处补齐见 theme.css / BV_COLORS） */
+    --bv-uploader-mask-background: rgba(50, 50, 50, 0.8);
+    /* 删除按钮底色（新颜色，三处补齐见 theme.css / BV_COLORS） */
+    --bv-uploader-delete-background: rgba(0, 0, 0, 0.7);
+}

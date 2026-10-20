@@ -27,6 +27,11 @@ export const iconNames = [
     "warning",
     // Rate 的空星（outline）；实心星由 rate-parts 同一 path 改 fill 渲染
     "star",
+    // Uploader：新增（+）、重试（replay）、拖拽上传（upload）、文件（description）
+    "plus",
+    "replay",
+    "upload",
+    "description",
 ] as const;
 
 export type IconName = (typeof iconNames)[number];
@@ -76,6 +81,26 @@ const glyphs: Record<IconName, React.ReactNode> = {
         </>
     ),
     star: <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />,
+    plus: <path d="M12 5v14M5 12h14" />,
+    replay: (
+        <>
+            <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+            <path d="M20 4v5h-5" />
+        </>
+    ),
+    upload: (
+        <>
+            <path d="M12 16V4M8 8l4-4 4 4" />
+            <path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" />
+        </>
+    ),
+    description: (
+        <>
+            <path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5Z" />
+            <path d="M14 3v4.5h4.5" />
+            <path d="M8.5 13h7M8.5 16.5h5" />
+        </>
+    ),
 };
 
 export interface IconProps extends Omit<React.SVGProps<SVGSVGElement>, "name"> {

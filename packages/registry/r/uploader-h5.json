@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "uploader-h5",
+  "type": "registry:component",
+  "title": "Uploader（H5 实现）",
+  "description": "H5 宫格预览 + 「+」宫格唤起 input（capture 透传）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/uploader-parts",
+    "@bivane/use-uploader-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/uploader.tsx",
+      "content": "import * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\nimport {\n    UploaderAddTile,\n    UploaderGridItem,\n    type UploaderRenderProps,\n} from \"@/components/ui/uploader-parts\";\n\n/**\n * Bivane Uploader · H5 实现（模式 C）\n * 交互定义见 bivane-responsive-matrix.md §2.2\n *\n * 宫格预览：每文件一瓦片，图片走缩略图、非图片走文件图标；上传中遮罩转圈+百分比，\n * 失败遮罩可点重试。入口是「+」宫格，点它唤起 `<input type=file>`；\n * `capture` 透传给 input 以直接唤起相机。选中后立即重置 input.value，\n * 保证同一文件可再次选择。\n *\n * 自定义触发（onPickRequest）：传了它，点「+」不再打开系统弹窗，改为把命令句柄\n * 交给 consumer（对接 App JSBridge），拿到文件后 handle.addFiles 回填；不传则\n * 照旧打开 file input。openPicker 注册进 openPickerRef 供 handle.open() 回退。\n */\nexport function H5Uploader(props: UploaderRenderProps) {\n    const {\n        items,\n        canAdd,\n        addFiles,\n        removeItem,\n        retryItem,\n        accept,\n        multiple,\n        disabled,\n        capture,\n        className,\n        style,\n        id,\n        ariaLabel,\n        handle,\n        onPickRequest,\n        openPickerRef,\n    } = props;\n\n    const inputRef = React.useRef<HTMLInputElement | null>(null);\n\n    const openPicker = React.useCallback(() => {\n        if (!disabled) inputRef.current?.click();\n    }, [disabled]);\n\n    // 把 openPicker 注册给分发层的句柄，供 handle.open() 回退到系统弹窗\n    React.useEffect(() => {\n        openPickerRef.current = openPicker;\n    });\n\n    const handleTrigger = React.useCallback(() => {\n        if (onPickRequest) onPickRequest(handle);\n        else openPicker();\n    }, [onPickRequest, handle, openPicker]);\n\n    const handleChange = React.useCallback(\n        async (event: React.ChangeEvent<HTMLInputElement>) => {\n            const files = Array.from(event.target.files ?? []);\n            // 先清空再 await：同一文件重选仍能触发 change\n            event.target.value = \"\";\n            if (files.length > 0) await addFiles(files);\n        },\n        [addFiles],\n    );\n\n    return (\n        <div\n            id={id}\n            data-mode=\"h5\"\n            data-slot=\"uploader\"\n            role=\"group\"\n            aria-label={ariaLabel ?? \"文件上传\"}\n            aria-disabled={disabled || undefined}\n            className={cn(\n                \"flex flex-wrap items-start gap-[var(--bv-uploader-grid-gap)]\",\n                className,\n            )}\n            style={style}\n        >\n            {items.map((item) => (\n                <UploaderGridItem\n                    key={item.key}\n                    item={item}\n                    onRemove={() => void removeItem(item.key)}\n                    onRetry={() => void retryItem(item.key)}\n                    disabled={disabled}\n                />\n            ))}\n            {canAdd && <UploaderAddTile onClick={handleTrigger} ariaLabel={ariaLabel} />}\n            <input\n                ref={inputRef}\n                type=\"file\"\n                data-slot=\"uploader-input\"\n                className=\"hidden\"\n                accept={accept}\n                multiple={multiple}\n                {...(capture ? { capture } : {})}\n                tabIndex={-1}\n                aria-hidden\n                onChange={handleChange}\n            />\n        </div>\n    );\n}",
+      "type": "registry:component",
+      "target": "components/h5/uploader.tsx"
+    }
+  ]
+}

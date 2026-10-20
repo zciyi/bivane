@@ -15,7 +15,10 @@
                     "target": "lib/utils.ts"
                 }
             ],
-            "dependencies": ["clsx", "tailwind-merge"]
+            "dependencies": [
+                "clsx",
+                "tailwind-merge"
+            ]
         },
         {
             "name": "portal",
@@ -29,7 +32,9 @@
                     "target": "lib/portal.tsx"
                 }
             ],
-            "dependencies": ["react-dom"]
+            "dependencies": [
+                "react-dom"
+            ]
         },
         {
             "name": "imperative-host",
@@ -43,7 +48,9 @@
                     "target": "lib/imperative-host.tsx"
                 }
             ],
-            "dependencies": ["react-dom"]
+            "dependencies": [
+                "react-dom"
+            ]
         },
         {
             "name": "tokens",
@@ -104,7 +111,9 @@
                     "target": "hooks/use-lock-scroll.ts"
                 }
             ],
-            "registryDependencies": ["use-device-mode"]
+            "registryDependencies": [
+                "use-device-mode"
+            ]
         },
         {
             "name": "use-drag-to-dismiss",
@@ -132,7 +141,9 @@
                     "target": "components/providers/responsive-provider.tsx"
                 }
             ],
-            "registryDependencies": ["use-device-mode"]
+            "registryDependencies": [
+                "use-device-mode"
+            ]
         },
         {
             "name": "icon",
@@ -146,7 +157,9 @@
                     "target": "components/ui/icon.tsx"
                 }
             ],
-            "registryDependencies": ["utils"]
+            "registryDependencies": [
+                "utils"
+            ]
         },
         {
             "name": "panel-header",
@@ -179,7 +192,10 @@
                     "target": "components/ui/overlay.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "tokens"
+            ]
         },
         {
             "name": "button",
@@ -193,8 +209,14 @@
                     "target": "components/ui/button.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"],
-            "dependencies": ["class-variance-authority"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ],
+            "dependencies": [
+                "class-variance-authority"
+            ]
         },
         {
             "name": "cell",
@@ -208,7 +230,11 @@
                     "target": "components/ui/cell.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ]
         },
         {
             "name": "use-field-state",
@@ -236,7 +262,11 @@
                     "target": "components/ui/input.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "tokens", "use-field-state"]
+            "registryDependencies": [
+                "utils",
+                "tokens",
+                "use-field-state"
+            ]
         },
         {
             "name": "use-input-number-state",
@@ -305,7 +335,11 @@
                     "target": "components/ui/switch.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ]
         },
         {
             "name": "checkbox",
@@ -319,7 +353,11 @@
                     "target": "components/ui/checkbox.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ]
         },
         {
             "name": "radio",
@@ -333,7 +371,10 @@
                     "target": "components/ui/radio.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "tokens"
+            ]
         },
         {
             "name": "tag",
@@ -347,8 +388,14 @@
                     "target": "components/ui/tag.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"],
-            "dependencies": ["class-variance-authority"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ],
+            "dependencies": [
+                "class-variance-authority"
+            ]
         },
         {
             "name": "badge",
@@ -362,7 +409,10 @@
                     "target": "components/ui/badge.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "tokens"
+            ]
         },
         {
             "name": "popup",
@@ -400,7 +450,9 @@
                     "target": "hooks/use-dialog-store.ts"
                 }
             ],
-            "registryDependencies": ["use-device-mode"]
+            "registryDependencies": [
+                "use-device-mode"
+            ]
         },
         {
             "name": "dialog",
@@ -426,7 +478,9 @@
                 "use-drag-to-dismiss",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-dialog"]
+            "dependencies": [
+                "@radix-ui/react-dialog"
+            ]
         },
         {
             "name": "use-toast-store",
@@ -454,7 +508,10 @@
                     "target": "components/ui/toast-parts.tsx"
                 }
             ],
-            "registryDependencies": ["icon", "use-toast-store"]
+            "registryDependencies": [
+                "icon",
+                "use-toast-store"
+            ]
         },
         {
             "name": "toast-h5",
@@ -603,7 +660,9 @@
                 "use-virtual-window",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "select",
@@ -698,7 +757,9 @@
                 "use-menu-state",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-dropdown-menu"]
+            "dependencies": [
+                "@radix-ui/react-dropdown-menu"
+            ]
         },
         {
             "name": "dropdown-menu",
@@ -809,7 +870,10 @@
                 "use-date-value",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover", "react-day-picker"]
+            "dependencies": [
+                "@radix-ui/react-popover",
+                "react-day-picker"
+            ]
         },
         {
             "name": "date-picker",
@@ -906,7 +970,9 @@
                 "use-time-value",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "time-picker",
@@ -1003,7 +1069,9 @@
                 "use-datetime-value",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "datetime-picker",
@@ -1100,7 +1168,9 @@
                 "use-picker-state",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "picker",
@@ -1196,7 +1266,9 @@
                 "use-cascader-state",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "cascader",
@@ -1232,7 +1304,9 @@
                     "target": "hooks/use-calendar-state.ts"
                 }
             ],
-            "registryDependencies": ["use-date-value"]
+            "registryDependencies": [
+                "use-date-value"
+            ]
         },
         {
             "name": "calendar-parts",
@@ -1295,7 +1369,9 @@
                 "use-calendar-state",
                 "tokens"
             ],
-            "dependencies": ["react-day-picker"]
+            "dependencies": [
+                "react-day-picker"
+            ]
         },
         {
             "name": "calendar",
@@ -1388,7 +1464,11 @@
                     "target": "components/ui/ellipsis.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "icon", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ]
         },
         {
             "name": "tooltip",
@@ -1421,7 +1501,11 @@
                     "target": "components/ui/popover-parts.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "use-device-mode", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "use-device-mode",
+                "tokens"
+            ]
         },
         {
             "name": "popover-h5",
@@ -1442,7 +1526,9 @@
                 "popup",
                 "tokens"
             ],
-            "dependencies": ["@radix-ui/react-popover"]
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "popover-pc",
@@ -1456,8 +1542,14 @@
                     "target": "components/pc/popover.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "popover-parts", "tokens"],
-            "dependencies": ["@radix-ui/react-popover"]
+            "registryDependencies": [
+                "utils",
+                "popover-parts",
+                "tokens"
+            ],
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
         },
         {
             "name": "popover",
@@ -1490,7 +1582,9 @@
                     "target": "hooks/use-action-sheet-store.ts"
                 }
             ],
-            "registryDependencies": ["use-device-mode"]
+            "registryDependencies": [
+                "use-device-mode"
+            ]
         },
         {
             "name": "action-sheet-parts",
@@ -1504,7 +1598,10 @@
                     "target": "components/ui/action-sheet-parts.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "use-action-sheet-store"]
+            "registryDependencies": [
+                "utils",
+                "use-action-sheet-store"
+            ]
         },
         {
             "name": "action-sheet",
@@ -1553,7 +1650,10 @@
                     "target": "components/ui/notify-parts.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "use-notify-store"]
+            "registryDependencies": [
+                "utils",
+                "use-notify-store"
+            ]
         },
         {
             "name": "notify",
@@ -1603,7 +1703,10 @@
                     "target": "components/ui/loading-parts.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "use-loading-store"]
+            "registryDependencies": [
+                "utils",
+                "use-loading-store"
+            ]
         },
         {
             "name": "loading",
@@ -1667,7 +1770,12 @@
                     "target": "components/h5/rate.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "rate-parts", "use-rate-state", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "rate-parts",
+                "use-rate-state",
+                "tokens"
+            ]
         },
         {
             "name": "rate-pc",
@@ -1681,7 +1789,12 @@
                     "target": "components/pc/rate.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "rate-parts", "use-rate-state", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "rate-parts",
+                "use-rate-state",
+                "tokens"
+            ]
         },
         {
             "name": "rate",
@@ -1744,7 +1857,11 @@
                     "target": "components/ui/slider-parts.tsx"
                 }
             ],
-            "registryDependencies": ["utils", "use-slider-state", "tokens"]
+            "registryDependencies": [
+                "utils",
+                "use-slider-state",
+                "tokens"
+            ]
         },
         {
             "name": "slider-h5",
@@ -1806,6 +1923,98 @@
                 "slider-h5",
                 "slider-pc"
             ]
+        },
+        {
+            "name": "uploader",
+            "type": "registry:component",
+            "title": "Uploader 上传",
+            "description": "模式 C 分发层：H5 宫格预览+相机(capture) / PC 拖拽区+列表+粘贴。队列·进度·校验在 use-uploader-state。传输：afterRead 回调优先，其次 action URL 走内置 XHR，都没有则仅本地预览。含可选 canvas 图片压缩。",
+            "files": [
+                {
+                    "path": "components/responsive/uploader.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/uploader.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-uploader-state",
+                "uploader-parts",
+                "uploader-h5",
+                "uploader-pc"
+            ]
+        },
+        {
+            "name": "uploader-parts",
+            "type": "registry:component",
+            "title": "Uploader 共用视觉件",
+            "description": "宫格瓦片/列表行/删除钮/进度/拖拽区等共用视觉件，槽名按模式+角色区分。",
+            "files": [
+                {
+                    "path": "components/ui/uploader-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/uploader-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-uploader-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "uploader-h5",
+            "type": "registry:component",
+            "title": "Uploader（H5 实现）",
+            "description": "H5 宫格预览 + 「+」宫格唤起 input（capture 透传）。",
+            "files": [
+                {
+                    "path": "components/h5/uploader.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/uploader.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "uploader-parts",
+                "use-uploader-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "uploader-pc",
+            "type": "registry:component",
+            "title": "Uploader（PC 实现）",
+            "description": "PC 拖拽区（深度计数防抖）+ 列表视图 + 粘贴上传。",
+            "files": [
+                {
+                    "path": "components/pc/uploader.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/uploader.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "uploader-parts",
+                "use-uploader-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-uploader-state",
+            "type": "registry:hook",
+            "title": "Uploader 上传队列状态机",
+            "description": "纯函数（createFileItem/validateFileSize/matchAccept/compressImage/formatFileSize/transportXHR）+ React 状态机（addFiles/removeItem/retryItem），受控/非受控统一入口。",
+            "files": [
+                {
+                    "path": "hooks/use-uploader-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-uploader-state.ts"
+                }
+            ],
+            "dependencies": []
         }
     ]
 }

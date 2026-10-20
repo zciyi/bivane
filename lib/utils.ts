@@ -27,6 +27,8 @@ const BV_COLORS = [
   'bv-gray-4',
   'bv-gray-6',
   'bv-overlay',
+  'bv-uploader-mask-background',
+  'bv-uploader-delete-background',
 ] as const;
 
 const BV_RADIUS = ['bv-sm', 'bv-md', 'bv-lg', 'bv-max'] as const;
