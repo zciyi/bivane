@@ -1323,6 +1323,88 @@ function probeUploader(label) {
   })()`);
 }
 
+/**
+ * Tabs / NavBar / Tabbar 探针（模式 B / B / C）
+ *
+ * 判据核心：
+ *   - Tabs：标签条高 44px；**H5 overflow-x=auto（可横滑）/ PC hidden（不滑）**；
+ *     下划线指示器高 3px、宽 40px，且水平中心落在激活标题中心（`lineCenterDelta ≈ 0`）；
+ *     未激活面板 aria-hidden（数量 = 面板数 − 1）。
+ *   - NavBar：栏高 46px；**H5 标题 text-align=center / PC left** —— 这是两端唯一的落位差异，
+ *     也是「模式 B 换壳」最容易被做成「两端一模一样」而漏掉的地方。
+ *   - Tabbar：H5 variant=bottom、项高 50px；PC variant=sidebar/top、项高 40px；激活项取主色。
+ */
+function probeNav(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    out.tabs = [...document.querySelectorAll('[data-slot="tabs"]')].map(root => {
+      const nav = root.querySelector('[data-slot="tabs-nav"]');
+      const line = root.querySelector('[data-slot="tabs-line"]');
+      const active = root.querySelector('[data-slot="tabs-tab"][data-active="true"]');
+      const panels = [...root.querySelectorAll('[data-slot="tabs-panel"]')];
+      const navCs = nav ? getComputedStyle(nav) : null;
+      const lineCs = line ? getComputedStyle(line) : null;
+      const lineRect = line ? line.getBoundingClientRect() : null;
+      const activeRect = active ? active.getBoundingClientRect() : null;
+      return {
+        mode: root.dataset.mode,
+        type: root.dataset.type,
+        navH: navCs ? px(navCs.height) : null,
+        overflowX: navCs ? navCs.overflowX : null,
+        tabCount: root.querySelectorAll('[data-slot="tabs-tab"]').length,
+        panelCount: panels.length,
+        activeTabText: active ? (active.textContent || '').trim().slice(0, 8) : null,
+        activeTabColor: active ? getComputedStyle(active).color : null,
+        activeFontSize: active ? getComputedStyle(active).fontSize : null,
+        lineH: lineCs ? px(lineCs.height) : null,
+        lineW: lineRect ? px(lineRect.width) : null,
+        lineColor: lineCs ? lineCs.backgroundColor : null,
+        lineCenterDelta: (lineRect && activeRect)
+          ? px((lineRect.left + lineRect.width / 2) - (activeRect.left + activeRect.width / 2))
+          : null,
+        hiddenPanels: panels.filter(p => p.getAttribute('aria-hidden') === 'true').length,
+      };
+    });
+
+    out.navBars = [...document.querySelectorAll('[data-slot="nav-bar"]')].map(root => {
+      const bar = root.querySelector('[data-slot="nav-bar-bar"]');
+      const center = root.querySelector('[data-slot="nav-bar-center"]');
+      const title = root.querySelector('[data-slot="nav-bar-title"]');
+      return {
+        mode: root.dataset.mode,
+        barH: bar ? px(getComputedStyle(bar).height) : null,
+        titleAlign: center ? getComputedStyle(center).textAlign : null,
+        titleText: title ? (title.textContent || '').trim().slice(0, 10) : null,
+        titleFontSize: title ? getComputedStyle(title).fontSize : null,
+        hasBack: !!root.querySelector('[data-slot="nav-bar-back"]'),
+        position: getComputedStyle(root).position,
+      };
+    });
+    // 占位块是 fixed 条的**兄弟**（不是后代），只能在文档级查
+    out.navBarPlaceholders = document.querySelectorAll('[data-slot="nav-bar-placeholder"]').length;
+
+    out.tabbars = [...document.querySelectorAll('[data-slot="tabbar"]')].map(root => {
+      const items = [...root.querySelectorAll('[data-slot="tabbar-item"], [data-slot="tabbar-pc-item"]')];
+      const active = items.find(i => i.getAttribute('data-active') === 'true');
+      return {
+        mode: root.dataset.mode,
+        variant: root.dataset.variant,
+        itemCount: items.length,
+        itemH: items[0] ? px(getComputedStyle(items[0]).height) : null,
+        itemFontSize: items[0] ? getComputedStyle(items[0]).fontSize : null,
+        activeText: active ? (active.textContent || '').trim().slice(0, 8) : null,
+        activeColor: active ? getComputedStyle(active).color : null,
+        position: getComputedStyle(root).position,
+        width: px(getComputedStyle(root).width),
+      };
+    });
+
+    return JSON.stringify(out);
+  })()`);
+}
+
 async function hoverSelector(selector, dxRatio = 0.5) {
   const raw = await evaluate(`(() => {
     const el = document.querySelector(${JSON.stringify(selector)});
@@ -1843,6 +1925,50 @@ async function run() {
     console.log('  scroll:', await scrollToSection('P3 · Uploader'));
     await shot(`${cfg.name}-12-uploader`);
     reports.push(await probeUploader(`${cfg.name} / uploader 初始`));
+
+    // --- 13. Tabs / NavBar / Tabbar（模式 B / B / C） ---
+    // 三件套都是「两端形态差很大、但只有一份实现」的典型：
+    //   Tabs  → H5 标签条可横滑 / PC 不滑 + 下划线；PC 键盘 ←/→ 切页
+    //   NavBar→ H5 标题居中 / PC 标题左对齐（两端唯一的落位差异）
+    //   Tabbar→ H5 底部条 50px / PC 侧边或顶部 40px
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · Tabs'));
+    await shot(`${cfg.name}-13-tabs`);
+    reports.push(await probeNav(`${cfg.name} / nav 三件套 初始`));
+
+    // 点第二个标签（H5 与 PC 各一个实例）：两端应同时切到第二项
+    // （demo 里两个实例共用同一个 value，这正是模式 B「值语义一致」的现场证明）
+    await evaluate(`(() => {
+      const root = document.querySelector('[data-slot="tabs"]');
+      const target = root.querySelectorAll('[data-slot="tabs-tab"]')[1];
+      target.click();
+      return (target.textContent || '').trim();
+    })()`);
+    await sleep(300);
+    await shot(`${cfg.name}-13b-tabs-switched`);
+    reports.push(await probeNav(`${cfg.name} / nav 三件套 切页后`));
+
+    // PC 键盘：←/→ 切页（PC 实例才吃键盘）
+    if (!cfg.mobile) {
+      await evaluate(`(() => {
+        const roots = [...document.querySelectorAll('[data-slot="tabs"]')];
+        const pc = roots.find(r => r.dataset.mode === 'pc');
+        if (!pc) return 'NOT_FOUND';
+        const tab = pc.querySelector('[data-slot="tabs-tab"][data-active="true"]');
+        tab.focus();
+        return (tab.textContent || '').trim();
+      })()`);
+      await pressKey(KEYS.ArrowRight);
+      await sleep(250);
+      await shot(`${cfg.name}-13c-tabs-keyboard`);
+      reports.push(await probeNav(`${cfg.name} / nav 三件套 → 键切页后`));
+    }
+
+    await evaluate(`window.scrollTo(0, 0)`);
+    console.log('  scroll:', await scrollToSection('P3 · NavBar'));
+    await shot(`${cfg.name}-13d-navbar`);
+    console.log('  scroll:', await scrollToSection('P3 · Tabbar'));
+    await shot(`${cfg.name}-13e-tabbar`);
   }
 
   fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(reports, null, 2), 'utf8');

@@ -80,6 +80,15 @@ const EXPECTED = [
   'src/components/h5/uploader.tsx',
   'src/components/pc/uploader.tsx',
   'src/components/responsive/uploader.tsx',
+  'src/hooks/use-tabs-state.ts',
+  'src/components/ui/tabs-parts.tsx',
+  'src/components/responsive/tabs.tsx',
+  'src/components/responsive/nav-bar.tsx',
+  'src/hooks/use-tabbar-state.ts',
+  'src/components/ui/tabbar-parts.tsx',
+  'src/components/h5/tabbar.tsx',
+  'src/components/pc/tabbar.tsx',
+  'src/components/responsive/tabbar.tsx',
 ];
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
@@ -232,6 +241,9 @@ import { DropdownMenu } from '@/components/responsive/dropdown-menu';
 import { Popup } from '@/components/responsive/popup';
 import { Select } from '@/components/responsive/select';
 import { Search } from '@/components/responsive/search';
+import { Tab, Tabs } from '@/components/responsive/tabs';
+import { NavBar } from '@/components/responsive/nav-bar';
+import { Tabbar, type TabbarItem } from '@/components/responsive/tabbar';
 import { showSuccessToast, showToast } from '@/components/responsive/toast';
 import type { MenuItem } from '@/hooks/use-menu-state';
 
@@ -245,6 +257,12 @@ const MENU_ITEMS: MenuItem[] = [
   },
   { value: 'delete', label: '删除', danger: true },
   { value: 'locked', label: '锁定项', disabled: true },
+];
+
+const TABBAR_ITEMS: TabbarItem[] = [
+  { value: 'home', label: '首页', icon: <Icon name="home" /> },
+  { value: 'order', label: '订单', icon: <Icon name="order" />, badge: 2 },
+  { value: 'me', label: '我的', icon: <Icon name="user" /> },
 ];
 
 const CITY_OPTIONS = [
@@ -435,6 +453,48 @@ export default function App() {
         <Cell title="App 桥回填" value={<Uploader ariaLabel="桥接" onPickRequest={(h) => { void h.addFiles(new File([], "bridge.txt")); }} />} />
         <Cell title="禁用" value={<Uploader ariaLabel="禁用上传" disabled />} />
       </CellGroup>
+
+      <CellGroup title="Tabs">
+        <Cell
+          title="标签页"
+          value={
+            <Tabs defaultValue={0} onChange={(index) => showToast('标签：' + index)}>
+              <Tab title="标签一">内容一</Tab>
+              <Tab title="标签二">内容二</Tab>
+            </Tabs>
+          }
+        />
+      </CellGroup>
+
+      <CellGroup title="NavBar">
+        <Cell
+          title="导航栏"
+          value={
+            <NavBar
+              title="订单详情"
+              leftArrow
+              fixed={false}
+              onClickLeft={() => showToast('返回')}
+              rightText="帮助"
+              onClickRight={() => showToast('帮助')}
+            />
+          }
+        />
+      </CellGroup>
+
+      <CellGroup title="Tabbar">
+        <Cell
+          title="标签栏"
+          value={
+            <Tabbar
+              items={TABBAR_ITEMS}
+              defaultValue="home"
+              fixed={false}
+              onChange={(value) => showToast('选中：' + value)}
+            />
+          }
+        />
+      </CellGroup>
       </CellGroup>
 
       <Popup open={popupOpen} position="bottom" onOpenChange={setPopupOpen} closeable aria-label="示例弹层">
@@ -570,6 +630,9 @@ async function main() {
       '@bivane/slider',
       '@bivane/uploader',
       '@bivane/search',
+      '@bivane/tabs',
+      '@bivane/nav-bar',
+      '@bivane/tabbar',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -639,6 +702,14 @@ async function main() {
           // utilities.css 里没有 [data-slot=…] 规则引用它们，故不进探针（否则造假 MISS）。
           '--bv-uploader-grid-size',
           '--bv-uploader-mask-background',
+          // Tabs / NavBar / Tabbar：三个组件的槽名都是 Tailwind 工具类拼的，
+          // utilities.css 里没有 [data-slot=…] 规则引用它们，故只探 token 变量
+          // （token 在 vant.css 的 :root 里，一定进消费者 CSS 产物）。
+          '--bv-tabs-height',
+          '--bv-tabs-bottom-bar-height',
+          '--bv-nav-bar-height',
+          '--bv-tabbar-height',
+          '--bv-tabbar-pc-sidebar-width',
           'bv-fade-in',
         ];
         for (const probe of probes) {

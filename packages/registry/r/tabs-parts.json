@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabs-parts",
+  "type": "registry:component",
+  "title": "Tabs 组合式子件",
+  "description": "Tab 标记组件与子件元信息收集（纯函数摊平 children，不做渲染期登记，避免 StrictMode 重复注册与顺序漂移）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tabs-parts.tsx",
+      "content": "import * as React from 'react';\n\n/**\n * Bivane Tabs · 组合式子件与子件元信息收集\n *\n * Tabs 是**组合式** API（对齐 Vant）：\n *\n *   <Tabs value={active} onChange={setActive}>\n *     <Tab title=\"标签一\">内容一</Tab>\n *     <Tab title=\"标签二\">内容二</Tab>\n *   </Tabs>\n *\n * 「标签条」与「内容区」是两块互不相邻的 DOM，但用户只写了一份 children。\n * 收口办法是让 Tab 成为一个**声明式标记**：它自己不渲染任何东西，\n * Tabs 在渲染前把 children 摊平、读出每个 Tab 的 title / disabled / children，\n * 自己拼出标签条与内容区。\n *\n * 为什么不用「注册式」（Tab 渲染时把自己登记进 Tabs）：\n * 登记是渲染期副作用，在 StrictMode 双渲染与并发渲染下会重复登记、\n * 顺序还可能倒过来（用户看到的标签顺序与 children 顺序不一致）。\n * 读 children 是纯函数，没有这些问题。\n *\n * Tab 用**类型身份**识别（Set 里比对函数引用），不是靠 props 形状猜：\n * 猜形状会把「恰好有 title 属性的自定义组件」也当成标签吞掉。\n */\n\nexport interface TabProps {\n  /** 标签文案 */\n  title: React.ReactNode;\n  /** 禁用该标签：不可点，键盘切换时跳过 */\n  disabled?: boolean;\n  /** 标签内容（渲染在内容区） */\n  children?: React.ReactNode;\n}\n\n/** 已登记的 Tab 组件类型（用于识别 children 里的 Tab 元素） */\nconst TAB_TYPES = new Set<React.ElementType>();\n\n/**\n * Tab 标记组件：本身不渲染任何 DOM。\n *\n * 参数带下划线前缀是因为它确实用不到 props（props 是给 Tabs 读的）。\n */\nexport function Tab(_props: TabProps): null {\n  return null;\n}\nTAB_TYPES.add(Tab);\n\nexport interface TabMeta {\n  /** 稳定 key（React key 与测量索引都用它） */\n  key: string;\n  /** 标签文案 */\n  title: React.ReactNode;\n  /** 是否禁用 */\n  disabled: boolean;\n  /** 标签内容 */\n  content: React.ReactNode;\n}\n\nexport interface CollectedTabs {\n  /** 摊平后的 Tab 列表（顺序 = children 顺序） */\n  tabs: TabMeta[];\n  /** 非 Tab 的 children（原样保留到内容区末尾，不吞掉用户内容） */\n  others: React.ReactNode[];\n}\n\n/** 摊平 children：数组与 Fragment 都展开成一层 */\nfunction flattenChildren(children: React.ReactNode): React.ReactNode[] {\n  const out: React.ReactNode[] = [];\n  React.Children.forEach(children, (child) => {\n    if (child === null || child === undefined || typeof child === 'boolean') return;\n    if (React.isValidElement(child) && child.type === React.Fragment) {\n      const fragmentProps = child.props as { children?: React.ReactNode };\n      out.push(...flattenChildren(fragmentProps.children));\n      return;\n    }\n    out.push(child);\n  });\n  return out;\n}\n\nfunction isTabElement(node: React.ReactElement): boolean {\n  return typeof node.type !== 'string' && TAB_TYPES.has(node.type as React.ElementType);\n}\n\n/**\n * 从 children 里收集 Tab 元信息。\n *\n * 纯函数：同样的 children 永远得到同样的结果（key 用下标派生，稳定）。\n */\nexport function collectTabs(children: React.ReactNode): CollectedTabs {\n  const tabs: TabMeta[] = [];\n  const others: React.ReactNode[] = [];\n\n  flattenChildren(children).forEach((child, index) => {\n    if (React.isValidElement(child) && isTabElement(child)) {\n      const props = child.props as TabProps;\n      tabs.push({\n        key: `tab-${index}`,\n        title: props.title,\n        disabled: props.disabled ?? false,\n        content: props.children ?? null,\n      });\n      return;\n    }\n    others.push(child);\n  });\n\n  return { tabs, others };\n}\n",
+      "type": "registry:component",
+      "target": "components/ui/tabs-parts.tsx"
+    }
+  ]
+}

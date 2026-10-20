@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabbar-pc",
+  "type": "registry:component",
+  "title": "Tabbar（PC 实现）",
+  "description": "侧边导航（默认）或顶部导航（variant=top），图标在左文字在右。侧边形态不渲染占位块（它占横向位置，业务侧自行留边距）。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/tabbar-parts",
+    "@bivane/use-tabbar-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/pc/tabbar.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { TabbarItemView } from '@/components/ui/tabbar-parts';\nimport type { TabbarItem } from '@/hooks/use-tabbar-state';\n\n/**\n * Bivane Tabbar · PC 导航（模式 C 的大屏实现）\n * 交互定义见 bivane-responsive-matrix.md §2.3\n *\n * PC 端没有「底栏」这个形态：宽屏上把导航压在屏幕最下面既远又占横屏空间，\n * 桌面端惯用的是**侧边导航**（Ant Design Pro / VS Code 那一类）或**顶部导航**。\n * 两种形态由 `variant` 决定，默认侧边。\n *\n *   ├ sidebar ── 左侧竖排，图标在左文字在右，激活项铺底色\n *   └ top ───── 横排顶部，图标在左文字在右，激活项带下划线\n *\n * 侧边形态不渲染占位块：它占的是**横向**位置，一个流内占位块推不动内容，\n * 业务侧需要自己给内容区留出 `--bv-tabbar-pc-sidebar-width` 的边距\n * （或把导航放进 flex 布局的第一列）。\n */\n\nexport type PcTabbarVariant = 'sidebar' | 'top';\n\nexport interface PcTabbarProps\n  extends Omit<\n    React.HTMLAttributes<HTMLDivElement>,\n    'onChange' | 'onSelect'\n  > {\n  /** 标签项 */\n  items: TabbarItem[];\n  /** 当前激活项的 value */\n  active?: string;\n  /** 点击某一项 */\n  onSelect: (value: string) => void;\n  /** 导航形态：侧边（默认）/ 顶部 */\n  variant: PcTabbarVariant;\n  /** 固定 */\n  fixed: boolean;\n  /** 固定时留等高占位块（仅顶部形态有效） */\n  placeholder: boolean;\n  /** 分隔线 */\n  border: boolean;\n}\n\nexport const PcTabbar = React.forwardRef<HTMLDivElement, PcTabbarProps>(\n  function PcTabbar(\n    {\n      items,\n      active,\n      onSelect,\n      variant,\n      fixed,\n      placeholder,\n      border,\n      className,\n      style,\n      ...rest\n    },\n    ref,\n  ) {\n    const isSidebar = variant === 'sidebar';\n\n    const bar = (\n      <div\n        ref={ref}\n        {...rest}\n        data-slot=\"tabbar\"\n        data-mode=\"pc\"\n        data-variant={variant}\n        className={cn(\n          isSidebar\n            ? 'flex w-[var(--bv-tabbar-pc-sidebar-width)] flex-col bg-bv-surface'\n            : 'flex w-full items-stretch bg-bv-surface',\n          fixed &&\n            (isSidebar\n              ? 'fixed bottom-0 left-0 top-0 z-[var(--bv-tabbar-z-index)]'\n              : 'fixed left-0 right-0 top-0 z-[var(--bv-tabbar-z-index)]'),\n          border &&\n            (isSidebar\n              ? 'border-r border-bv-border'\n              : 'bv-hairline bv-hairline--bottom'),\n          className,\n        )}\n        style={style}\n      >\n        {items.map((item) => (\n          <TabbarItemView\n            key={item.value}\n            item={item}\n            active={item.value === active}\n            mode=\"desktop\"\n            variant={variant}\n            onSelect={onSelect}\n          />\n        ))}\n      </div>\n    );\n\n    if (isSidebar) return bar;\n\n    return (\n      <>\n        {fixed && placeholder ? (\n          <div\n            aria-hidden=\"true\"\n            data-slot=\"tabbar-placeholder\"\n            className=\"h-[var(--bv-tabbar-pc-item-height)]\"\n          />\n        ) : null}\n        {bar}\n      </>\n    );\n  },\n);\n",
+      "type": "registry:component",
+      "target": "components/pc/tabbar.tsx"
+    }
+  ]
+}

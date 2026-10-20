@@ -177,6 +177,73 @@ const PROBE = `(() => {
     };
   });
 
+  // Tabs / NavBar / Tabbar：模式 B / B / C。
+  // 判据是「token 真的落到盒子上」：标签条 44px、栏高 46px、
+  // H5 底栏项高 50px / PC 40px；NavBar 标题落位 H5 居中 / PC 左对齐。
+  out.tabs = [...document.querySelectorAll('[data-slot="tabs-nav"]')].map((nav) => {
+    const cs = getComputedStyle(nav);
+    const active = nav.querySelector('[data-slot="tabs-tab"][data-active="true"]');
+    const line = nav.querySelector('[data-slot="tabs-line"]');
+    return {
+      mode: nav.closest('[data-slot="tabs"]')?.getAttribute('data-mode') ?? null,
+      h: px(cs.height),
+      overflowX: cs.overflowX,
+      activeFontSize: active ? getComputedStyle(active).fontSize : null,
+      lineHeight: line ? px(getComputedStyle(line).height) : null,
+    };
+  });
+
+  out.navBar = [...document.querySelectorAll('[data-slot="nav-bar-bar"]')].map((bar) => {
+    const center = bar.querySelector('[data-slot="nav-bar-center"]');
+    const title = bar.querySelector('[data-slot="nav-bar-title"]');
+    return {
+      mode: bar.closest('[data-slot="nav-bar"]')?.getAttribute('data-mode') ?? null,
+      h: px(getComputedStyle(bar).height),
+      titleAlign: center ? getComputedStyle(center).textAlign : null,
+      titleFontSize: title ? getComputedStyle(title).fontSize : null,
+    };
+  });
+
+  out.tabbar = [...document.querySelectorAll('[data-slot="tabbar"]')].map((bar) => {
+    const item = bar.querySelector('[data-slot="tabbar-item"], [data-slot="tabbar-pc-item"]');
+    return {
+      mode: bar.getAttribute('data-mode'),
+      variant: bar.getAttribute('data-variant'),
+      itemH: item ? px(getComputedStyle(item).height) : null,
+      itemFontSize: item ? getComputedStyle(item).fontSize : null,
+    };
+  });
+
+  // Tabbar 角标几何：角标应「挂在图标右上角、大半露在图标外」。
+  // dx/dy = 角标中心相对图标右上角的偏移（外探为正），
+  // overlap*Ratio = 角标盖住图标的面积比例（太大 = 图标被糊掉）。
+  out.tabbarBadges = [...document.querySelectorAll('[data-slot="tabbar"]')].map((bar) =>
+    [...bar.querySelectorAll('[data-slot="tabbar-item"], [data-slot="tabbar-pc-item"]')]
+      .map((item) => {
+        const icon = item.querySelector(
+          '[data-slot="tabbar-item-icon"], [data-slot="tabbar-pc-item-icon"]',
+        );
+        const badge = icon ? icon.querySelector('[data-slot="badge"]') : null;
+        if (!icon || !badge) return null;
+        const ir = icon.getBoundingClientRect();
+        const br = badge.getBoundingClientRect();
+        const overlapX = Math.max(0, Math.min(br.right, ir.right) - Math.max(br.left, ir.left));
+        const overlapY = Math.max(0, Math.min(br.bottom, ir.bottom) - Math.max(br.top, ir.top));
+        return {
+          variant: bar.getAttribute('data-variant'),
+          dot: badge.getAttribute('data-dot') === 'true',
+          iconW: px(ir.width),
+          badgeW: px(br.width),
+          badgeH: px(br.height),
+          dx: px(br.left + br.width / 2 - ir.right),
+          dy: px(br.top + br.height / 2 - ir.top),
+          overlapXRatio: px(overlapX / Math.max(1, ir.width)),
+          overlapYRatio: px(overlapY / Math.max(1, ir.height)),
+        };
+      })
+      .filter(Boolean),
+  );
+
   const root = getComputedStyle(document.documentElement);
   out.tokens = {
     'padding-md': root.getPropertyValue('--bv-padding-md').trim(),
@@ -189,6 +256,11 @@ const PROBE = `(() => {
     'time-picker-wheel-item-height': root.getPropertyValue('--bv-time-picker-wheel-item-height').trim(),
     'time-picker-pc-panel-width': root.getPropertyValue('--bv-time-picker-pc-panel-width').trim(),
     'time-picker-pc-trigger-height': root.getPropertyValue('--bv-time-picker-pc-trigger-height').trim(),
+    'tabs-height': root.getPropertyValue('--bv-tabs-height').trim(),
+    'tabs-bottom-bar-height': root.getPropertyValue('--bv-tabs-bottom-bar-height').trim(),
+    'nav-bar-height': root.getPropertyValue('--bv-nav-bar-height').trim(),
+    'tabbar-height': root.getPropertyValue('--bv-tabbar-height').trim(),
+    'tabbar-pc-item-height': root.getPropertyValue('--bv-tabbar-pc-item-height').trim(),
   };
   return JSON.stringify(out);
 })()`;

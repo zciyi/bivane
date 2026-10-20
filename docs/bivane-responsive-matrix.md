@@ -90,6 +90,9 @@
 | Cascader       | C    | 树的走法不同：H5 联动滚轮（省市区三列，换父列子列重算）vs PC 面包屑 + 逐级右展多列面板（点叶子即生效）+ 路径全文搜索；值恒为根→叶子完整路径                                                                                          |
 | Calendar       | C    | 日历范式不同：H5 全屏弹层 + 月份纵向滚动懒挂载 + 触摸拖选（range/multiple 确定条暂存）vs PC 内嵌常驻月历（range 双月）+ 鼠标拖选 + 键盘巡航（点选即生效）；single/range/multiple，值恒为 'YYYY-MM-DD'                                |
 | InputNumber   | B    | 离散数量录入（− 输入框 ＋）：H5 横排 ±（数字键盘、44px 热区、长按连发）/ PC 输入框 + 竖排 ▲▼（↑↓/Home/End 键盘），同一份值模型换壳（§6.5-2 模式 B），值语义逐字对齐 Vant van-stepper |
+| Tabs          | B    | 同一激活值模型（**下标**，0 起）两端换壳：H5 标签条可横滑 + 激活项滚入视野 + 内容区手势横滑 / PC 标签条不滑动 + ←/→ 键盘切换 + 下划线指示器（组合式 API，`<Tabs><Tab title>`） |
+| NavBar        | B    | 同一条「左·中·右」标题栏换壳：H5 返回箭头 + 标题**居中**（三等分，中间格居中）/ PC 标题**左对齐** + 操作区右对齐；层级回调两端同一份 |
+| Tabbar        | C    | 位置与信息模型都不同：H5 底部固定条（图标在上文字在下 + 安全区）/ PC 侧边导航（默认）或顶部导航（`pcVariant`），图标在左文字在右 |
 
 ### 3.2 P1：Popup / Overlay / Dialog / Toast
 
@@ -526,6 +529,71 @@ Vant `van-slider` 支持单值/区间、reverse 反向、vertical 竖直，H5 �
 - **状态归属**：`value`/`open`/历史/建议源/防抖全在分发层 `responsive/search.tsx`（跨模式同义）。
 - a11y：建议列表 `role="listbox"` + 行 `role="option"` `aria-selected`；无障碍标签用 `ariaLabel`。
 - 全为**结构 token**（`--bv-search-*` 尺寸/间距/圆角），**不新增颜色 token**，颜色复用 `--bv-muted`/`--bv-text*`/`--bv-border`。
+
+### 3.17 Tabs / NavBar / Tabbar（模式 B / B / C，2026-10-20）
+
+**定死取值**
+
+| 项                | Tabs                                          | NavBar                                | Tabbar                                            |
+| ----------------- | --------------------------------------------- | ------------------------------------- | ------------------------------------------------- |
+| 标签条/栏高       | `--bv-tabs-height` 44px（对齐 Vant）         | `--bv-nav-bar-height` 46px            | H5 `--bv-tabbar-height` 50px / PC item 40px      |
+| 标题字号          | `--bv-tabs-font` 14px                         | 16px 加粗（`--bv-nav-bar-title-*`）  | H5 12px / PC 14px                                 |
+| 图标尺寸          | —                                             | 返回箭头 16px                         | H5 20px / PC 16px                                 |
+| 指示器            | 下划线高 3px、宽 40px（`lineWidth` 可改）      | —                                     | PC 顶部导航激活项 2px 下边框                       |
+| 激活色            | `--bv-tabs-active-color` = primary            | 左右文字/图标 = primary               | `--bv-tabbar-item-active-color` = primary         |
+
+**关键规则**
+
+- **Tabs 组合式 API**：`<Tabs value><Tab title="…">内容</Tab></Tabs>`。
+  `<Tab>` 是**声明式标记**（自己不渲染 DOM），`Tabs` 渲染前把 children **摊平**
+  （数组与 Fragment 都展开）读出 `title/disabled/children`。
+  **不用「渲染期登记」**：登记是渲染副作用，StrictMode 双渲染会重复登记、
+  并发渲染下顺序还可能倒过来（用户看到的标签顺序与 children 顺序不一致）。
+  识别靠**函数身份**（`TAB_TYPES` Set 比对引用），不靠 props 形状猜 ——
+  猜形状会把「恰好有 title 属性的自定义组件」也吞成标签。
+  非 Tab 的 children 原样保留到内容区末尾，不吞用户内容。
+- **Tabs 值语义 = 下标**（0 起，对齐 Vant `v-model:active`），不是自定义 key。
+  受控展示态**直接派生自 prop**（`useTabsState`），不做「内部 state + effect 同步」。
+- **Tabs 键盘（仅 PC）**：`←/→` 切页、`Home/End` 跳首尾，**跳过禁用项**、
+  撞到头尾**回绕**（停在边界会让「再按一次右键」像失灵）。焦点用 roving tabindex 跟随。
+  H5 不接管键盘（触屏没有键盘）。
+- **Tabs H5 滚入视野**：激活项**居中**而不是「刚好露出」——滑到一半时用户仍看不清当前项。
+  用 `nav.scrollLeft = 目标` 而不是 `scrollIntoView`（后者在 jsdom 不存在，
+  且会连带滚动祖先）。CSS `scroll-smooth` 提供平滑。
+- **Tabs 手势（H5，`swipeable`）**：位移 > 6px 才判定方向（横向 vs 纵向交给页面滚动）；
+  横向时 `setPointerCapture` 接管，位移超过「容器宽 20% 与 80px 中较小者」才切页。
+  容器 `touch-action: pan-y` 保证纵向滚动照常。
+- **Tabs 下划线指示器**：`getBoundingClientRect` 量激活项相对标签条左沿的偏移与宽度，
+  居中放在标题下；`lineWidth="auto"` 时宽度取标题实测宽（默认固定 40px，对齐 Vant）。
+  标签条宽度变化（窗口缩放）用 `ResizeObserver` 重算。
+- **Tabs 内容区**：全部面板常驻一条 flex 轨道，`transform: translateX(-active*100%)` 横向滑动；
+  非激活面板 `aria-hidden` + `inert` + `pointer-events-none`。
+- **NavBar 标题落位**：H5 是「左/中/右**三等分**、中间格居中」——
+  两侧等宽，标题才真的是「居中」而不是「在剩余空间里居中」。
+  PC 是「左侧 + 标题(flex-1，左对齐) + 右侧操作区(shrink-0，右对齐)」。
+- **NavBar 不接收 children**：内容由页面自己排；固定态下把内容塞进 fixed 容器会钉在屏幕上。
+  右侧要放搜索框用 `right` prop。根元素是 `<nav>`（导航地标），`ariaLabel` 给它命名。
+- **NavBar 占位块**：根与占位块是**两个根**（fixed 的条与流内占位不能同容器）。
+  占位块 = 安全区 padding + `--bv-nav-bar-height` 内层，两块总高必须相等。
+- **Tabbar 值语义 = 字符串**（`value`），不是下标：一项对应一条路由，标识天然是字符串。
+  受控值**对不上任何项时就是「谁都不选中」**，不替业务方兜一个第一项
+  （那会让受控方以为自己选中了它）。非受控才落到第一个未禁用项。
+- **Tabbar 路由映射**：组件库**不绑任何路由框架** —— 受控 `value` + `onChange` 就是全部契约，
+  `item.href` 只是可选的链接透传（渲染成 `<a>`）。
+- **Tabbar 角标不用 `Badge` 的 `position="top-right"`**：那一档的语义是
+  「角标中心压在图标角点上」（`top-0 right-0 translate(50%,-50%)`），实测盖住图标
+  **40%（H5，20px 图标）/ 50%（PC，16px 图标，角标 16.39px 比图标还宽）** → 图标被糊掉。
+  Tabbar 改成「图标盒 `relative` + 角标绝对定位 + 外探量」
+  （`--bv-tabbar-badge-right/top: -4px` + `translate 50%`）：角标挂在角上、大半露在图标外，
+  压住比例降到 **20% / 25%**，红点完全在图标外（overlap 0）。
+  几何由 measure 的 `tabbarBadges` 探针钉住（`dx/dy` 外探量 + `overlap*Ratio`）。
+- **Tabbar 槽名按模式区分**：H5 `tabbar-item` / PC `tabbar-pc-item`，
+  不复用同名，免得两套实现的样式互相串。共用零件的外壳差异走
+  `tabbarItemClass(mode, variant, …)` **纯函数**（JS 分支），不用 `bv-h5:`/`bv-pc:` 变体。
+- **Tabbar PC 侧边不渲染占位块**：它占的是**横向**位置，流内占位块推不动内容，
+  业务侧要自己留 `--bv-tabbar-pc-sidebar-width` 的边距。
+- 三者均为**结构 token**（`--bv-tabs-*` / `--bv-nav-bar-*` / `--bv-tabbar-*`），
+  **不新增颜色 token**，颜色一律复用 `--bv-text`/`--bv-primary`/`--bv-border`/`--bv-gray-6`。
 
 ## 4. 测试要求
 

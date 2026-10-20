@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-tabbar-state",
+  "type": "registry:hook",
+  "title": "Tabbar 激活项状态机",
+  "description": "纯函数（findTabIndex/resolveInitialValue）+ React 绑定。值语义用字符串标识（非下标），组件库不绑定路由框架，路由映射由业务用受控 value + onChange 承担。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-tabbar-state.ts",
+      "content": "import * as React from 'react';\n\n/**\n * Bivane Tabbar · 激活项状态机\n *\n * 交互定义见 bivane-responsive-matrix.md §2.3（Tabbar：模式 C）。\n *\n * 值语义用**字符串标识**（`value`）而不是下标：Tabbar 的一项通常对应一条\n * 路由，路由标识天然是字符串；下标会随「多一个角标项 / 少一项」而漂移。\n * 组件库不绑定任何路由框架，路由映射交给业务：\n * 受控 `value` + `onChange` 就是全部契约，item 上的 `href` 只是可选的透传。\n */\n\nexport interface TabbarItem {\n  /** 项标识（受控值） */\n  value: string;\n  /** 文案 */\n  label: React.ReactNode;\n  /** 图标（通常是一个 <Icon /> 节点） */\n  icon?: React.ReactNode;\n  /** 角标：true = 小圆点；数字/字符串 = 文字角标 */\n  badge?: string | number | boolean;\n  /** 禁用该项（不可点） */\n  disabled?: boolean;\n  /** 传了就渲染成链接（<a href>），不传渲染成按钮 */\n  href?: string;\n}\n\n/** 找出 value 对应的下标；找不到返回 -1 */\nexport function findTabIndex(items: TabbarItem[], value: string | undefined): number {\n  if (value === undefined) return -1;\n  return items.findIndex((item) => item.value === value);\n}\n\n/**\n * 非受控时的初始激活项。\n *\n * 优先用 defaultValue（能对上就用），对不上就落到第一个未禁用项 ——\n * 「一个都没选」的底栏会让用户不知道自己在哪，默认落在第一项更合理。\n */\nexport function resolveInitialValue(\n  items: TabbarItem[],\n  defaultValue: string | undefined,\n): string | undefined {\n  if (defaultValue !== undefined && findTabIndex(items, defaultValue) >= 0) {\n    return defaultValue;\n  }\n  const firstEnabled = items.find((item) => !item.disabled);\n  if (firstEnabled) return firstEnabled.value;\n  return items[0]?.value;\n}\n\nexport interface UseTabbarStateOptions {\n  /** 标签项 */\n  items: TabbarItem[];\n  /** 受控激活项 */\n  value?: string;\n  /** 非受控初始激活项 */\n  defaultValue?: string;\n  /** 激活项变化 */\n  onChange?: (value: string) => void;\n}\n\nexport interface TabbarState {\n  /** 当前激活项的 value（对不上任何 item 时为 undefined，即「谁都不选中」） */\n  active?: string;\n  /** 切换激活项 */\n  setActive: (value: string) => void;\n  /** 是否受控 */\n  isControlled: boolean;\n}\n\n/**\n * Tabbar 的值状态。\n *\n * 受控展示态**直接派生自 prop**：受控值对不上任何一项时就是「谁都不选中」，\n * 不替业务方兜一个第一项（那会让受控方以为自己选中了它）。\n */\nexport function useTabbarState({\n  items,\n  value,\n  defaultValue,\n  onChange,\n}: UseTabbarStateOptions): TabbarState {\n  const isControlled = value !== undefined;\n  const [internal, setInternal] = React.useState<string | undefined>(() =>\n    resolveInitialValue(items, defaultValue),\n  );\n\n  const active = isControlled ? value : internal;\n\n  const setActive = React.useCallback(\n    (next: string) => {\n      if (!isControlled) setInternal(next);\n      onChange?.(next);\n    },\n    [isControlled, onChange],\n  );\n\n  return { active, setActive, isControlled };\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-tabbar-state.ts"
+    }
+  ]
+}

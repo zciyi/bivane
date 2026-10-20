@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-tabs-state",
+  "type": "registry:hook",
+  "title": "Tabs 激活态状态机",
+  "description": "纯函数（clampIndex/nextEnabledIndex/firstEnabledIndex/lastEnabledIndex）+ React 绑定。受控展示态直接派生自 prop，不做内部 state + effect 同步。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-tabs-state.ts",
+      "content": "import * as React from 'react';\n\n/**\n * Bivane Tabs · 激活态状态机\n *\n * 交互定义见 bivane-responsive-matrix.md §2.3（Tabs：模式 B）。\n *\n * 纯函数与 React 绑定分离（架构 §6.5 ③）：边界判定（夹紧、回绕、跳过禁用项）\n * 全部落在纯函数里，可以直接单测；hook 只做「受控 / 非受控」这一层绑定。\n *\n * 值语义：激活项用**下标**（0 起）表达，逐字对齐 Vant 的 `v-model:active`\n * （Vant 的 Tabs 管的也是序号，不是自定义 key）。\n */\n\n/** 把下标夹到合法区间；count <= 0 时归零（一个标签都没有时无可选项） */\nexport function clampIndex(index: number, count: number): number {\n  if (!Number.isFinite(index)) return 0;\n  const truncated = Math.trunc(index);\n  if (count <= 0) return 0;\n  if (truncated < 0) return 0;\n  if (truncated > count - 1) return count - 1;\n  return truncated;\n}\n\n/**\n * 找下一个可用的标签下标：跳过 disabled 项，撞到头尾回绕。\n *\n * 回绕而不是停在边界：标签条是一个环（最后一项后面是第一项），\n * 停在边界会让「再按一次右键」变成无响应，误以为键盘失灵。\n * 全部禁用时退回当前下标（无处可去，保持原状）。\n */\nexport function nextEnabledIndex(\n  current: number,\n  count: number,\n  step: 1 | -1,\n  isDisabled: boolean[],\n): number {\n  if (count <= 0) return 0;\n  const from = clampIndex(current, count);\n  for (let i = 1; i <= count; i += 1) {\n    const candidate = (((from + step * i) % count) + count) % count;\n    if (!isDisabled[candidate]) return candidate;\n  }\n  return from;\n}\n\n/** 第一个未禁用的下标；全禁用时返回 -1 */\nexport function firstEnabledIndex(isDisabled: boolean[]): number {\n  return isDisabled.findIndex((disabled) => !disabled);\n}\n\n/** 最后一个未禁用的下标；全禁用时返回 -1 */\nexport function lastEnabledIndex(isDisabled: boolean[]): number {\n  for (let i = isDisabled.length - 1; i >= 0; i -= 1) {\n    if (!isDisabled[i]) return i;\n  }\n  return -1;\n}\n\nexport interface UseTabsStateOptions {\n  /** 受控激活下标 */\n  value?: number;\n  /** 非受控初始激活下标，默认 0 */\n  defaultValue?: number;\n  /** 标签总数 */\n  count: number;\n  /** 激活项变化 */\n  onChange?: (index: number) => void;\n}\n\nexport interface TabsState {\n  /** 当前激活下标 */\n  active: number;\n  /** 切换激活项 */\n  setActive: (index: number) => void;\n  /** 是否受控 */\n  isControlled: boolean;\n}\n\n/**\n * Tabs 的值状态。\n *\n * 受控展示态**直接派生自 prop**，不做「内部 state + effect 同步」：\n * 那套写法在受控值变化时总会慢一拍，且引用去重逻辑会把它锁死在旧值上\n * （Uploader 曾因此「受控模式选文件无反应」）。这里受控时根本不存在内部值。\n */\nexport function useTabsState({\n  value,\n  defaultValue = 0,\n  count,\n  onChange,\n}: UseTabsStateOptions): TabsState {\n  const isControlled = value !== undefined;\n  const [internal, setInternal] = React.useState(() => clampIndex(defaultValue, count));\n\n  const active = isControlled\n    ? clampIndex(value, count)\n    : clampIndex(internal, count);\n\n  const setActive = React.useCallback(\n    (index: number) => {\n      const next = clampIndex(index, count);\n      if (!isControlled) setInternal(next);\n      onChange?.(next);\n    },\n    [count, isControlled, onChange],\n  );\n\n  return { active, setActive, isControlled };\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-tabs-state.ts"
+    }
+  ]
+}

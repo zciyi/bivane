@@ -1137,3 +1137,97 @@
     /* 删除按钮底色（新颜色，三处补齐见 theme.css / BV_COLORS） */
     --bv-uploader-delete-background: rgba(0, 0, 0, 0.7);
 }
+
+/* ---------- 组件级 token：Tabs 标签页 ----------
+ * 逐字对齐 Vant 4 tabs/index.less：标签条高 44px、标签字号 14px、
+ * 下划线高 3px、宽 40px。
+ *
+ * Tabs 是模式 B（同一个 primitive 两端换壳），因此**不需要** *-pc 变体：
+ * 模式 B 的两端共用一套尺寸，「密度不同」属于模式 A/C 的定义。
+ * 颜色一律复用既有语义 token（--bv-text / --bv-primary / --bv-border），
+ * 不新增颜色命名空间（架构 §3.4③）。
+ */
+:root,
+:host {
+    --bv-tabs-height: 44px;
+    --bv-tabs-background: var(--bv-background-2);
+    --bv-tabs-font: var(--bv-font-md);
+    --bv-tabs-line-height: var(--bv-line-md);
+    --bv-tabs-padding-x: var(--bv-padding-base);
+    --bv-tabs-text-color: var(--bv-text);
+    --bv-tabs-active-color: var(--bv-primary);
+    --bv-tabs-border-color: var(--bv-border);
+    --bv-tabs-disabled-opacity: var(--bv-disabled-opacity);
+    /* 下划线指示器（Vant: 高 3px、宽 40px） */
+    --bv-tabs-bottom-bar-height: 3px;
+    --bv-tabs-bottom-bar-width: 40px;
+    --bv-tabs-line-duration: var(--bv-duration-fast);
+    /* 内容区切换动画时长（可被 Tabs 的 duration prop 覆盖） */
+    --bv-tabs-duration: var(--bv-duration-base);
+    /* 标签条吸顶时的层级（低于弹层 2000） */
+    --bv-tabs-sticky-z-index: 10;
+}
+
+/* ---------- 组件级 token：NavBar 导航栏 ----------
+ * 逐字对齐 Vant 4 nav-bar/index.less：栏高 46px、标题 16px 加粗、
+ * 左右文字与图标为主色。
+ *
+ * 模式 B：两端共用一套尺寸，只是标题落位不同（H5 居中 / PC 左对齐），
+ * 因此不写 *-pc 变体。颜色复用 --bv-text / --bv-primary。
+ */
+:root,
+:host {
+    --bv-nav-bar-height: 46px;
+    --bv-nav-bar-padding-x: var(--bv-padding-md);
+    --bv-nav-bar-gap: var(--bv-padding-xs);
+    --bv-nav-bar-background: var(--bv-background-2);
+    --bv-nav-bar-title-color: var(--bv-text);
+    --bv-nav-bar-title-font-size: var(--bv-font-lg);
+    --bv-nav-bar-title-line-height: var(--bv-line-lg);
+    --bv-nav-bar-text-color: var(--bv-primary);
+    --bv-nav-bar-icon-color: var(--bv-primary);
+    --bv-nav-bar-arrow-size: 16px;
+    --bv-nav-bar-z-index: 10;
+}
+
+/* ---------- 组件级 token：Tabbar 底部标签栏 ----------
+ * 逐字对齐 Vant 4 tabbar/index.less：底栏高 50px、图标 20px、字号 12px、
+ * 未选中灰 6、选中主色。
+ *
+ * Tabbar 是模式 C（底栏 / 侧边导航 / 顶部导航三套形态），
+ * H5 与 PC 各自读自己的 token，不进 modes.css（架构 §6.5 ②）。
+ * 颜色复用 --bv-gray-6 / --bv-primary，不新增颜色命名空间。
+ */
+:root,
+:host {
+    /* —— H5 底栏 —— */
+    --bv-tabbar-height: 50px;
+    --bv-tabbar-background: var(--bv-background-2);
+    --bv-tabbar-item-padding-x: var(--bv-padding-base);
+    --bv-tabbar-item-color: var(--bv-gray-6);
+    --bv-tabbar-item-active-color: var(--bv-primary);
+    --bv-tabbar-item-icon-size: 20px;
+    --bv-tabbar-icon-gap: 2px;
+    --bv-tabbar-line-height: var(--bv-line-sm);
+    --bv-tabbar-disabled-opacity: var(--bv-disabled-opacity);
+    --bv-tabbar-z-index: 10;
+    --bv-tabbar-transition-duration: var(--bv-duration-fast);
+    /*
+     * 角标外探量（负值 = 向图标右上角外侧推）。
+     * 通用 Badge 的 position="top-right" 是「角标中心压在角点上」，
+     * 在 Tabbar 这类「图标小、角标大」的场合会把图标糊掉
+     * （实测压住图标 40%，PC 上角标还比图标宽）。
+     * 这里改成「角标中心落在角点外侧 N px」，角标挂在角上、大半露在图标外，
+     * 压住图标的面积降到约 20%（Vant tabbar 的做法同向）。
+     */
+    --bv-tabbar-badge-right: -4px;
+    --bv-tabbar-badge-top: -4px;
+
+    /* —— PC 导航（侧边 / 顶部）—— */
+    --bv-tabbar-pc-sidebar-width: 200px;
+    --bv-tabbar-pc-item-height: 40px;
+    --bv-tabbar-pc-item-padding-x: var(--bv-padding-md);
+    --bv-tabbar-pc-item-gap: var(--bv-padding-xs);
+    --bv-tabbar-pc-item-icon-size: 16px;
+    --bv-tabbar-pc-line-height: var(--bv-line-md);
+}

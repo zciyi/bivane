@@ -34,6 +34,13 @@ export const iconNames = [
     "replay",
     "upload",
     "description",
+    // Tabbar 导航项：首页 / 我的 / 购物车 / 订单 / 设置 / 消息
+    "home",
+    "user",
+    "cart",
+    "order",
+    "setting",
+    "message",
 ] as const;
 
 export type IconName = (typeof iconNames)[number];
@@ -108,6 +115,43 @@ const glyphs: Record<IconName, React.ReactNode> = {
             <path d="M14 3v4.5h4.5" />
             <path d="M8.5 13h7M8.5 16.5h5" />
         </>
+    ),
+    // Tabbar 导航项图标（Tabbar 的 icon 传 <Icon name="…" />）
+    home: (
+        <>
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <path d="M9 22V12h6v10" />
+        </>
+    ),
+    user: (
+        <>
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+        </>
+    ),
+    cart: (
+        <>
+            <circle cx="9" cy="20" r="1.5" />
+            <circle cx="18" cy="20" r="1.5" />
+            <path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6" />
+        </>
+    ),
+    order: (
+        <>
+            <path d="M8 6h13M8 12h13M8 18h13" />
+            <path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" />
+        </>
+    ),
+    setting: (
+        <>
+            <path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1" />
+            <circle cx="15" cy="7" r="2" />
+            <circle cx="9" cy="12" r="2" />
+            <circle cx="17" cy="17" r="2" />
+        </>
+    ),
+    message: (
+        <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-4-.9L3 21l1.9-4.9A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z" />
     ),
 };
 

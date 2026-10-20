@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabbar-h5",
+  "type": "registry:component",
+  "title": "Tabbar（H5 实现）",
+  "description": "底部固定条 + 安全区（env(safe-area-inset-bottom)），图标在上文字在下；固定时留等高占位块。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [
+    "@bivane/utils",
+    "@bivane/tabbar-parts",
+    "@bivane/use-tabbar-state",
+    "@bivane/tokens"
+  ],
+  "files": [
+    {
+      "path": "components/h5/tabbar.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { TabbarItemView } from '@/components/ui/tabbar-parts';\nimport type { TabbarItem } from '@/hooks/use-tabbar-state';\n\n/**\n * Bivane Tabbar · H5 底栏（模式 C 的小屏实现）\n * 交互定义见 bivane-responsive-matrix.md §2.3\n *\n * 底部固定条 + 安全区（env(safe-area-inset-bottom)），图标在上、文字在下。\n * 固定时留一个等高占位块，避免内容被压在底栏下面。\n */\n\nexport interface H5TabbarProps\n  extends Omit<\n    React.HTMLAttributes<HTMLDivElement>,\n    'onChange' | 'onSelect'\n  > {\n  /** 标签项 */\n  items: TabbarItem[];\n  /** 当前激活项的 value */\n  active?: string;\n  /** 点击某一项 */\n  onSelect: (value: string) => void;\n  /** 固定在底部 */\n  fixed: boolean;\n  /** 固定时留等高占位块 */\n  placeholder: boolean;\n  /** 底部安全区 */\n  safeAreaInsetBottom: boolean;\n  /** 顶部 hairline 分隔线 */\n  border: boolean;\n}\n\nexport const H5Tabbar = React.forwardRef<HTMLDivElement, H5TabbarProps>(\n  function H5Tabbar(\n    {\n      items,\n      active,\n      onSelect,\n      fixed,\n      placeholder,\n      safeAreaInsetBottom,\n      border,\n      className,\n      style,\n      ...rest\n    },\n    ref,\n  ) {\n    return (\n      <>\n        {fixed && placeholder ? (\n          <div\n            aria-hidden=\"true\"\n            data-slot=\"tabbar-placeholder\"\n            className={cn(safeAreaInsetBottom && 'bv-safe-area-bottom')}\n          >\n            <div\n              data-slot=\"tabbar-placeholder-bar\"\n              className=\"h-[var(--bv-tabbar-height)]\"\n            />\n          </div>\n        ) : null}\n\n        <div\n          ref={ref}\n          {...rest}\n          data-slot=\"tabbar\"\n          data-mode=\"h5\"\n          data-variant=\"bottom\"\n          className={cn(\n            'flex w-full items-stretch bg-bv-surface',\n            fixed &&\n              'fixed bottom-0 left-0 right-0 z-[var(--bv-tabbar-z-index)]',\n            border && 'bv-hairline bv-hairline--top',\n            safeAreaInsetBottom && 'bv-safe-area-bottom',\n            className,\n          )}\n          style={style}\n        >\n          {items.map((item) => (\n            <TabbarItemView\n              key={item.value}\n              item={item}\n              active={item.value === active}\n              mode=\"mobile\"\n              variant=\"bottom\"\n              onSelect={onSelect}\n            />\n          ))}\n        </div>\n      </>\n    );\n  },\n);\n",
+      "type": "registry:component",
+      "target": "components/h5/tabbar.tsx"
+    }
+  ]
+}

@@ -1434,6 +1434,132 @@ H5 相机直唤 + 图片压缩（canvas，等比缩放到 `maxWidth` + `toBlob` 
 > 当成切换（拦它又会把空格一起拦掉）。故 PC 用 `Anchor` 只做定位、`open` 受控，并用
 > `onPointerDownOutside/FocusOutside` 显式把输入框判为「内部」不误关。详见源码注释。
 
+### Tabs
+
+标签页。**模式 B**：同一个 primitive 两端换壳，**激活值语义完全一致**（下标，0 起，对齐 Vant 的 `v-model:active`）。差异在两端怎么切页：H5 标签条**可横滑**、激活项自动滚入视野、内容区可手势横滑；PC 标签条**不滑动**、靠 `←/→` 键盘切换，激活项下有下划线指示器。
+
+组合式 API —— 标签与内容写在同一个 `<Tab>` 里：
+
+```tsx
+const [active, setActive] = React.useState(0);
+
+<Tabs value={active} onChange={setActive}>
+  <Tab title="标签一">内容一</Tab>
+  <Tab title="标签二">内容二</Tab>
+  <Tab title="禁用" disabled>内容三</Tab>
+</Tabs>
+```
+
+```tsx
+// 卡片形态
+<Tabs type="card" defaultValue={0}>
+  <Tab title="日">周日</Tab>
+  <Tab title="周">周一</Tab>
+</Tabs>
+
+// H5 手势切页（swipeable 只在 H5 生效；PC 恒为键盘切换）
+<Tabs swipeable>…</Tabs>
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` | `number` | `0` | 受控 / 非受控激活下标 |
+| `onChange` | `(index: number) => void` | — | 激活项变化 |
+| `type` | `'line' \| 'card'` | `'line'` | 下划线 / 卡片 |
+| `animated` | `boolean` | `true` | 内容区切换动画 |
+| `swipeable` | `boolean` | `false` | H5 内容区手势横滑（PC 不生效） |
+| `sticky` | `boolean` | `false` | 标签条吸顶 |
+| `duration` | `number` | `300` | 切换动画毫秒 |
+| `lineWidth` | `number \| 'auto'` | `40` | 下划线宽度（px）；`'auto'` 与标题同宽 |
+| `color` | `string` | — | 激活色（覆盖主色） |
+| `ariaLabel` | `string` | — | 标签条的无障碍名称 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+`<Tab>` 的 prop：`title`（标签文案，必填）、`disabled`（不可点、键盘跳过）、`children`（内容）。
+
+> **键盘**：PC 端 `←/→` 切页、`Home/End` 跳首尾，**跳过禁用项**、撞到头尾**回绕**。
+> H5 端不接管键盘（触屏没有键盘）。
+
+### NavBar
+
+导航栏。**模式 B**：同一条「左 · 中 · 右」标题栏，同一份层级回调；差异只在**标题落在哪** —— H5 标题**居中**（单手操作时「这是当前页」必须正中），PC 标题**左对齐**（居中标题会把左侧返回与右侧操作挤成两截）。
+
+```tsx
+// H5：返回箭头 + 居中标题 + 右侧动作
+<NavBar
+  title="订单详情"
+  leftArrow
+  onClickLeft={() => history.back()}
+  rightText="帮助"
+  onClickRight={() => setHelp(true)}
+/>
+
+// PC：左对齐标题 + 右对齐操作区
+<NavBar title="订单详情" rightText="帮助" onClickRight={() => setHelp(true)} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` | — | 标题文案 |
+| `leftText` / `rightText` | `ReactNode` | — | 左 / 右文字 |
+| `leftArrow` | `boolean` | `false` | 返回箭头（对齐 Vant，默认不显示） |
+| `onClickLeft` / `onClickRight` | `() => void` | — | 点击左侧 / 右侧 |
+| `left` / `right` | `ReactNode` | — | 自定义左右内容（顶替文字与箭头） |
+| `fixed` | `boolean` | `true` | 贴顶固定 |
+| `placeholder` | `boolean` | `true` | 固定时留等高占位块 |
+| `border` | `boolean` | `true` | 底部分隔线 |
+| `safeAreaInsetTop` | `boolean` | `true` | 顶部安全区 |
+| `backLabel` | `string` | `'返回'` | 返回箭头的无障碍名称 |
+| `ariaLabel` | `string` | — | 导航地标的无障碍名称 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+> **不接收 children**：内容由页面自己排。固定态下把内容塞进 fixed 容器会把它钉在屏幕上。
+> 右侧要放搜索框请用 `right`。
+
+### Tabbar
+
+底部标签栏。**模式 C**：H5 是**底部固定条**（图标在上、文字在下、带安全区），PC 是**侧边导航**（默认）或**顶部导航**（`pcVariant="top"`，图标在左、文字在右）。两端不是「同一个东西换壳」——底栏占满宽度均分、侧边导航占一列左对齐，位置与信息模型都不同。
+
+```tsx
+const items: TabbarItem[] = [
+  { value: "home", label: "首页", icon: <Icon name="home" /> },
+  { value: "order", label: "订单", icon: <Icon name="order" />, badge: 3 },
+  { value: "cart", label: "购物车", icon: <Icon name="cart" />, badge: true },
+  { value: "me", label: "我的", icon: <Icon name="user" /> },
+];
+
+// 受控：路由映射由业务承担，组件库不绑任何路由框架
+const [value, setValue] = React.useState("home");
+<Tabbar items={items} value={value} onChange={setValue} />;
+
+// PC 用侧边导航
+<Tabbar items={items} pcVariant="sidebar" value={value} onChange={setValue} />
+
+// PC 用顶部导航
+<Tabbar items={items} pcVariant="top" value={value} onChange={setValue} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `items` | `TabbarItem[]` | — | 标签项 |
+| `value` / `defaultValue` | `string` | — | 受控 / 非受控激活项（**字符串标识**，不是下标） |
+| `onChange` | `(value: string) => void` | — | 激活项变化 |
+| `pcVariant` | `'sidebar' \| 'top'` | `'sidebar'` | PC 端形态（H5 恒为底部） |
+| `fixed` | `boolean` | `true` | 固定 |
+| `placeholder` | `boolean` | `true` | 固定时留等高占位块（PC 侧边形态不适用） |
+| `safeAreaInsetBottom` | `boolean` | `true` | 底部安全区（仅 H5 底栏生效） |
+| `border` | `boolean` | `true` | 分隔线 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+`TabbarItem`：`value`（项标识，必填）、`label`（文案）、`icon`（图标节点）、`badge`（`true` = 红点 / 数字或字符串 = 文字角标）、`disabled`、`href`（给了就渲染成链接）。
+
+> **为什么用字符串而不是下标**：Tabbar 的一项通常对应一条路由，路由标识天然是字符串；
+> 下标会随「多一个角标项 / 少一项」而漂移。
+> **PC 侧边导航不渲染占位块**：它占的是**横向**位置，流内占位块推不动内容，
+> 业务侧需要自己给内容区留出 `--bv-tabbar-pc-sidebar-width` 的边距。
+> **角标会探出图标右上角约 4px**（数字角标在 H5 下会探出底栏上沿约 7px）。
+> 因此把底栏放进 `overflow-hidden` 的容器里会**削平角标顶部**，需要留位的场景请改用内边距。
+
 ## 四、两端差异由谁决定
 
 优先级从高到低：

@@ -2114,6 +2114,169 @@
                 }
             ],
             "dependencies": []
+        },
+        {
+            "name": "use-tabs-state",
+            "type": "registry:hook",
+            "title": "Tabs 激活态状态机",
+            "description": "纯函数（clampIndex/nextEnabledIndex/firstEnabledIndex/lastEnabledIndex）+ React 绑定。受控展示态直接派生自 prop，不做内部 state + effect 同步。",
+            "files": [
+                {
+                    "path": "hooks/use-tabs-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-tabs-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "tabs-parts",
+            "type": "registry:component",
+            "title": "Tabs 组合式子件",
+            "description": "Tab 标记组件与子件元信息收集（纯函数摊平 children，不做渲染期登记，避免 StrictMode 重复注册与顺序漂移）。",
+            "files": [
+                {
+                    "path": "components/ui/tabs-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/tabs-parts.tsx"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "tabs",
+            "type": "registry:component",
+            "title": "Tabs 标签页",
+            "description": "模式 B 分发层（同一文件内按模式换壳）：H5 标签条可横滑 + 激活项滚入视野 + 内容区手势横滑；PC 标签条不滑动 + ←/→ 键盘切换 + 下划线指示器。组合式 API：<Tabs><Tab title>内容</Tab></Tabs>。",
+            "files": [
+                {
+                    "path": "components/responsive/tabs.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/tabs.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "use-device-mode",
+                "responsive-provider",
+                "use-tabs-state",
+                "tabs-parts",
+                "tokens"
+            ]
+        },
+        {
+            "name": "nav-bar",
+            "type": "registry:component",
+            "title": "NavBar 导航栏",
+            "description": "模式 B（同一文件内按模式换壳）：H5 返回箭头 + 标题居中 + 右侧动作；PC 标题左对齐 + 操作区右对齐。贴顶 fixed + 安全区，固定时留等高占位块。",
+            "files": [
+                {
+                    "path": "components/responsive/nav-bar.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/nav-bar.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "responsive-provider",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-tabbar-state",
+            "type": "registry:hook",
+            "title": "Tabbar 激活项状态机",
+            "description": "纯函数（findTabIndex/resolveInitialValue）+ React 绑定。值语义用字符串标识（非下标），组件库不绑定路由框架，路由映射由业务用受控 value + onChange 承担。",
+            "files": [
+                {
+                    "path": "hooks/use-tabbar-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-tabbar-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "tabbar-parts",
+            "type": "registry:component",
+            "title": "Tabbar 共用零件",
+            "description": "一项的视图（图标 + 角标 + 文字）。跨模式共用零件的外壳差异走 JS 分支（tabbarItemClass 纯函数），不用 bv-h5:/bv-pc: 变体；槽名按模式区分（tabbar-item / tabbar-pc-item）。",
+            "files": [
+                {
+                    "path": "components/ui/tabbar-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/tabbar-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "badge",
+                "use-device-mode",
+                "use-tabbar-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "tabbar-h5",
+            "type": "registry:component",
+            "title": "Tabbar（H5 实现）",
+            "description": "底部固定条 + 安全区（env(safe-area-inset-bottom)），图标在上文字在下；固定时留等高占位块。",
+            "files": [
+                {
+                    "path": "components/h5/tabbar.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/tabbar.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "tabbar-parts",
+                "use-tabbar-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "tabbar-pc",
+            "type": "registry:component",
+            "title": "Tabbar（PC 实现）",
+            "description": "侧边导航（默认）或顶部导航（variant=top），图标在左文字在右。侧边形态不渲染占位块（它占横向位置，业务侧自行留边距）。",
+            "files": [
+                {
+                    "path": "components/pc/tabbar.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/tabbar.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "tabbar-parts",
+                "use-tabbar-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "tabbar",
+            "type": "registry:component",
+            "title": "Tabbar 底部标签栏",
+            "description": "模式 C 分发层：H5 底部固定条 / PC 侧边或顶部导航（pcVariant）。激活项用字符串 value 表达；item.href 为可选的链接透传。",
+            "files": [
+                {
+                    "path": "components/responsive/tabbar.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/tabbar.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-tabbar-state",
+                "tabbar-parts",
+                "tabbar-h5",
+                "tabbar-pc",
+                "tokens"
+            ]
         }
     ]
 }

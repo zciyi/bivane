@@ -42,6 +42,9 @@ import { Slider } from "@/components/responsive/slider";
 import { Uploader } from "@/components/responsive/uploader";
 import type { UploaderFileItem } from "@/hooks/use-uploader-state";
 import { Search } from "@/components/responsive/search";
+import { NavBar } from "@/components/responsive/nav-bar";
+import { Tab, Tabs } from "@/components/responsive/tabs";
+import { Tabbar, type TabbarItem } from "@/components/responsive/tabbar";
 import type { MenuItem, MenuValue } from "@/hooks/use-menu-state";
 import {
     ToastHost,
@@ -889,6 +892,198 @@ function SearchDemos() {
                     <div className="w-full max-w-[320px]">
                         <Search disabled placeholder="禁用" ariaLabel="禁用" />
                     </div>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/**
+ * Tabs 双模式示例（模式 B）
+ * 同一个 value 同时喂给 H5 与 PC 两个实例：模式 B 的要点就是
+ * 「同一个 primitive 两端换壳，值语义完全一致」。
+ */
+function TabsDemos() {
+    const [active, setActive] = React.useState(0);
+    const [cardActive, setCardActive] = React.useState(1);
+
+    const tabs = (
+        <>
+            <Tab title="标签一">内容一</Tab>
+            <Tab title="标签二">内容二</Tab>
+            <Tab title="标签三">内容三</Tab>
+            <Tab title="很长的标签标题四">内容四</Tab>
+        </>
+    );
+
+    return (
+        <Section title="P3 · Tabs 标签页（模式 B：H5 标签条可横滑+手势 / PC 不滑动+键盘+下划线）">
+            <Block>
+                <Row>
+                    <div className="w-full max-w-[360px]">
+                        <p className="mb-bv-xs text-bv-sm text-bv-text-2">
+                            H5（forceMode=mobile）：标签超出可横滑，激活项滚入视野，内容区可手势横滑
+                        </p>
+                        <Tabs value={active} onChange={setActive} swipeable forceMode="mobile">
+                            {tabs}
+                        </Tabs>
+                    </div>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-xs text-bv-sm text-bv-text-2">
+                            PC（forceMode=desktop）：←/→ 切换，激活项下有下划线指示器
+                        </p>
+                        <Tabs value={active} onChange={setActive} forceMode="desktop">
+                            {tabs}
+                        </Tabs>
+                    </div>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-xs text-bv-sm text-bv-text-2">
+                            type=&quot;card&quot;：卡片形态（无下划线指示器）
+                        </p>
+                        <Tabs type="card" value={cardActive} onChange={setCardActive}>
+                            <Tab title="日">周日</Tab>
+                            <Tab title="周">周一</Tab>
+                            <Tab title="月">本月</Tab>
+                        </Tabs>
+                    </div>
+                </Row>
+                <Row>
+                    <span className="text-bv-text-2">
+                        当前激活：第 {active + 1} 项（两端共用同一个 value）
+                    </span>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/**
+ * NavBar 双模式示例（模式 B）
+ * H5 标题居中、PC 标题左对齐；层级回调（返回 / 右侧动作）两端同一份。
+ */
+function NavBarDemos() {
+    const [log, setLog] = React.useState("（无）");
+
+    return (
+        <Section title="P3 · NavBar 导航栏（模式 B：H5 返回箭头+标题居中 / PC 标题左对齐+操作区右对齐）">
+            <Block>
+                <Row>
+                    <div className="w-full max-w-[360px]">
+                        <p className="mb-bv-xs text-bv-sm text-bv-text-2">
+                            H5：左箭头 + 居中标题 + 右侧动作
+                        </p>
+                        <NavBar
+                            forceMode="mobile"
+                            fixed={false}
+                            title="订单详情"
+                            leftArrow
+                            onClickLeft={() => setLog("H5 · 返回")}
+                            rightText="帮助"
+                            onClickRight={() => setLog("H5 · 帮助")}
+                        />
+                    </div>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-xs text-bv-sm text-bv-text-2">
+                            PC：左对齐标题 + 右对齐操作区
+                        </p>
+                        <NavBar
+                            forceMode="desktop"
+                            fixed={false}
+                            title="订单详情"
+                            leftArrow
+                            onClickLeft={() => setLog("PC · 返回")}
+                            rightText="帮助"
+                            onClickRight={() => setLog("PC · 帮助")}
+                        />
+                    </div>
+                </Row>
+                <Row>
+                    <span className="text-bv-text-2">最近操作：{log}</span>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+const TABBAR_ITEMS: TabbarItem[] = [
+    { value: "home", label: "首页", icon: <Icon name="home" /> },
+    { value: "order", label: "订单", icon: <Icon name="order" />, badge: 3 },
+    { value: "cart", label: "购物车", icon: <Icon name="cart" />, badge: true },
+    { value: "me", label: "我的", icon: <Icon name="user" /> },
+];
+
+/**
+ * Tabbar 双模式示例（模式 C）
+ * H5 底部固定条 / PC 侧边导航（默认）或顶部导航（pcVariant="top"）。
+ */
+function TabbarDemos() {
+    const [value, setValue] = React.useState("home");
+
+    return (
+        <Section title="P3 · Tabbar 标签栏（模式 C：H5 底部固定条 / PC 侧边或顶部导航）">
+            <Block>
+                <Row>
+                    <div className="w-full max-w-[360px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            H5：底部条，图标在上文字在下（含角标与红点）。
+                            底栏自带顶部 hairline 分隔线，角标会探出这条线约 7px。
+                        </p>
+                        {/*
+                         * 不要给底栏再套一个带边框的白框：底栏自己已经画了顶部
+                         * hairline，再加框会出现两条线（其中一条还悬在框里），
+                         * 看着像「多了一条线」。这里用无边框白块，
+                         * hairline 就是块的顶边，角标探出去落在页面上（同真机底栏）。
+                         */}
+                        <div className="bg-bv-surface">
+                            <Tabbar
+                                forceMode="mobile"
+                                fixed={false}
+                                items={TABBAR_ITEMS}
+                                value={value}
+                                onChange={setValue}
+                            />
+                        </div>
+                    </div>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            PC：侧边导航（默认 200px 宽），右侧竖线是导航自带的列分隔
+                        </p>
+                        <div className="flex bg-bv-surface">
+                            <Tabbar
+                                forceMode="desktop"
+                                fixed={false}
+                                items={TABBAR_ITEMS}
+                                value={value}
+                                onChange={setValue}
+                            />
+                            <div className="flex-1 p-bv-md text-bv-sm text-bv-text-2">
+                                内容区（侧边导航占左侧一列）
+                            </div>
+                        </div>
+                    </div>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            PC：顶部导航（pcVariant=&quot;top&quot;），下方的线是导航自带的分隔
+                        </p>
+                        <div className="bg-bv-surface">
+                            <Tabbar
+                                forceMode="desktop"
+                                pcVariant="top"
+                                fixed={false}
+                                items={TABBAR_ITEMS}
+                                value={value}
+                                onChange={setValue}
+                            />
+                            <div className="p-bv-md text-bv-sm text-bv-text-2">
+                                内容区（顶部导航的下分隔线把导航与内容隔开）
+                            </div>
+                        </div>
+                    </div>
+                    <span className="text-bv-text-2">当前选中：{value}</span>
                 </Row>
             </Block>
         </Section>
@@ -2900,6 +3095,9 @@ function Playground() {
                 <SliderDemos />
                 <UploaderDemos />
                 <SearchDemos />
+                <TabsDemos />
+                <NavBarDemos />
+                <TabbarDemos />
 
                 {/* ---------- P1 弹层实例（都通过 portal 渲染到 body） ---------- */}
 
