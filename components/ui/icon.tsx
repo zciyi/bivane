@@ -18,7 +18,9 @@ export const iconNames = [
     "check",
     // Checkbox 半选（indeterminate）横杠
     "minus",
+    // Search：放大镜（胶囊内）、时钟（历史记录行）、关闭（清除键）
     "search",
+    "clock",
     "cross",
     "loading",
     "success",
@@ -53,6 +55,12 @@ const glyphs: Record<IconName, React.ReactNode> = {
         </>
     ),
     cross: <path d="M18 6 6 18M6 6l12 12" />,
+    clock: (
+        <>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+        </>
+    ),
     loading: <path d="M12 3a9 9 0 1 0 9 9" />,
     success: (
         <>

@@ -1034,6 +1034,50 @@
     --bv-input-number-long-press-interval: 200ms;
 }
 
+/* ---------- 组件级 token：Search ----------
+ * Bivane 的 Search 比 van-search 多了「建议 / 历史」两块内容，
+ * 因此除移植 van-search 的胶囊尺寸外，另加建议行与 H5 全屏页的结构值。
+ * 全部是结构 token（尺寸/间距/圆角），**不新增颜色 token**：
+ * 颜色一律复用 --bv-muted / --bv-text / --bv-text-3 / --bv-border 等既有语义色，
+ * 规避「颜色 token 需三处补齐、漏一处即类名保留而样式为空」那类静默失效。 */
+:root,
+:host {
+    /* 胶囊输入外壳（两端共用） */
+    --bv-search-height: 34px;
+    --bv-search-background: var(--bv-muted);
+    --bv-search-padding-x: var(--bv-padding-sm);
+    --bv-search-radius: var(--bv-radius-max); /* shape=round */
+    --bv-search-radius-square: var(--bv-radius-md); /* shape=square */
+    /* 放大镜与清除键 */
+    --bv-search-icon-size: 16px;
+    --bv-search-icon-gap: var(--bv-padding-xs);
+    --bv-search-clear-size: 16px;
+    --bv-search-clear-gap: var(--bv-padding-xs);
+    /* 建议 / 历史行：H5 触控目标 44px，PC 行 36px（命名期固定，不进 modes.css） */
+    --bv-search-h5-row-height: 44px;
+    --bv-search-pc-row-height: 36px;
+    --bv-search-row-padding-x: var(--bv-padding-md);
+    --bv-search-row-gap: var(--bv-padding-sm);
+    --bv-search-row-font: var(--bv-font-md);
+    --bv-search-row-line-height: var(--bv-line-md);
+    --bv-search-row-icon-size: 15px;
+    /* PC 建议浮层 */
+    --bv-search-pc-z-index: var(--bv-z-popup);
+    --bv-search-pc-panel-min-width: 180px;
+    --bv-search-pc-panel-max-height: 320px;
+    --bv-search-pc-panel-radius: var(--bv-radius-lg);
+    --bv-search-pc-panel-border-color: var(--bv-border);
+    --bv-search-pc-panel-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    --bv-search-pc-suggestion-padding-y: var(--bv-padding-xs);
+    /* H5 全屏搜索页 */
+    --bv-search-h5-header-height: 52px;
+    --bv-search-h5-body-padding: var(--bv-padding-md);
+    --bv-search-h5-section-gap: var(--bv-padding-sm);
+    --bv-search-h5-section-title-font: var(--bv-font-sm);
+    --bv-search-h5-section-title-line-height: var(--bv-line-sm);
+    --bv-search-h5-back-icon-size: 22px;
+}
+
 /* ---------- 组件级 token：Rate（逐字移植 Vant 4 rate/index.less）---------- */
 :root,
 :host {

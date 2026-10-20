@@ -41,6 +41,7 @@ import { Rate } from "@/components/responsive/rate";
 import { Slider } from "@/components/responsive/slider";
 import { Uploader } from "@/components/responsive/uploader";
 import type { UploaderFileItem } from "@/hooks/use-uploader-state";
+import { Search } from "@/components/responsive/search";
 import type { MenuItem, MenuValue } from "@/hooks/use-menu-state";
 import {
     ToastHost,
@@ -821,6 +822,72 @@ function UploaderDemos() {
                             }}
                             ariaLabel="App桥回填"
                         />
+                    </div>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+const SEARCH_HOT_WORDS = ["苹果手机", "苹果电脑", "苹果手表", "香蕉手机", "香蕉牛奶", "橙子"];
+
+function SearchDemos() {
+    const [log, setLog] = React.useState<string>("（尚未提交）");
+    // 历史受控：真实场景接 localStorage / 接口
+    const [history, setHistory] = React.useState<string[]>(["苹果", "耳机"]);
+
+    // 异步建议源：按关键词过滤全集，Promise.resolve 模拟远程请求（配合 debounce）
+    const fetchSuggestions = React.useCallback((kw: string) => {
+        const key = kw.trim();
+        return Promise.resolve(
+            SEARCH_HOT_WORDS.filter((item) => item.includes(key)).slice(0, 5),
+        );
+    }, []);
+
+    return (
+        <Section title="P3 · Search 搜索（模式 C：H5 内联条→全屏页+历史 / PC 内联→建议浮层）">
+            <Block>
+                <Row>
+                    <div className="w-full max-w-[320px]">
+                        <Search
+                            suggestions={["苹果", "香蕉", "橙子", "草莓"]}
+                            onSearch={(kw) => setLog(`静态建议提交：${kw}`)}
+                            ariaLabel="静态建议搜索"
+                        />
+                    </div>
+                    <span className="text-bv-text-2">{log}</span>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[320px]">
+                        <Search
+                            onFetchSuggestions={fetchSuggestions}
+                            debounce={300}
+                            placeholder="异步建议（防抖 300ms）"
+                            onSearch={(kw) => setLog(`异步建议提交：${kw}`)}
+                            ariaLabel="异步建议搜索"
+                        />
+                    </div>
+                    <span className="text-bv-text-2">输入后 ↑↓ 巡航 / Enter 选中 / Esc 关闭（PC）</span>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[320px]">
+                        <Search
+                            history={history}
+                            onHistoryChange={setHistory}
+                            suggestions={["iPhone", "iPad", "iMac"]}
+                            placeholder="搜历史（H5 全屏页展示）"
+                            onSearch={(kw) => setLog(`历史/建议提交：${kw}`)}
+                            ariaLabel="历史搜索"
+                        />
+                    </div>
+                    <span className="text-bv-text-2">历史：{history.join("、") || "（空）"}</span>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[320px]">
+                        <Search shape="square" clearable placeholder="square 形状" ariaLabel="方形" />
+                    </div>
+                    <div className="w-full max-w-[320px]">
+                        <Search disabled placeholder="禁用" ariaLabel="禁用" />
                     </div>
                 </Row>
             </Block>
@@ -2832,6 +2899,7 @@ function Playground() {
                 <RateDemos />
                 <SliderDemos />
                 <UploaderDemos />
+                <SearchDemos />
 
                 {/* ---------- P1 弹层实例（都通过 portal 渲染到 body） ---------- */}
 

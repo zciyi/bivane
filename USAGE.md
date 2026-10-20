@@ -1385,6 +1385,55 @@ H5 相机直唤 + 图片压缩（canvas，等比缩放到 `maxWidth` + `toBlob` 
 | `onOversize` / `onExceed` | `(f) => void` | — | 超大小 / 超个数回调 |
 | `ariaLabel` | `string` | — | 渲染到容器上，与全库一致用 `ariaLabel` |
 
+### Search
+
+搜索框。**模式 C**：搜索词 / 历史 / 建议源两端一致，差异在**输入框在哪、建议摆在哪** —— H5 是**内联只读条 → 聚焦展开全屏搜索页**（返回键退出，页内展示历史记录），PC 是**内联输入框 + 锚定建议浮层**（↑↓ 巡航 / Enter 选中 / Esc 关闭）。PC 不展示历史区。
+
+```tsx
+// 静态建议：组件内按关键词过滤，空关键词展示「热词」
+<Search suggestions={["苹果", "香蕉", "橙子"]} onSearch={(kw) => go(kw)} />
+
+// 异步建议：debounce 毫秒后才请求；同时给 suggestions 与 onFetchSuggestions 时以异步为准
+<Search
+  debounce={300}
+  onFetchSuggestions={(kw) => fetch(`/api/sug?kw=${kw}`).then((r) => r.json())}
+  onSearch={(kw) => go(kw)}
+/>
+
+// 历史记录：传 history + onHistoryChange 即受控（接 localStorage / 接口）；不传则组件内内存维护
+<Search history={history} onHistoryChange={setHistory} onSearch={(kw) => go(kw)} />
+```
+
+> **提交即收起**：回车提交或点中一条建议/历史后，当前浮层（全屏页 / 建议浮层）会自动收起。
+> H5 全屏页的「返回」只退出、不提交。
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `value` / `defaultValue` | `string` | `''` | 受控 / 非受控搜索词 |
+| `onChange` | `(value: string) => void` | — | 每次输入 |
+| `onSearch` | `(keyword: string) => void` | — | 提交（回车 / 点建议 / 点历史） |
+| `onClear` | `() => void` | — | 点清除键 |
+| `placeholder` | `string` | `'搜索'` | |
+| `disabled` / `readonly` | `boolean` | `false` | `readonly` 不可输入，PC 也不浮出建议 |
+| `clearable` | `boolean` | `true` | 展示清除键 |
+| `shape` | `'round' \| 'square'` | `'round'` | 胶囊 / 方形 |
+| `label` | `ReactNode` | — | 左侧固定文案 |
+| `suggestions` | `string[]` | — | 静态建议（按关键词过滤） |
+| `onFetchSuggestions` | `(kw) => string[] \| Promise<string[]>` | — | 异步建议源；空关键词不触发，经 `debounce` 后请求 |
+| `debounce` | `number` | `300` | 异步建议防抖毫秒 |
+| `history` / `onHistoryChange` | `string[]` / `(h) => void` | — | 历史受控；不传则内存维护（提交去重前置，默认上限 10） |
+| `showHistory` | `boolean` | `true` | H5 全屏页是否展示历史区（PC 恒不展示） |
+| `historyLimit` | `number` | `10` | 历史条数上限 |
+| `emptyText` / `loadingText` | `ReactNode` | `'没有找到相关结果'` / `'搜索中…'` | 建议列表空态 / 加载态 |
+| `historyText` / `clearHistoryText` | `ReactNode` | `'历史记录'` / `'清空'` | H5 历史区标题 / 清空按钮 |
+| `ariaLabel` | `string` | — | 渲染到输入框上，与全库一致用 `ariaLabel` |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱（契约唯一例外） |
+
+> **PC 为什么不用 `Popover.Trigger`**：搜索框是「聚焦即开」的 combobox，而 Trigger 是
+> 「点击 / 空格即切换」的按钮 —— 已聚焦时再点一下会被它误关，且用户按**空格**输入词会被
+> 当成切换（拦它又会把空格一起拦掉）。故 PC 用 `Anchor` 只做定位、`open` 受控，并用
+> `onPointerDownOutside/FocusOutside` 显式把输入框判为「内部」不误关。详见源码注释。
+
 ## 四、两端差异由谁决定
 
 优先级从高到低：

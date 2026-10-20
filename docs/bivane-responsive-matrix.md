@@ -49,7 +49,7 @@
 | **InputNumber**               | 输入框唤起数字键盘，加减按钮热区 44px                                                                                                                                                                        | 输入框 + 竖排 ▲▼ 微调列 + 键盘微调                                                                                                                                                                            | **B**   | 边界与步长                                                        | ✅    |
 | **NumberKeyboard**            | 自定义数字键盘弹层（含「完成」键）                                                                                                                                                                           | 不渲染，直接用系统键盘                                                                                                                                                                                        | **C**   | 输入格式化                                                        | ⬜    |
 | **Uploader**                  | 点击唤起相机/相册（`capture`），压缩上传，宫格预览                                                                                                                                                           | 拖拽上传区 + 文件选择器，多选/粘贴，列表视图                                                                                                                                                                  | **C**   | 上传队列、进度、校验                                              | ✅    |
-| **Search**                    | 全屏搜索页，返回退出，历史记录                                                                                                                                                                               | 内联输入框 + 建议浮层，快捷键聚焦                                                                                                                                                                             | **C**   | 防抖、历史/建议源                                                 | ⬜    |
+| **Search**                    | 内联搜索条 → 聚焦展开全屏搜索页（返回键退出），展示历史记录，输入时切建议列表                                                                                                                            | 内联输入框 + 建议浮层（Radix Popover 锚定 + 键盘巡航），**不设快捷键聚焦**                                                                                                                                    | **C**   | 防抖、历史/建议源（静态 + 异步）                                      | ✅    |
 | **Rate**                      | 点击/滑动选择，热区 44px                                                                                                                                                                                     | 点击/悬停预览 + 键盘方向键                                                                                                                                                                                    | **C**   | 值语义                                                            | ✅    |
 | **Checkbox / Radio / Switch** | 行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）                                                                                                                                                            | 标准控件 16~20px，label 可点，键盘空格                                                                                                                                                                        | **A**   | 受控状态                                                          | ✅    |
 
@@ -386,6 +386,7 @@ H5 = Popup 底部弹层 + **联动滚轮**（不做 Vant Cascader 的下钻面�
 - **规则 6：Root 恒 `modal={false}`**（DropdownMenu 见 §3.4），外部关闭统一交 DismissableLayer。
 - **规则 7：禁止在 `onCloseAutoFocus` 里无条件 `preventDefault + focus 自己的触发器`。** Radix FocusScope 的卸载还焦在 unmount cleanup **内再排一个 `setTimeout(0)`** 执行（比新浮层挂载 passive effect 更晚一拍）。跨实例点击时旧层若在这个延迟回调里抢焦，新浮层的 focusin 监听已经就位且没有 deferred pointerdown 标志压制 → 新浮层被判 focusOutside 立即关闭（真机症状「B 展开后直接关闭」，100% 复现）。做法：**不传 `onCloseAutoFocus`**，用 Radix NonModal 默认逻辑——外部交互关闭（`hasInteractedOutsideRef`）不还焦，Esc/选中关闭才 focus 已登记的 trigger；自写的 `document.activeElement !== node` 守卫挡不住（此刻焦点已被新浮层拿走，条件恰好成立）。唯一例外是 DatePicker（要还焦到内部 input 而非外层 div），它用 `skipCloseAutoFocusRef`：外部 pointerdown/focusoutside 时置位，延迟还焦回调里读到就跳过。
 - **唯一例外：H5 Popover** 保留 Anchor + 自管 click（bubble/drawer 双形态共用外层 open，Trigger 的内部 toggle 会错位；触屏也没有 mousedown 迁焦竞态），理由见 `components/h5/popover.tsx` 文件头。
+- **第二个例外：Search PC（聚焦即开的 combobox）** 同样不能用 Trigger —— Trigger 是「点击 / 空格切换」的按钮，与输入框互斥：① 已聚焦再点一下（移动光标）会被它误关；② 用户按**空格**输入词时 keydown 冒泡到 Trigger 被当成切换，而为拦它 `preventDefault` 又会把空格输入一起拦掉。做法：`Anchor asChild` **只做定位**、`open` 受控（聚焦 / 有关键词驱动），再用 `onPointerDownOutside` / `onFocusOutside` **显式把输入框判为「内部」**（target 在 pill 内则 `preventDefault`）——等价补回本节要保住的「触发器算内部、不被误关」那道保护。详见 §3.16 与 `components/pc/search.tsx` 文件头。
 - 回归测试：`tests/anchor-switch.test.tsx` —— 用完整真实手势（pointerdown→迁焦→mousedown→pointerup→mouseup→click），末尾**连排两个 `setTimeout(0)`**（第一个 flush passive effects，旧层 cleanup 在其中再排一个 setTimeout；第二个才跑到旧层的延迟还焦）；jsdom 只派 click 或只等一个 tick 都会漏掉「旧层抢焦关掉新层」。断言跨实例同一手势关旧开新且延迟还焦后新层仍在、同实例反复点击稳定、清除按钮不关层、disabled 不开、Esc 关闭还焦触发器。
 
 ### 3.12 Calendar（模式 C，日历）
@@ -507,6 +508,24 @@ Vant `van-slider` 支持单值/区间、reverse 反向、vertical 竖直，H5 �
 - 几何换算 `resolveSliderGeometry`：`reverse` 翻转所有比例、`vertical` 转 `top%`；bar 起止由 `min(disp)*100`/`max(disp)*100` 给出。
 - a11y：根 `role="group"` + 每颗按钮 `role="slider"` + `aria-valuenow` + `aria-label`（range 区分「起始/结束」）；`aria-disabled`。
 - 颜色走 props 默认 `var(--bv-slider-*)`，**不新增工具类**。
+
+### 3.16 Search（模式 C，搜索框；2026-10-20）
+
+**定死取值**
+
+- **H5**：内联条是**只读**输入（`readonly`，清键隐藏），点击/聚焦展开 `Popup position="fullscreen"`；顶部「返回 + 可编辑输入」，主体在**历史区**（无关键词且有历史）与**建议列表**间切换。返回键退出且不提交。内联条只读是为了避免「点一下先弹系统键盘、再盖全屏页」的双键盘抖动。
+- **PC**：内联可编辑输入 + Radix 建议浮层；↑↓ 在建议间巡航、Enter 选中激活项（无激活项则提交）、Esc / 点外部关闭；**无快捷键聚焦**（矩阵 §2.2 已同步删除）。
+- **值语义**：提交（回车）与点中建议/历史都会 **写入历史 + `onSearch` + 收起浮层**；返回只收起不提交。
+
+**关键规则**
+
+- **⚠ PC 不用 `Popover.Trigger`，是 §3.11 的显式例外**：搜索框是「聚焦即开」的 combobox，Trigger 是「点击/空格切换」的按钮，二者互斥——①已聚焦再点一下（移光标）会被 Trigger 误关；②按**空格**输入词时 keydown 冒泡到 Trigger 被当切换，若 `preventDefault` 拦截又会把空格输入一起拦掉。故 PC 用 `Anchor asChild` **只定位**、`open` 受控（聚焦/有关键词驱动），并用 `onPointerDownOutside`/`onFocusOutside` **显式把输入框判为「内部」**（target 在 pill 内则 `preventDefault`）补回 §3.11 想保住的那道保护；`onOpenAutoFocus`/`onCloseAutoFocus` 均 `preventDefault`，焦点恒留输入框。
+- **建议源**：`suggestions`（静态，组件内按关键词过滤，空关键词=热词态）与 `onFetchSuggestions`（异步）二选一，同时提供以异步为准；异步经 `debounce`（默认 300ms）后才请求，空关键词不触发。异步源用 `ref` 持取，避免内联箭头函数导致 effect 每渲染重跑。
+- **历史**：`history`/`onHistoryChange` 受控；不传则组件内内存态（卸载即失）。`pushHistory` 去重前置 + 截断 `historyLimit`（默认 10），空词不写。
+- **共用件**：`SearchInputShell`（胶囊，两端一致=模式 A）+ `SearchSuggestionList/Row`（建议行高按模式分支 H5 44px / PC 36px）；视图契约 `SearchViewProps` 放 `search-parts`，分发层打包后两端实现皆为受控展示层。
+- **状态归属**：`value`/`open`/历史/建议源/防抖全在分发层 `responsive/search.tsx`（跨模式同义）。
+- a11y：建议列表 `role="listbox"` + 行 `role="option"` `aria-selected`；无障碍标签用 `ariaLabel`。
+- 全为**结构 token**（`--bv-search-*` 尺寸/间距/圆角），**不新增颜色 token**，颜色复用 `--bv-muted`/`--bv-text*`/`--bv-border`。
 
 ## 4. 测试要求
 

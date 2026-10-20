@@ -54,6 +54,11 @@ const EXPECTED = [
   'src/components/h5/select.tsx',
   'src/components/pc/select.tsx',
   'src/components/responsive/select.tsx',
+  'src/hooks/use-search-state.ts',
+  'src/components/ui/search-parts.tsx',
+  'src/components/h5/search.tsx',
+  'src/components/pc/search.tsx',
+  'src/components/responsive/search.tsx',
   'src/hooks/use-time-value.ts',
   'src/components/ui/time-parts.tsx',
   'src/components/h5/time-picker.tsx',
@@ -226,6 +231,7 @@ import { Dialog, showConfirmDialog } from '@/components/responsive/dialog';
 import { DropdownMenu } from '@/components/responsive/dropdown-menu';
 import { Popup } from '@/components/responsive/popup';
 import { Select } from '@/components/responsive/select';
+import { Search } from '@/components/responsive/search';
 import { showSuccessToast, showToast } from '@/components/responsive/toast';
 import type { MenuItem } from '@/hooks/use-menu-state';
 
@@ -269,6 +275,19 @@ export default function App() {
               <Badge content={5} />
               <Icon name="success" size={16} />
             </div>
+          }
+        />
+      </CellGroup>
+
+      <CellGroup title="Search">
+        <Cell
+          title="静态建议"
+          value={
+            <Search
+              ariaLabel="静态建议搜索"
+              suggestions={['北京', '上海', '广州']}
+              onSearch={(kw) => showToast('搜索：' + kw)}
+            />
           }
         />
       </CellGroup>
@@ -550,6 +569,7 @@ async function main() {
       '@bivane/rate',
       '@bivane/slider',
       '@bivane/uploader',
+      '@bivane/search',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -605,6 +625,11 @@ async function main() {
           'data-slot=rate-item',
           '--bv-rate-icon-size',
           'data-slot=slider',
+          // Search：search-input 被 utilities.css 的聚焦环规则引用（整块胶囊出框），
+          // 故进清单；search-suggestion* / search-h5-* 只是运行期槽标记，无 CSS 选择器引用，不进
+          'data-slot=search-input',
+          '--bv-search-height',
+          '--bv-search-radius',
           // slider-bar / slider-rail / slider-line 没有任何 CSS 选择器引用，
           // 只是运行期标记，按「只有被引用的槽名才该出现在产物里」不进清单
           'data-slot=slider-button',

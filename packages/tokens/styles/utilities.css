@@ -734,6 +734,22 @@
     }
 }
 
+/* ---------- Search 聚焦态：焦点环画在整块胶囊上，不画在输入框 ----------
+ * 胶囊根 [data-slot=search-input] 是 div（不可聚焦），bv-focus-ring 的
+ * :focus-visible 画不到它身上。所以内层输入框/清除键一律让位出框，
+ * 由胶囊用 :focus-within 承接「整块区域」的环——判据 pointer:fine，
+ * 触屏永远拿不到框，与 field-box 同款。 */
+@media (pointer: fine) {
+    [data-slot="search-input"] .bv-focus-ring:focus-visible {
+        outline: none;
+    }
+
+    [data-slot="search-input"]:focus-within {
+        outline: var(--bv-focus-ring-width) solid var(--bv-focus-ring-color);
+        outline-offset: var(--bv-focus-ring-offset);
+    }
+}
+
 /* ---------- 按压态蒙层（对应 Vant 按钮的 ::before 黑色蒙层）---------- */
 .bv-press {
     position: relative;

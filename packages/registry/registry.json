@@ -686,6 +686,105 @@
             ]
         },
         {
+            "name": "use-search-state",
+            "type": "registry:hook",
+            "title": "搜索状态模型",
+            "description": "跨模式共用的搜索词/历史/建议源与防抖，纯函数 + React 绑定（不 import 组件，避免环）。两端只共享「搜什么、建议从哪来」，不共享「建议摆在哪」。",
+            "files": [
+                {
+                    "path": "hooks/use-search-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-search-state.ts"
+                }
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "search-parts",
+            "type": "registry:component",
+            "title": "Search 共用零件",
+            "description": "两端共用的输入胶囊、建议列表与视图契约。胶囊两端一致（模式 A）；建议行高按模式分支（H5 触控 44px / PC 36px）。",
+            "files": [
+                {
+                    "path": "components/ui/search-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/search-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "input",
+                "use-device-mode",
+                "use-search-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "search-h5",
+            "type": "registry:component",
+            "title": "Search（H5 实现）",
+            "description": "内联只读搜索条 → 聚焦展开 Popup fullscreen 全屏搜索页，返回键退出；主体在历史记录与建议列表之间切换。",
+            "files": [
+                {
+                    "path": "components/h5/search.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/search.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "search-parts",
+                "popup",
+                "use-search-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "search-pc",
+            "type": "registry:component",
+            "title": "Search（PC 实现）",
+            "description": "内联输入框 + Radix Popover 建议浮层：Anchor 只定位、open 受控、onPointerDownOutside/FocusOutside 显式判定输入框为内部，↑↓/Enter/Esc 键盘。聚焦即开，不设快捷键。",
+            "files": [
+                {
+                    "path": "components/pc/search.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/search.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "search-parts",
+                "use-search-state",
+                "tokens"
+            ],
+            "dependencies": [
+                "@radix-ui/react-popover"
+            ]
+        },
+        {
+            "name": "search",
+            "type": "registry:component",
+            "title": "Search 搜索框",
+            "description": "模式 C 分发层：H5 内联条→全屏搜索页（历史记录）/ PC 内联输入框→建议浮层。支持静态或异步建议、历史可控、异步防抖。",
+            "files": [
+                {
+                    "path": "components/responsive/search.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/search.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-search-state",
+                "search-parts",
+                "search-h5",
+                "search-pc"
+            ]
+        },
+        {
             "name": "use-menu-state",
             "type": "registry:hook",
             "title": "菜单树模型",
