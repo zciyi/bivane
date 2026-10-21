@@ -80,6 +80,16 @@ export interface UseVirtualWindowOptions {
   overscan?: number;
   /** 传 false 时不做窗口化（分组列表等不定高场景），窗口恒为全量 */
   enabled?: boolean;
+  /**
+   * 显式给定视口高度（px）。
+   *
+   * 什么时候需要给：调用方已经知道容器高度（如 List 的 height prop），
+   * 不必等 DOM 测量。jsdom 里 clientHeight 恒为 0，
+   * 不给这个值就只能退化成全量渲染 —— 窗口化逻辑在测试里等于没生效。
+   *
+   * 不给时按容器实测（clientHeight）。
+   */
+  viewportHeight?: number;
 }
 
 export interface UseVirtualWindowResult {
@@ -95,24 +105,29 @@ export function useVirtualWindow({
   count,
   overscan = 4,
   enabled = true,
+  viewportHeight: fixedViewportHeight,
 }: UseVirtualWindowOptions): UseVirtualWindowResult {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = React.useState(0);
-  const [viewportHeight, setViewportHeight] = React.useState(0);
+  const [measuredHeight, setMeasuredHeight] = React.useState(0);
+  // 显式给定的高度优先；否则用实测值
+  const viewportHeight = fixedViewportHeight ?? measuredHeight;
 
   React.useEffect(() => {
     const node = containerRef.current;
     if (!node || !enabled) return undefined;
+    // 显式给了视口高度就不必再测（也测不准 —— jsdom 里恒为 0）
+    if (fixedViewportHeight !== undefined) return undefined;
 
     const sync = () => {
       setScrollTop(node.scrollTop);
-      setViewportHeight(node.clientHeight);
+      setMeasuredHeight(node.clientHeight);
     };
     sync();
 
     node.addEventListener('scroll', sync, { passive: true });
     return () => node.removeEventListener('scroll', sync);
-  }, [enabled]);
+  }, [enabled, fixedViewportHeight]);
 
   // 项数变化（过滤后）时回到顶部，避免停留在越界位置显示一片空白。
   // 不区分 enabled：关闭窗口化时同样会因过滤而变短，也需要归零。

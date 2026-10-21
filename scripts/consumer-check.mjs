@@ -89,6 +89,19 @@ const EXPECTED = [
   'src/components/h5/tabbar.tsx',
   'src/components/pc/tabbar.tsx',
   'src/components/responsive/tabbar.tsx',
+  'src/hooks/use-list-state.ts',
+  'src/components/ui/list-parts.tsx',
+  'src/components/h5/list.tsx',
+  'src/components/pc/list.tsx',
+  'src/components/responsive/list.tsx',
+  'src/hooks/use-table-state.ts',
+  'src/components/ui/table-parts.tsx',
+  'src/components/ui/table-pagination.tsx',
+  'src/components/ui/data-container-parts.tsx',
+  'src/components/responsive/data-container.tsx',
+  'src/components/h5/table.tsx',
+  'src/components/pc/table.tsx',
+  'src/components/responsive/table.tsx',
 ];
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
@@ -244,6 +257,9 @@ import { Search } from '@/components/responsive/search';
 import { Tab, Tabs } from '@/components/responsive/tabs';
 import { NavBar } from '@/components/responsive/nav-bar';
 import { Tabbar, type TabbarItem } from '@/components/responsive/tabbar';
+import { List } from '@/components/responsive/list';
+import { Table, type TableColumn } from '@/components/responsive/table';
+import { DataContainer } from '@/components/responsive/data-container';
 import { showSuccessToast, showToast } from '@/components/responsive/toast';
 import type { MenuItem } from '@/hooks/use-menu-state';
 
@@ -263,6 +279,25 @@ const TABBAR_ITEMS: TabbarItem[] = [
   { value: 'home', label: '首页', icon: <Icon name="home" /> },
   { value: 'order', label: '订单', icon: <Icon name="order" />, badge: 2 },
   { value: 'me', label: '我的', icon: <Icon name="user" /> },
+];
+
+const LIST_ROWS = [
+  { id: '1', name: '订单 01' },
+  { id: '2', name: '订单 02' },
+  { id: '3', name: '订单 03' },
+];
+
+const TABLE_COLUMNS: TableColumn[] = [
+  { key: 'name', title: '名称', sortable: true, h5Role: 'title' },
+  { key: 'amount', title: '金额', h5Role: 'meta' },
+];
+
+const TABLE_ROWS = [
+  { id: '1', name: '订单 01', amount: 128 },
+  { id: '2', name: '订单 02', amount: 256 },
+  { id: '3', name: '订单 03', amount: 512 },
+  { id: '4', name: '订单 04', amount: 1024 },
+  { id: '5', name: '订单 05', amount: 2048 },
 ];
 
 const CITY_OPTIONS = [
@@ -495,6 +530,74 @@ export default function App() {
           }
         />
       </CellGroup>
+
+      <CellGroup title="List">
+        <Cell
+          title="滚动加载列表"
+          value={
+            <div className="h-[160px] w-[240px] overflow-hidden">
+              <List
+                data={LIST_ROWS}
+                renderItem={(item) => (
+                  <Cell title={(item as { name: string }).name} value="¥128" />
+                )}
+                rowKey={(item) => (item as { id: string }).id}
+                onLoad={() => showToast('触底加载')}
+                onRefresh={() => showToast('刷新')}
+              />
+            </div>
+          }
+        />
+      </CellGroup>
+
+      <CellGroup title="Table">
+        <Cell
+          title="数据表格"
+          value={
+            <div className="w-[420px] overflow-hidden">
+              <Table columns={TABLE_COLUMNS} data={TABLE_ROWS} />
+            </div>
+          }
+        />
+        <Cell
+          title="分页（local）"
+          value={
+            <div className="w-[420px] overflow-hidden">
+              <Table
+                columns={TABLE_COLUMNS}
+                data={TABLE_ROWS}
+                pagination
+                paginationMode="local"
+                pageSize={2}
+                total={TABLE_ROWS.length}
+              />
+            </div>
+          }
+        />
+      </CellGroup>
+
+      <CellGroup title="DataContainer">
+        <Cell
+          title="分页（auto→PC）"
+          value={
+            <div className="w-[420px] overflow-hidden">
+              <DataContainer total={TABLE_ROWS.length} pageSize={2}>
+                <Table columns={TABLE_COLUMNS} data={TABLE_ROWS.slice(0, 2)} />
+              </DataContainer>
+            </div>
+          }
+        />
+        <Cell
+          title="无限滚动（auto→H5）"
+          value={
+            <div className="w-[420px] overflow-hidden">
+              <DataContainer loadStrategy="infinite">
+                <Table columns={TABLE_COLUMNS} data={TABLE_ROWS} />
+              </DataContainer>
+            </div>
+          }
+        />
+      </CellGroup>
       </CellGroup>
 
       <Popup open={popupOpen} position="bottom" onOpenChange={setPopupOpen} closeable aria-label="示例弹层">
@@ -633,6 +736,9 @@ async function main() {
       '@bivane/tabs',
       '@bivane/nav-bar',
       '@bivane/tabbar',
+      '@bivane/list',
+      '@bivane/table',
+      '@bivane/data-container',
       '@bivane/dialog',
       '@bivane/toast',
       '@bivane/button',
@@ -710,6 +816,21 @@ async function main() {
           '--bv-nav-bar-height',
           '--bv-tabbar-height',
           '--bv-tabbar-pc-sidebar-width',
+          // List / Table：槽名同样都是 Tailwind 工具类拼的（utilities.css 无 [data-slot=…] 规则引用），
+          // 故只探 token 变量（token 在 vant.css 的 :root 里，一定进消费者 CSS 产物）。
+          '--bv-list-status-min-height',
+          '--bv-list-item-min-height',
+          '--bv-list-pc-item-height',
+          '--bv-table-cell-line-height',
+          '--bv-table-card-gap',
+          '--bv-table-pc-cell-padding-x',
+          // 分页条：槽名是 Tailwind 工具类拼的（utilities.css 无 [data-slot=…] 规则引用），
+          // 只探 token 变量
+          '--bv-table-pagination-gap',
+          '--bv-table-pagination-button-size',
+          // DataContainer 加载层：--bv-load-* 是跨模式共用状态区的 token
+          '--bv-load-status-min-height',
+          '--bv-load-status-line-height',
           'bv-fade-in',
         ];
         for (const probe of probes) {

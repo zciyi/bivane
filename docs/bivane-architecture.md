@@ -330,7 +330,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 - **P1 弹层** ✅：Popup → Dialog → Toast → use-lock-scroll
 - **P1′ 弹层补全** ✅：ActionSheet（Popup+列表）→ Alert/Confirm（Dialog preset）→ Notify（Toast 换信息模型）→ Loading
 - **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker ✅ / Cascader ✅ → Calendar ✅
-- **P3 表单与列表** ⬜：Field/Input/Textarea ✅ → Switch/Checkbox/Radio ✅ → Rate/Slider ✅ → InputNumber ✅ → Uploader ✅ → **Search ✅（2026-10-20，模式 C）** → **Tabs/NavBar ✅（2026-10-20，模式 B）→ Tabbar ✅（2026-10-20，模式 C）** → List vs Table
+- **P3 表单与列表** ✅：Field/Input/Textarea ✅ → Switch/Checkbox/Radio ✅ → Rate/Slider ✅ → InputNumber ✅ → Uploader ✅ → **Search ✅（2026-10-20，模式 C）** → **Tabs/NavBar ✅（2026-10-20，模式 B）→ Tabbar ✅（2026-10-20，模式 C）** → **List ✅ / Table ✅（2026-10-20，模式 C / C，闭环 P3）**
 - **P4 生态** ⬜：第 2/3 套风格 → tweakcn 适配 → 文档站 → registry 发布验证
 
 ## 9. 验证与质量门

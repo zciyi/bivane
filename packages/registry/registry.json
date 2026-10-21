@@ -2277,6 +2277,259 @@
                 "tabbar-pc",
                 "tokens"
             ]
+        },
+        {
+            "name": "use-list-state",
+            "type": "registry:hook",
+            "title": "List 数据获取状态机",
+            "description": "纯函数（resolveListStatus/isNearBottom/resolvePullStatus/computePullDistance）+ React 绑定。三态（loading/finished/error）全部受控，组件不持有数据也不发请求，只在正确时机通知业务去取数据。",
+            "files": [
+                {
+                    "path": "hooks/use-list-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-list-state.ts"
+                }
+            ],
+            "registryDependencies": []
+        },
+        {
+            "name": "list-parts",
+            "type": "registry:component",
+            "title": "List 共用零件",
+            "description": "列表项视图 + 状态提示区。跨模式共用零件的外壳差异走 JS 分支（listItemClass 纯函数），不用 bv-h5:/bv-pc: 变体；槽名按模式区分（list-item / list-pc-item）。",
+            "files": [
+                {
+                    "path": "components/ui/list-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/list-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-list-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "list-h5",
+            "type": "registry:component",
+            "title": "List（H5 实现）",
+            "description": "竖向滚动容器 + 触底哨兵（IntersectionObserver）加载 + 顶部下拉刷新手势（阻尼 0.5，阈值 64px）。",
+            "files": [
+                {
+                    "path": "components/h5/list.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/list.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "list-parts",
+                "use-list-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "list-pc",
+            "type": "registry:component",
+            "title": "List（PC 实现）",
+            "description": "固定高度滚动容器 + 滚到底加载 + 顶部「刷新」按钮（H5 下拉刷新的等价交互）+ 可选虚拟滚动（需给 itemHeight）。",
+            "files": [
+                {
+                    "path": "components/pc/list.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/list.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "list-parts",
+                "use-list-state",
+                "use-virtual-window",
+                "tokens"
+            ]
+        },
+        {
+            "name": "list",
+            "type": "registry:component",
+            "title": "List 列表",
+            "description": "模式 C 分发层：H5 无限滚动 + 触底加载 + 下拉刷新 / PC 滚动加载 + 刷新按钮 + 虚拟滚动。三态全受控；virtual/itemHeight/height 是 PC 端形态参数，H5 端忽略。",
+            "files": [
+                {
+                    "path": "components/responsive/list.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/list.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "use-device-mode",
+                "responsive-provider",
+                "use-list-state",
+                "list-parts",
+                "list-h5",
+                "list-pc",
+                "tokens"
+            ]
+        },
+        {
+            "name": "use-table-state",
+            "type": "registry:hook",
+            "title": "Table 列定义与排序规则",
+            "description": "纯函数（nextSortOrder/compareSortValues/sortData/filterData/resolveRowKey）+ React 绑定。排序 asc→desc→取消 的方向切换规则两端共享，排序/筛选/选中三组状态可受控可非受控。",
+            "files": [
+                {
+                    "path": "hooks/use-table-state.ts",
+                    "type": "registry:hook",
+                    "target": "hooks/use-table-state.ts"
+                }
+            ],
+            "registryDependencies": []
+        },
+        {
+            "name": "table-parts",
+            "type": "registry:component",
+            "title": "Table 共用零件",
+            "description": "字段单元格 / 排序指示器 / 标签与值的排版类名。跨模式共用零件的外壳差异走 JS 分支（tableCellClass 等纯函数）；槽名按模式区分（table-card-* / table-pc-*）。",
+            "files": [
+                {
+                    "path": "components/ui/table-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/table-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "table-pagination",
+                "utils",
+                "icon",
+                "use-device-mode",
+                "use-table-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "table-pagination",
+            "type": "registry:component",
+            "title": "Table 分页条",
+            "description": "PC 表格底部分页条：共 N 条 + 每页条数下拉 + 上/下一页 + 页码（省略号）+ 跳页输入。纯函数 computePageCount/clampPage/sliceStartIndex/buildPageItems + usePagination。local 模式组件自己切全量数据，remote 模式（默认）业务给当页数据。",
+            "files": [
+                {
+                    "path": "components/ui/table-pagination.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/table-pagination.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "tokens"
+            ]
+        },
+        {
+            "name": "table-h5",
+            "type": "registry:component",
+            "title": "Table（H5 实现）",
+            "description": "卡片化列表：一行数据 = 一张卡片。title 直出、meta 次要字段、detail 收进「展开详情」。字段标签可点排序（与 PC 表头同一套方向规则）。",
+            "files": [
+                {
+                    "path": "components/h5/table.tsx",
+                    "type": "registry:component",
+                    "target": "components/h5/table.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "table-parts",
+                "use-table-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "table-pc",
+            "type": "registry:component",
+            "title": "Table（PC 实现）",
+            "description": "标准 <table>：点表头排序、position: sticky 列固定、表头下拉列筛选（单层多选，自研不用 Radix）、行首 checkbox 选择 + 表头全选。",
+            "files": [
+                {
+                    "path": "components/pc/table.tsx",
+                    "type": "registry:component",
+                    "target": "components/pc/table.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "table-pagination",
+                "utils",
+                "icon",
+                "table-parts",
+                "use-table-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "table",
+            "type": "registry:component",
+            "title": "Table 表格",
+            "description": "模式 C 分发层：H5 卡片化列表 / PC 标准表格（排序/列固定/列筛选/行选择）。两端消费同一份 columns；h5Role 只影响 H5 呈现。",
+            "files": [
+                {
+                    "path": "components/responsive/table.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/table.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "table-pagination",
+                "use-device-mode",
+                "responsive-provider",
+                "use-table-state",
+                "table-parts",
+                "table-h5",
+                "table-pc",
+                "tokens"
+            ]
+        },
+        {
+            "name": "data-container-parts",
+            "type": "registry:component",
+            "title": "DataContainer 共用零件",
+            "description": "加载层零件：LoadSentinel（IntersectionObserver 触底哨兵，无 IO 时退化为滚动几何判定）+ LoadStatus（加载中/没有更多/出错可重试）。对内容层透明，只在下方挂哨兵与状态提示。",
+            "files": [
+                {
+                    "path": "components/ui/data-container-parts.tsx",
+                    "type": "registry:component",
+                    "target": "components/ui/data-container-parts.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "icon",
+                "use-list-state",
+                "tokens"
+            ]
+        },
+        {
+            "name": "data-container",
+            "type": "registry:component",
+            "title": "DataContainer 加载层容器",
+            "description": "只回答「数据怎么来」：children 可以是任意渲染器（节点原样渲染，函数则按 (page, pageSize) 调用由业务自切）。loadStrategy 让加载策略与 mode 正交（auto=PC分页/H5滚动、pagination=两端分页、infinite=两端滚动），低代码 pageMode 字段直接映射它。",
+            "files": [
+                {
+                    "path": "components/responsive/data-container.tsx",
+                    "type": "registry:component",
+                    "target": "components/responsive/data-container.tsx"
+                }
+            ],
+            "registryDependencies": [
+                "utils",
+                "use-device-mode",
+                "responsive-provider",
+                "use-list-state",
+                "data-container-parts",
+                "table-pagination",
+                "tokens"
+            ]
         }
     ]
 }

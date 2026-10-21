@@ -1560,6 +1560,229 @@ const [value, setValue] = React.useState("home");
 > **角标会探出图标右上角约 4px**（数字角标在 H5 下会探出底栏上沿约 7px）。
 > 因此把底栏放进 `overflow-hidden` 的容器里会**削平角标顶部**，需要留位的场景请改用内边距。
 
+### List
+
+滚动加载列表。**模式 C**：H5 是**竖向滚动容器 + 触底哨兵加载 + 顶部下拉刷新**，PC 是**固定高度滚动容器 + 滚到底加载 + 顶部「刷新」按钮**（可开虚拟滚动）。
+
+```tsx
+const [loading, setLoading] = useState(false);
+const [finished, setFinished] = useState(false);
+const [rows, setRows] = useState<Order[]>([]);
+
+<List
+  data={rows}
+  renderItem={(order) => <Cell title={order.name} value={order.amount} />}
+  rowKey={(order) => order.id}
+  loading={loading}
+  finished={finished}
+  onLoad={async () => {
+    setLoading(true);
+    const next = await fetchOrders(rows.length);
+    setRows((prev) => [...prev, ...next]);
+    setLoading(false);
+    if (next.length < PAGE_SIZE) setFinished(true);
+  }}
+  onRefresh={async () => {
+    setRows(await fetchOrders(0));
+    setFinished(false);
+  }}
+/>
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `data` | `readonly unknown[]` | — | 列表数据 |
+| `renderItem` | `(item, index) => ReactNode` | — | 渲染单项 |
+| `rowKey` | `(item, index) => string` | `String(index)` | 行 key |
+| `loading` | `boolean` | `false` | 加载中（受控） |
+| `finished` | `boolean` | `false` | 已无更多（受控） |
+| `error` | `boolean` | `false` | 加载出错（受控） |
+| `onLoad` | `() => void` | — | 触底 / 滚到底时触发 |
+| `onRefresh` | `() => void` | — | 下拉刷新（H5）/ 刷新按钮（PC） |
+| `onRetry` | `() => void` | — | 出错后的重试 |
+| `onItemClick` | `(item, index) => void` | — | 点击某项 |
+| `loadingText` | `ReactNode` | `'加载中…'` | 加载中文案 |
+| `finishedText` | `ReactNode` | `'没有更多了'` | 无更多文案 |
+| `errorText` | `ReactNode` | `'加载失败'` | 出错文案 |
+| `threshold` | `number` | `80` | 触底提前量（px） |
+| `pullRefresh` | `boolean` | `true` | H5 下拉刷新开关 |
+| `virtual` | `boolean` | `false` | PC 虚拟滚动（需配 `itemHeight`） |
+| `itemHeight` | `number` | — | PC 虚拟滚动行高（px） |
+| `height` | `number \| string` | — | PC 滚动容器高度 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+> **三态全部受控**：组件不持有数据也不发请求，只在正确时机通知业务去取数据。
+> 列表数据是业务异步取的，若组件替业务持有 `loading`，会出现「请求已发出但 loading
+> 还没置 true」的窗口，期间用户能连点触发重复请求。
+> **`onRefresh` 不传就不渲染刷新按钮**：PC 端会渲染一个显式的「刷新」按钮
+> （鼠标没有「下拉」这个手势，这是 H5 下拉刷新的等价交互），业务不接刷新逻辑时别传。
+> **列表项不加内边距**：行的排版归业务的内容组件（如 `Cell`）管。
+> List 只保证「H5 行高 ≥ 48px、PC 行高 ≥ 36px」的最小热区，内容更高时撑开、不裁切。
+> **`virtual` 要配 `itemHeight`**：行高由业务给定，不做测量（测量式需要 ResizeObserver
+> 与不定高处理，复杂度收益不匹配）。`height` 给数值时会直接用作视口高度。
+> **虚拟滚动要求所有行实际高度一致**：窗口是按 `itemHeight` 算的，
+> 某一行比它高（或矮）会导致后续行错位或留缝 —— 请让行内容高度可控。
+> **虚拟滚动在 `itemHeight` 缺失时自动退化为全量渲染**（不会渲染成空白）。
+
+### Table
+
+数据表格。**模式 C**：H5 是**卡片化列表**（关键字段直出，其余字段收进「展开详情」），PC 是**标准表格**（排序 / 列固定 / 列筛选 / 行选择）。两端消费同一份 `columns`。
+
+```tsx
+const columns: TableColumn[] = [
+  { key: "name", title: "名称", sortable: true, h5Role: "title" },
+  { key: "amount", title: "金额", sortable: true, h5Role: "meta" },
+  { key: "status", title: "状态", h5Role: "detail", filterable: true, filters: ["paid", "pending"] },
+];
+
+<Table columns={columns} data={orders} onSelectionChange={setSelected} />;
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `columns` | `readonly TableColumn[]` | — | 列定义 |
+| `data` | `readonly unknown[]` | — | 数据 |
+| `sort` | `SortState \| null` | — | 受控排序（`null` = 无排序） |
+| `defaultSort` | `SortState` | — | 非受控初始排序 |
+| `onSortChange` | `(sort: SortState \| null) => void` | — | 排序变化 |
+| `filters` | `Record<string, readonly string[]>` | — | 受控列筛选 |
+| `defaultFilters` | `Record<string, readonly string[]>` | — | 非受控初始筛选 |
+| `onFilterChange` | `(filters) => void` | — | 筛选变化 |
+| `selectedKeys` | `readonly string[]` | — | 受控选中行 |
+| `defaultSelectedKeys` | `readonly string[]` | — | 非受控初始选中 |
+| `onSelectionChange` | `(keys: string[]) => void` | — | 选中变化 |
+| `onRowClick` | `(row, index) => void` | — | 点击某行 |
+| `emptyText` | `ReactNode` | `'暂无数据'` | 空态文案 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+`TableColumn`：`key`（必填）、`title`（表头 / 字段标签）、`render`（自定义单元格）、`sortValue`（排序取值）、`sortable`（是否可排序）、`width`（PC 列宽）、`align`（对齐）、`fixed`（PC 固定列 `'left' \| 'right'`）、`h5Role`（H5 角色 `'title' \| 'meta' \| 'detail'`）、`filterable` + `filters`（PC 列筛选）。
+
+> **排序是三态**：点一次升序、两次降序、三次**取消**。取消时 `onSortChange` 传 `null`。
+> 受控 `sort` 用 `null` 表示「无排序」而不是 `undefined` ——
+> `undefined` 会被组件理解成「非受控」，受控方就再也取消不了排序了。
+> **`h5Role` 只影响 H5**：`'title'` 直出为卡片标题，`'meta'` 是卡片主体里的字段，
+> `'detail'` 收进「展开详情」。不标 `title` 时第一列自动当标题（没有标题的卡片无法扫读）。
+> **PC 的排序入口是表头，H5 是卡片底部的排序按钮**，但方向切换规则是同一份，
+> 排出来的顺序两端一致。
+> **列筛选是 PC 端能力**（表头下拉多选），H5 卡片形态不提供筛选入口 ——
+> 卡片没有「列」的概念，筛选器放不进去。
+> **不传 `onSelectionChange` 就不渲染选择列**（两端都不渲染）。
+
+#### 分页（仅 PC）
+
+打开 `pagination` 后，PC 表格底部出现分页条。
+
+```tsx
+// ① local：前端分页 —— data 给全量，组件自己按页切
+<Table
+  columns={columns}
+  data={allRows}              // 全量
+  pagination
+  paginationMode="local"
+  pageSize={10}
+  current={page}              // 受控
+  onPageChange={setPage}
+/>
+
+// ② remote：后端分页（默认）—— data 是当页数据，切页由业务换 data
+<Table
+  columns={columns}
+  data={pageRows}            // 当前页（业务自己 slice 或来自接口）
+  pagination
+  pageSize={10}
+  total={totalCount}         // 必须给，组件拿不到总量
+  current={page}
+  onPageChange={(p) => { setPage(p); fetchPage(p); }}
+  pageSizeOptions={[10, 20, 50]}
+/>
+
+// ③ 后端页码从 0 开始
+<Table {...props} pagination paginationMode="local" startPage={0} />
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `pagination` | `boolean` | `false` | 分页条开关（H5 接受但**不渲染**） |
+| `paginationMode` | `'remote' \| 'local'` | `'remote'` | `remote`=data 是当页、组件不切；`local`=data 是全量、组件切 |
+| `pageSize` | `number` | `10` | 每页条数 |
+| `total` | `number` | — | 总条数；`local` 模式不给则用筛选后的行数 |
+| `startPage` | `number` | `1` | 页码起始值；后端从 0 开始时传 `0` |
+| `current` | `number` | — | 受控当前页 |
+| `defaultCurrent` | `number` | — | 非受控初始页 |
+| `onPageChange` | `(page, pageSize) => void` | — | 切页回调 |
+| `showTotal` | `boolean` | `true` | 是否显示总条数 |
+| `totalText` | `ReactNode \| (total) => ReactNode` | — | 自定义总条数文案 |
+| `pageSizeOptions` | `number[]` | — | 给了就渲染「每页 N 条」下拉 |
+| `onPageSizeChange` | `(pageSize) => void` | — | 换每页条数（此时也会回到起始页并触发 `onPageChange`） |
+
+> **`remote` 是默认值，这是刻意的**：数据总是从接口来，业务天然只持有一页。
+> 想让组件帮你切必须显式写 `paginationMode="local"`，避免「传了全量数据却被组件按当页再切一次」
+> 这种难查的双重切片。
+> **`remote` 模式下 `total` 必须给**：组件拿不到总量，`data.length` 是**当页行数**，
+> 用它算总页数会永远只有 1 页。
+> **换每页条数会回到起始页**：停在第 5 页但每页从 10 变 100 时，第 5 页会落到空区间。
+> **页码越界会被夹紧**：删光最后一页的最后一条数据后，当前页自动落到末页，不会渲染空白页。
+> **排序/筛选在分页之前生效**：页数依赖「当前能看到多少行」，而行数是被筛选改过的。
+> 先分页再筛选的话，第 3 页筛完可能只剩 1 行。
+
+### DataContainer
+
+**加载层容器**：只回答「数据怎么来」，对内容层完全透明 —— `children` 可以是 Table、List 或任何自定义渲染器。
+
+```tsx
+// ① auto（默认）：PC 出分页条，H5 出触底哨兵
+<DataContainer total={total} pageSize={10} onPageChange={setPage}>
+  {(page, size) => <Table columns={columns} data={rows.slice((page-1)*size, page*size)} />}
+</DataContainer>
+
+// ② pagination：两端都分页（记录详情页，手机也要一页一页翻）
+<DataContainer loadStrategy="pagination" total={total} pageSize={10}>
+  <Table columns={columns} data={rows} />
+</DataContainer>
+
+// ③ infinite：两端都触底加载（2000 条报表，手机也得滑）
+<DataContainer
+  loadStrategy="infinite"
+  loading={loading}
+  finished={noMore}
+  onLoad={loadMore}
+>
+  <Table columns={columns} data={accumulatedRows} />
+</DataContainer>
+```
+
+| prop | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `children` | `ReactNode \| (page, pageSize) => ReactNode` | — | 内容层；传函数则由你按页切数据 |
+| `loadStrategy` | `'auto' \| 'pagination' \| 'infinite'` | `'auto'` | **加载策略，与 mode 正交** |
+| `pagination` | `boolean` | — | 覆盖策略推导的触发器（逃生口，一般不用传） |
+| `current` / `defaultCurrent` | `number` | — | 受控 / 非受控当前页 |
+| `pageSize` | `number` | `10` | 每页条数 |
+| `total` | `number` | — | 总条数（分页模式必给） |
+| `startPage` | `number` | `1` | 页码起始值（后端从 0 开始时传 `0`） |
+| `onPageChange` | `(page, pageSize) => void` | — | 切页 |
+| `showTotal` / `totalText` | `boolean` / `ReactNode` | `true` / — | 总条数开关与文案 |
+| `pageSizeOptions` | `number[]` | — | 给了就渲染「每页 N 条」下拉 |
+| `loading` / `finished` / `error` | `boolean` | `false` | 无限滚动三态（全受控） |
+| `onLoad` / `onRetry` | `() => void` | — | 触底加载 / 出错重试 |
+| `threshold` | `number` | `80` | 触底提前量（px） |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+
+> **为什么单独做一个组件，而不是把分页/加载塞进 Table**：
+> Table 只回答「一行数据长什么样」，DataContainer 只回答「数据怎么来」。
+> 低代码这类场景下两端要渲染的东西会持续演化（表格 → 看板 → 树形列表），
+> 而加载策略（分页 / 无限滚动 / 虚拟滚动 / 预加载）也在独立演化。
+> 两条线分开走，才不会互相拖累 —— 换渲染器不动加载层。
+> **`loadStrategy` 让加载策略与 mode 解耦**：过去「PC=分页、H5=滚动」写死在分发层里，
+> 业务改不了。现在由 schema 的 `pageMode` 字段显式映射：
+> `auto` 是最常见组合，`pagination` 给「手机也要翻页」的场景，`infinite` 给「PC 也要滑」的场景。
+> **数据切分与触发器是两件事**：`children` 传函数 → 组件按 `(page, pageSize)` 调用、
+> 由你切；传节点 → 原样渲染（数据已经切好了）。这与 `loadStrategy` 无关。
+> **组件不替你存数据**：无限滚动时 `onLoad` 只是通知你「该取下一页了」，
+> 数据怎么合并由你决定（与 List 同样的三态受控模型）。
+> **与 Table 的 `pagination` 的关系**：两者都可用。Table 自带分页适合「表格就是全部」的场景；
+> 要让加载策略与 mode 解耦、或加载的不是表格（看板、树形列表），用 DataContainer 包一层。
+
 ## 四、两端差异由谁决定
 
 优先级从高到低：

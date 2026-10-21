@@ -1405,6 +1405,151 @@ function probeNav(label) {
   })()`);
 }
 
+/**
+ * DataContainer 探针（加载层）。
+ *
+ * 判据（这次的核心是「策略与 mode 正交」）：
+ * - data-strategy 标注实际生效的触发器（pagination / infinite）
+ * - pagination 策略的实例底部有分页条；infinite 策略的有哨兵 + 状态区
+ * - 同一份 schema 在不同 forceMode 下得到不同触发器
+ */
+function probeDataContainer(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    out.containers = [...document.querySelectorAll('[data-slot="data-container"]')].map(root => {
+      const status = root.querySelector('[data-slot="load-status"], [data-slot="load-status-pc"]');
+      return {
+        mode: root.dataset.mode,
+        strategy: root.dataset.strategy,
+        hasSentinel: !!root.querySelector('[data-slot="data-container-sentinel"]'),
+        hasPagination: !!root.querySelector('[data-slot="table-pagination"]'),
+        statusText: status ? (status.textContent || '').trim() : null,
+        contentRows: root.querySelectorAll('tbody [data-slot="table-pc-row"], [data-slot="table-card"]').length,
+        h: px(root.getBoundingClientRect().height),
+      };
+    });
+
+    return JSON.stringify(out);
+  })()`);
+}
+
+/**
+ * Table 分页探针（PC 端）。
+ *
+ * 判据：
+ * - 分页条真的在表格底部（几何位置：top > table bottom）
+ * - 可见页码按钮数、总条数文案、当前页高亮（aria-current）
+ * - 首行文本：翻页后应变化（证明 local 模式的切片真的生效，而不只是按钮变色）
+ * - 首末页时上/下一页的 disabled 状态
+ */
+function probePagination(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    out.paginations = [...document.querySelectorAll('[data-slot="table-pagination"]')].map(bar => {
+      // 分页条可能挂在 Table 里，也可能挂在 DataContainer 里（内容层是任意渲染器），
+      // 所以向上找「最近的 table」，找不到就不做几何判定而不是崩掉。
+      const host = bar.closest('[data-slot="table"], [data-slot="data-container"]');
+      const table = bar.querySelector('table') || host?.querySelector('table') || null;
+      const barRect = bar.getBoundingClientRect();
+      const tableRect = table ? table.getBoundingClientRect() : null;
+      const pages = [...bar.querySelectorAll('[data-slot="table-pagination-page"]')];
+      const active = pages.find(p => p.getAttribute('aria-current') === 'page');
+      const rowRoot = bar.closest('[data-slot="table"]') || host;
+      const rows = [...(rowRoot?.querySelectorAll('tbody [data-slot="table-pc-row"]') ?? [])];
+      const prev = bar.querySelector('[data-slot="table-pagination-prev"]');
+      const next = bar.querySelector('[data-slot="table-pagination-next"]');
+      const totalEl = bar.querySelector('[data-slot="table-pagination-total"]');
+      return {
+        mode: bar.dataset.mode,
+        hostedBy: host?.getAttribute('data-slot') ?? null,
+        belowTable: tableRect ? barRect.top >= tableRect.bottom - 1 : null,
+        pageButtonCount: pages.length,
+        pageLabels: pages.map(p => p.textContent.trim()),
+        activePage: active ? active.textContent.trim() : null,
+        firstRowText: rows.length ? (rows[0].textContent || '').trim().slice(0, 10) : null,
+        rowCount: rows.length,
+        totalText: totalEl ? (totalEl.textContent || '').trim() : null,
+        hasSizeSelect: !!bar.querySelector('[data-slot="table-pagination-size"]'),
+        hasJumper: !!bar.querySelector('[data-slot="table-pagination-jumper"]'),
+        prevDisabled: prev ? prev.disabled : null,
+        nextDisabled: next ? next.disabled : null,
+        h: px(barRect.height),
+      };
+    });
+
+    return JSON.stringify(out);
+  })()`);
+}
+
+/**
+ * List / Table 探针（模式 C / 模式 C）。
+ *
+ * 判据：
+ * - List：H5 行高 ≥ 48（触控热区）、PC 行高 = 36；两端滚动容器 overflow-y = auto；
+ *   虚拟滚动实例的渲染行数应远小于数据总量。
+ * - Table：H5 是卡片（无 table 元素）、PC 是真表格；PC 的排序/筛选/选择控件都在。
+ */
+function probeListTable(label) {
+  return evaluate(`(() => {
+    const px = v => Math.round(parseFloat(v) * 100) / 100;
+    const out = { label: ${JSON.stringify(label)}, viewport: window.innerWidth + 'x' + window.innerHeight };
+
+    out.lists = [...document.querySelectorAll('[data-slot="list"]')].map(root => {
+      const items = [...root.querySelectorAll('[data-slot="list-item"], [data-slot="list-pc-item"]')];
+      const scroll = root.querySelector('[data-slot="list-scroll"]');
+      return {
+        mode: root.dataset.mode,
+        virtual: root.dataset.virtual ?? null,
+        itemCount: items.length,
+        itemH: items[0] ? px(getComputedStyle(items[0]).height) : null,
+        itemFontSize: items[0] ? getComputedStyle(items[0]).fontSize : null,
+        overflowY: scroll ? getComputedStyle(scroll).overflowY : null,
+        scrollH: scroll ? px(getComputedStyle(scroll).height) : null,
+        hasRefresh: !!root.querySelector('[data-slot="list-pc-refresh"]'),
+        hasStatus: !!root.querySelector('[data-slot="list-status"], [data-slot="list-pc-status"]'),
+      };
+    });
+
+    out.tables = [...document.querySelectorAll('[data-slot="table"]')].map(root => {
+      const cards = [...root.querySelectorAll('[data-slot="table-card"]')];
+      const rows = [...root.querySelectorAll('[data-slot="table-pc-row"]')];
+      const head = root.querySelector('[data-slot="table-pc-cell"]');
+      const title = root.querySelector('[data-slot="table-card-title"]');
+      const sortedTh = root.querySelector('[data-slot="table-pc-cell"][aria-sort]');
+      return {
+        mode: root.dataset.mode,
+        isTable: !!root.querySelector('table'),
+        cardCount: cards.length,
+        rowCount: rows.length,
+        // 首行文本：排序后应变化（判据「排序真的改变了行序」，不只是按钮存在）
+        firstRowText: rows.length
+          ? (rows[0].textContent || '').trim().slice(0, 12)
+          : cards.length
+            ? (cards[0].querySelector('[data-slot="table-card-title"]')?.textContent || '').trim().slice(0, 12)
+            : null,
+        ariaSort: sortedTh ? sortedTh.getAttribute('aria-sort') : null,
+        // 展开的卡片数（H5 展开详情）
+        expandedCards: cards.filter(c => c.getAttribute('data-expanded') === 'true').length,
+        filterPanelOpen: !!root.querySelector('[data-slot="table-pc-filter-panel"]'),
+        cardGap: cards.length
+          ? px(getComputedStyle(cards[0].parentElement).gap || getComputedStyle(cards[0].parentElement).rowGap)
+          : null,
+        cardTitleFontSize: title ? getComputedStyle(title).fontSize : null,
+        headCellH: head ? px(getComputedStyle(head).height) : null,
+        hasSort: !!root.querySelector('[data-slot="table-pc-sort"], [data-slot="table-card-sort-button"]'),
+        hasFilter: !!root.querySelector('[data-slot="table-pc-filter-trigger"]'),
+        hasSelect: !!root.querySelector('[role="checkbox"]'),
+      };
+    });
+
+    return JSON.stringify(out);
+  })()`);
+}
+
 async function hoverSelector(selector, dxRatio = 0.5) {
   const raw = await evaluate(`(() => {
     const el = document.querySelector(${JSON.stringify(selector)});
@@ -1969,6 +2114,78 @@ async function run() {
     await shot(`${cfg.name}-13d-navbar`);
     console.log('  scroll:', await scrollToSection('P3 · Tabbar'));
     await shot(`${cfg.name}-13e-tabbar`);
+
+    // --- 14. List / Table（模式 C / 模式 C）---
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · List'));
+    await shot(`${cfg.name}-14a-list`);
+    reports.push(await probeListTable(`${cfg.name} / list + table 初始`));
+
+    // --- 14b. List 滚到底加载：滚到容器底部应触发 onLoad（行数增加）---
+    console.log('  scroll:', await evaluate(`(() => {
+      const sc = [...document.querySelectorAll('[data-slot="list-scroll"]')][0];
+      if (!sc) return 'NOT_FOUND';
+      sc.scrollTop = sc.scrollHeight;
+      return 'SCROLLED';
+    })()`));
+    await sleep(900);
+    await shot(`${cfg.name}-14b-list-loaded`);
+    reports.push(await probeListTable(`${cfg.name} / list 滚到底后`));
+
+    // --- 14b2. 多实例隔离：点 PC 的「刷新」不应影响 H5 那个实例 ---
+    // 这条是 demo 曾把 H5/PC 两个 List 共用一份 useState 时被抓到的：
+    // 点一边刷新，另一边数据也被重置，看起来像组件 bug（真实业务里同页只命中一种模式）。
+    // 判据 = 点 PC 刷新后，H5 实例的行数与刷新前完全一致。
+    console.log('  click :', await realClickSelector('[data-slot="list-pc-refresh"]'));
+    await sleep(900);
+    const isolation = await evaluate(`(() => {
+      const lists = [...document.querySelectorAll('[data-slot="list"]')];
+      const count = r => r.querySelectorAll('[data-slot="list-item"], [data-slot="list-pc-item"]').length;
+      const h5 = lists.find(r => r.dataset.mode === 'h5');
+      const pc = lists.find(r => r.dataset.mode === 'pc');
+      if (!h5 || !pc) return JSON.stringify({ error: 'NOT_FOUND' });
+      return JSON.stringify({ h5Count: count(h5), pcCount: count(pc) });
+    })()`);
+    console.log('  iso   :', isolation);
+    await shot(`${cfg.name}-14b2-list-isolated`);
+    reports.push(isolation);
+
+    // --- 14c. Table PC：点表头排序（aria-sort 变化 + 行序变化）---
+    console.log('  click :', await realClickSelector('[data-slot="table-pc-sort"]'));
+    await sleep(400);
+    await shot(`${cfg.name}-14c-table-sorted`);
+    reports.push(await probeListTable(`${cfg.name} / table 排序后`));
+
+    // --- 14d. Table PC：打开列筛选面板 ---
+    console.log('  click :', await realClickSelector('[data-slot="table-pc-filter-trigger"]'));
+    await sleep(400);
+    await shot(`${cfg.name}-14d-table-filter`);
+    reports.push(await probeListTable(`${cfg.name} / table 筛选面板`));
+
+    // --- 14e. Table H5：展开卡片详情 ---
+    console.log('  click :', await realClickSelector('[data-slot="table-card-expand"]'));
+    await sleep(400);
+    await shot(`${cfg.name}-14e-table-card-expanded`);
+    reports.push(await probeListTable(`${cfg.name} / table 卡片展开后`));
+
+    // --- 14f. Table 分页（PC 端）：翻页后行内容真的换了一批 ---
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · Table 分页'));
+    await shot(`${cfg.name}-14f-pagination`);
+    reports.push(await probePagination(`${cfg.name} / pagination 初始`));
+
+    // 翻到第 2 页（local 模式：组件自己切数据）
+    // 翻到第 2 页（组件切数据）
+    console.log('  click :', await realClickSelector('[data-slot="table-pagination-next"]'));
+    await sleep(400);
+    await shot(`${cfg.name}-14f-pagination-page2`);
+    reports.push(await probePagination(`${cfg.name} / pagination 第 2 页`));
+
+    // --- 14g. DataContainer：加载策略与 mode 正交 ---
+    await reload();
+    console.log('  scroll:', await scrollToSection('P3 · DataContainer'));
+    await shot(`${cfg.name}-14g-data-container`);
+    reports.push(await probeDataContainer(`${cfg.name} / data-container 初始`));
   }
 
   fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(reports, null, 2), 'utf8');

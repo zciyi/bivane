@@ -45,6 +45,9 @@ import { Search } from "@/components/responsive/search";
 import { NavBar } from "@/components/responsive/nav-bar";
 import { Tab, Tabs } from "@/components/responsive/tabs";
 import { Tabbar, type TabbarItem } from "@/components/responsive/tabbar";
+import { List } from "@/components/responsive/list";
+import { Table, type TableColumn } from "@/components/responsive/table";
+import { DataContainer } from "@/components/responsive/data-container";
 import type { MenuItem, MenuValue } from "@/hooks/use-menu-state";
 import {
     ToastHost,
@@ -1084,6 +1087,429 @@ function TabbarDemos() {
                         </div>
                     </div>
                     <span className="text-bv-text-2">当前选中：{value}</span>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/** List demo 用的行数据 */
+interface DemoOrder {
+    id: string;
+    name: string;
+    amount: number;
+    status: string;
+}
+
+const DEMO_ORDER_SEED: DemoOrder[] = Array.from({ length: 12 }, (_, i) => ({
+    id: String(i + 1),
+    name: `订单 ${String(i + 1).padStart(2, "0")}`,
+    amount: (i + 1) * 37,
+    status: i % 3 === 0 ? "paid" : "pending",
+}));
+
+const DEMO_TABLE_COLUMNS: TableColumn[] = [
+    { key: "name", title: "名称", sortable: true, h5Role: "title" },
+    { key: "amount", title: "金额", sortable: true, h5Role: "meta" },
+    {
+        key: "status",
+        title: "状态",
+        h5Role: "detail",
+        filterable: true,
+        filters: ["paid", "pending"],
+    },
+];
+
+/**
+ * 单个 List 实例：自带一份数据状态。
+ *
+ * **必须每个实例独立持有 state**：验证台把 H5 与 PC 并排展示，若两者共用一份
+ * useState，点 PC 的「刷新」会把 H5 的数据一起重置 —— 看起来像组件 bug，
+ * 实际是 demo 把两个独立实例焊在了一起。真实业务里同一页面只会命中一种模式，
+ * 不存在这种共享。
+ */
+function ListDemo({
+    mode,
+    caption,
+    virtual = false,
+}: {
+    mode: "mobile" | "desktop";
+    caption: string;
+    virtual?: boolean;
+}) {
+    const [rows, setRows] = React.useState<DemoOrder[]>(DEMO_ORDER_SEED.slice(0, 6));
+    const [loading, setLoading] = React.useState(false);
+    const [finished, setFinished] = React.useState(false);
+
+    const loadMore = React.useCallback(() => {
+        setLoading(true);
+        // 模拟异步取数
+        window.setTimeout(() => {
+            setRows((prev) => {
+                const next = DEMO_ORDER_SEED.slice(prev.length, prev.length + 3);
+                if (prev.length + next.length >= DEMO_ORDER_SEED.length) {
+                    setFinished(true);
+                }
+                return [...prev, ...next];
+            });
+            setLoading(false);
+        }, 400);
+    }, []);
+
+    const refresh = React.useCallback(() => {
+        setLoading(true);
+        window.setTimeout(() => {
+            setRows(DEMO_ORDER_SEED.slice(0, 6));
+            setFinished(false);
+            setLoading(false);
+        }, 400);
+    }, []);
+
+    return (
+        <div className={mode === "mobile" ? "w-full max-w-[360px]" : "w-full max-w-[480px]"}>
+            <p className="mb-bv-sm text-bv-sm text-bv-text-2">{caption}</p>
+            <div className="h-[240px] overflow-hidden rounded-bv-lg bg-bv-surface">
+                <List
+                    forceMode={mode}
+                    data={rows}
+                    renderItem={(item) => (
+                        <Cell
+                            title={(item as DemoOrder).name}
+                            value={`¥${(item as DemoOrder).amount}`}
+                        />
+                    )}
+                    rowKey={(item) => (item as DemoOrder).id}
+                    loading={loading}
+                    finished={finished}
+                    onLoad={loadMore}
+                    onRefresh={refresh}
+                    virtual={virtual}
+                    itemHeight={virtual ? 44 : undefined}
+                    height={virtual ? 240 : undefined}
+                />
+            </div>
+        </div>
+    );
+}
+
+/**
+ * List 双模式示例（模式 C）
+ * H5：竖向滚动容器 + 触底加载 + 顶部下拉刷新；
+ * PC：固定高度滚动容器 + 滚到底加载 + 顶部「刷新」按钮。
+ */
+function ListDemos() {
+    return (
+        <Section title="P3 · List 列表（模式 C：H5 无限滚动+下拉刷新 / PC 滚动加载+刷新按钮）">
+            <Block>
+                <Row>
+                    <ListDemo
+                        mode="mobile"
+                        caption="H5：竖向滚动容器，滚到底自动加载；顶部下拉可刷新（两个实例各自独立，互不影响）"
+                    />
+                    <ListDemo
+                        mode="desktop"
+                        caption="PC：固定高度滚动容器 + 顶部「刷新」按钮（鼠标没有下拉手势，这是等价交互）"
+                    />
+                </Row>
+                <Row>
+                    <ListDemo
+                        mode="desktop"
+                        virtual
+                        caption="PC：虚拟滚动（给 virtual + itemHeight + height，只渲染视口内的行）"
+                    />
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/**
+ * 单个 Table 实例：排序/选中各自独立。
+ *
+ * 与 ListDemo 同理：验证台把两端并排展示，共用 state 会让
+ * 「点 PC 表头排序 → H5 卡片也跟着重排」，看起来像组件 bug。
+ */
+function TableDemo({
+    mode,
+    caption,
+    rows,
+}: {
+    mode: "mobile" | "desktop";
+    caption: string;
+    rows: DemoOrder[];
+}) {
+    const [selected, setSelected] = React.useState<string[]>([]);
+    const [sort, setSort] = React.useState<{ key: string; order: "asc" | "desc" } | null>(
+        null,
+    );
+
+    return (
+        <div className={mode === "mobile" ? "w-full max-w-[360px]" : "w-full max-w-[480px]"}>
+            <p className="mb-bv-sm text-bv-sm text-bv-text-2">{caption}</p>
+            <div
+                className={cn(
+                    "max-h-[320px] rounded-bv-lg",
+                    mode === "mobile"
+                        ? "overflow-y-auto bg-bv-background"
+                        : "overflow-hidden bg-bv-surface",
+                )}
+            >
+                <Table
+                    forceMode={mode}
+                    columns={DEMO_TABLE_COLUMNS}
+                    data={rows}
+                    sort={sort}
+                    onSortChange={setSort}
+                    onSelectionChange={setSelected}
+                />
+            </div>
+            <span className="text-bv-text-2">已选：{selected.join(", ") || "无"}</span>
+        </div>
+    );
+}
+
+/**
+ * Table 双模式示例（模式 C）
+ * H5：卡片化列表（关键字段直出 + 展开详情）；
+ * PC：标准表格（排序 / 列固定 / 列筛选 / 行选择）。
+ */
+function TableDemos() {
+    return (
+        <Section title="P3 · Table 表格（模式 C：H5 卡片化 / PC 标准表格）">
+            <Block>
+                <Row>
+                    <TableDemo
+                        mode="mobile"
+                        rows={DEMO_ORDER_SEED.slice(0, 4)}
+                        caption="H5：一张数据 = 一张卡片；「详情」展开其余字段，字段标签（带箭头）可点排序"
+                    />
+                    <TableDemo
+                        mode="desktop"
+                        rows={DEMO_ORDER_SEED.slice(0, 6)}
+                        caption="PC：真表格；点表头排序（表头就是标签，单元格只放值）、齿轮图标列筛选、行首勾选 + 表头全选"
+                    />
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/** 分页 demo 的全量数据（比 Table 其它 demo 多，用来撑出多页） */
+const PAGINATION_SEED: DemoOrder[] = Array.from({ length: 47 }, (_, i) => ({
+    id: `p-${i + 1}`,
+    name: `记录 ${String(i + 1).padStart(2, "0")}`,
+    amount: (i + 1) * 13,
+    status: i % 2 === 0 ? "paid" : "pending",
+}));
+
+const PAGINATION_COLUMNS: TableColumn[] = [
+    { key: "name", title: "名称", h5Role: "title" },
+    { key: "amount", title: "金额", sortable: true, h5Role: "meta" },
+];
+
+/**
+ * Table 分页示例（PC 端能力）。
+ *
+ * 三个实例分别演示三种典型接法：
+ * 1. local —— 组件自己切全量数据（前端分页）
+ * 2. remote + 受控 current —— 业务按页取数，组件只管控件（后端分页的常态）
+ * 3. startPage=0 —— 后端页码从 0 开始时
+ */
+function TablePaginationDemos() {
+    // 1. local：组件按页切片
+    const [localPage, setLocalPage] = React.useState(1);
+
+    // 2. remote：业务自己按页取数（这里用切片模拟接口返回）
+    const PAGE_SIZE = 10;
+    const [remotePage, setRemotePage] = React.useState(1);
+    const remoteSlice = React.useMemo(
+        () =>
+            PAGINATION_SEED.slice(
+                (remotePage - 1) * PAGE_SIZE,
+                remotePage * PAGE_SIZE,
+            ),
+        [remotePage],
+    );
+
+    return (
+        <Section title="P3 · Table 分页（PC 端：开关 / 本地远程 / 每页条数 / 起始页 / 总数 / 跳页 / 受控）">
+            <Block>
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ① local 模式：data 给全量，组件自己按页切（受控 current，外部也可驱动）
+                        </p>
+                        <div className="overflow-hidden rounded-bv-lg bg-bv-surface">
+                            <Table
+                                forceMode="desktop"
+                                columns={PAGINATION_COLUMNS}
+                                data={PAGINATION_SEED}
+                                pagination
+                                paginationMode="local"
+                                pageSize={10}
+                                current={localPage}
+                                onPageChange={setLocalPage}
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            className="mt-bv-sm cursor-pointer border-0 bg-transparent p-0 text-bv-sm text-bv-primary"
+                            onClick={() => setLocalPage(1)}
+                        >
+                            外部重置到第 1 页（当前 {localPage}）
+                        </button>
+                    </div>
+
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ② remote 模式（默认）：data 是当页数据，组件不切片；切页由业务换 data
+                        </p>
+                        <div className="overflow-hidden rounded-bv-lg bg-bv-surface">
+                            <Table
+                                forceMode="desktop"
+                                columns={PAGINATION_COLUMNS}
+                                data={remoteSlice}
+                                pagination
+                                pageSize={PAGE_SIZE}
+                                total={PAGINATION_SEED.length}
+                                pageSizeOptions={[10, 20, 50]}
+                                current={remotePage}
+                                onPageChange={(page) => setRemotePage(page)}
+                            />
+                        </div>
+                        <span className="text-bv-sm text-bv-text-2">
+                            业务持有的当前页：{remotePage}
+                        </span>
+                    </div>
+                </Row>
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ③ startPage=0：后端页码从 0 开始时（页码显示成 0…4）
+                        </p>
+                        <div className="overflow-hidden rounded-bv-lg bg-bv-surface">
+                            <Table
+                                forceMode="desktop"
+                                columns={PAGINATION_COLUMNS}
+                                data={PAGINATION_SEED}
+                                pagination
+                                paginationMode="local"
+                                pageSize={10}
+                                startPage={0}
+                                total={PAGINATION_SEED.length}
+                            />
+                        </div>
+                    </div>
+                </Row>
+            </Block>
+        </Section>
+    );
+}
+
+/**
+ * DataContainer 双模式示例（加载层）
+ *
+ * 关键演示「加载策略与 mode 正交」——这正是低代码 pageMode 字段该映射的东西：
+ * - auto（默认）：PC 分页条 / H5 触底哨兵
+ * - pagination：两端都分页（记录详情页，手机也要一页一页翻）
+ * - infinite：两端都触底加载（2000 条报表，手机也得滑）
+ */
+function DataContainerDemos() {
+    const PAGE_SIZE = 10;
+    const [page, setPage] = React.useState(1);
+    const [loading, setLoading] = React.useState(false);
+    const [accumulated, setAccumulated] = React.useState(6);
+    const [allLoaded, setAllLoaded] = React.useState(false);
+
+    const loadMore = React.useCallback(() => {
+        setLoading(true);
+        window.setTimeout(() => {
+            setAccumulated((prev) => {
+                const next = prev + 4;
+                if (next >= PAGINATION_SEED.length) setAllLoaded(true);
+                return Math.min(next, PAGINATION_SEED.length);
+            });
+            setLoading(false);
+        }, 400);
+    }, []);
+
+    // 切页回调（两端都分页时业务用它换 data；auto 下 PC 侧生效）
+    const onPageChange = React.useCallback((next: number) => {
+        setPage(next);
+    }, []);
+
+    return (
+        <Section title="P3 · DataContainer 加载层（只管「数据怎么来」，对内容层透明）">
+            <Block>
+                {/*
+                 * ① 这一份**不传 forceMode**：宽度决定形态。
+                 * PC → 分页条；H5 → 触底哨兵。这是「PC 分页 / H5 触底」最常见的一档，
+                 * 也是验证台应该展示的主形态 —— 用两份 forceMode 硬编码的实例冒充
+                 * 「同一份配置」会掩盖问题（H5 视口下仍强出分页条，看起来像 H5 有分页）。
+                 */}
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ① auto（默认）：宽屏出分页条，窄屏出触底哨兵 —— 这一份组件没传
+                            forceMode，缩放窗口跨 768px 就能看到形态自己变
+                        </p>
+                        <DataContainer
+                            total={PAGINATION_SEED.length}
+                            pageSize={PAGE_SIZE}
+                            current={page}
+                            onPageChange={onPageChange}
+                            loading={loading}
+                            finished={allLoaded}
+                            onLoad={loadMore}
+                        >
+                            {(currentPage: number, size: number) => (
+                                <Table
+                                    columns={PAGINATION_COLUMNS}
+                                    data={PAGINATION_SEED.slice(
+                                        (currentPage - 1) * size,
+                                        currentPage * size,
+                                    )}
+                                />
+                            )}
+                        </DataContainer>
+                        <span className="text-bv-sm text-bv-text-2">当前页：{page}</span>
+                    </div>
+                </Row>
+
+                <Row>
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ② loadStrategy=&quot;pagination&quot;：两端都分页（记录详情页，手机也要一页一页翻）
+                        </p>
+                        <DataContainer
+                            loadStrategy="pagination"
+                            total={PAGINATION_SEED.length}
+                            pageSize={PAGE_SIZE}
+                            pageSizeOptions={[10, 20]}
+                        >
+                            <Table
+                                columns={PAGINATION_COLUMNS}
+                                data={PAGINATION_SEED.slice(0, PAGE_SIZE)}
+                            />
+                        </DataContainer>
+                    </div>
+
+                    <div className="w-full max-w-[480px]">
+                        <p className="mb-bv-sm text-bv-sm text-bv-text-2">
+                            ③ loadStrategy=&quot;infinite&quot;：两端都触底哨兵（2000 条看板，PC 也要滑）
+                        </p>
+                        <DataContainer
+                            loadStrategy="infinite"
+                            loading={loading}
+                            finished={allLoaded}
+                            onLoad={loadMore}
+                        >
+                            <Table
+                                columns={PAGINATION_COLUMNS}
+                                data={PAGINATION_SEED.slice(0, accumulated)}
+                            />
+                        </DataContainer>
+                    </div>
                 </Row>
             </Block>
         </Section>
@@ -3098,6 +3524,10 @@ function Playground() {
                 <TabsDemos />
                 <NavBarDemos />
                 <TabbarDemos />
+                <ListDemos />
+                <TableDemos />
+                <TablePaginationDemos />
+                <DataContainerDemos />
 
                 {/* ---------- P1 弹层实例（都通过 portal 渲染到 body） ---------- */}
 

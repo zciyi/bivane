@@ -1231,3 +1231,117 @@
     --bv-tabbar-pc-item-icon-size: 16px;
     --bv-tabbar-pc-line-height: var(--bv-line-md);
 }
+
+/* ---------- 组件级 token：List 列表 ----------
+ * List 是模式 C（H5 无限滚动 + 触底加载 + 下拉刷新 / PC 滚动加载 + 刷新按钮 + 虚拟滚动），
+ * H5 与 PC 各自读自己的 token，不进 modes.css（架构 §6.5 ②）。
+ *
+ * 颜色一律复用既有语义 token（--bv-text / --bv-text-2 / --bv-text-3 /
+ * --bv-border / --bv-surface / --bv-muted / --bv-active / --bv-primary），
+ * 不新增颜色命名空间（架构 §3.4③）。
+ *
+ * Vant 4 没有 List 组件（van-list 只有 loading 态），这里的尺寸取自
+ * 本仓库既定的「H5 列表 48 / PC 行 36」行高基准（见工程约定）。
+ */
+:root,
+:host {
+    /* —— 两端共用 —— */
+    /* 状态提示区（加载中 / 没有更多 / 出错）的最小高度与文字密度 */
+    --bv-list-status-min-height: 44px;
+    --bv-list-status-padding-y: var(--bv-padding-sm);
+    --bv-list-status-line-height: var(--bv-line-sm);
+    --bv-list-status-icon-gap: var(--bv-padding-xs);
+
+    /* —— H5 —— */
+    --bv-list-item-min-height: 48px;
+    --bv-list-item-line-height: var(--bv-line-md);
+    /* 状态提示区的水平内边距（列表项本身不加 padding，排版归业务的内容组件管） */
+    --bv-list-status-padding-x: var(--bv-padding-md);
+    /* 下拉刷新：位移上限 96px、触发阈值 64px、回弹时长 */
+    --bv-list-pull-max-distance: 96px;
+    --bv-list-pull-threshold: 64px;
+    --bv-list-pull-duration: 200ms;
+    --bv-list-pull-z-index: 10;
+
+    /* —— PC —— */
+    --bv-list-pc-item-height: 36px;
+    --bv-list-pc-item-line-height: var(--bv-line-sm);
+    --bv-list-pc-toolbar-padding-x: var(--bv-padding-md);
+    --bv-list-pc-toolbar-padding-y: var(--bv-padding-xs);
+}
+
+/* ---------- 组件级 token：Table 表格 ----------
+ * Table 是模式 C（H5 卡片化列表 / PC 标准表格：排序 / 列固定 / 列筛选 / 行选择）。
+ *
+ * 颜色全部复用既有语义 token，不新增颜色命名空间。
+ * 列宽不在 token 里：它是数据驱动的（业务给 columns[i].width），
+ * 写进 token 就成了「所有列同宽」的假约束。
+ */
+:root,
+:host {
+    /* —— 两端共用：字段的排版 —— */
+    --bv-table-cell-gap: var(--bv-padding-xs);
+    --bv-table-cell-line-height: var(--bv-line-sm);
+    --bv-table-label-line-height: var(--bv-line-sm);
+    --bv-table-value-line-height: var(--bv-line-md);
+    --bv-table-sort-gap: var(--bv-padding-xs);
+    --bv-table-sort-icon-size: 12px;
+    --bv-table-empty-min-height: 96px;
+
+    /* —— H5 卡片 —— */
+    --bv-table-card-gap: var(--bv-padding-sm);
+    --bv-table-card-padding-x: var(--bv-padding-md);
+    --bv-table-card-padding-y: var(--bv-padding-md);
+    --bv-table-card-header-gap: var(--bv-padding-sm);
+    --bv-table-card-title-line-height: var(--bv-line-lg);
+    --bv-table-card-meta-gap: var(--bv-padding-xs);
+    --bv-table-card-field-gap: var(--bv-padding-base);
+    --bv-table-card-detail-gap: var(--bv-padding-sm);
+    --bv-table-card-expand-gap: var(--bv-padding-xs);
+    --bv-table-card-sort-gap: var(--bv-padding-sm);
+    --bv-table-card-select-size: 20px;
+    --bv-table-card-select-offset: 2px;
+
+    /* —— PC 表格 —— */
+    --bv-table-pc-cell-padding-x: var(--bv-padding-sm);
+    --bv-table-pc-cell-padding-y: var(--bv-padding-sm);
+    --bv-table-pc-label-width: 88px;
+    --bv-table-pc-select-column-width: 44px;
+    --bv-table-pc-select-size: 16px;
+    --bv-table-head-gap: var(--bv-padding-xs);
+    --bv-table-filter-panel-offset: 4px;
+    --bv-table-filter-panel-min-width: 140px;
+    --bv-table-filter-panel-padding-x: var(--bv-padding-sm);
+    --bv-table-filter-panel-padding-y: var(--bv-padding-xs);
+    --bv-table-filter-panel-z-index: 20;
+    --bv-table-filter-panel-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --bv-table-filter-option-padding-y: var(--bv-padding-xs);
+
+    /* —— PC 分页条（结构 token，颜色全部复用既有语义色）—— */
+    --bv-table-pagination-padding-x: var(--bv-padding-md);
+    --bv-table-pagination-padding-y: var(--bv-padding-sm);
+    --bv-table-pagination-gap: var(--bv-padding-xs);
+    --bv-table-pagination-line-height: var(--bv-line-sm);
+    --bv-table-pagination-button-size: 28px;
+    --bv-table-pagination-control-padding-y: var(--bv-padding-xs);
+    --bv-table-pagination-jumper-width: 56px;
+}
+
+/* ---------- 组件级 token：DataContainer 加载层 ----------
+ * DataContainer 是**加载层**：「数据怎么来」。它对内容层透明，
+ * 只在下方挂哨兵（触底加载）+ 状态提示（加载中/没有更多/出错可重试）。
+ *
+ * 之所以独立于 Table：低代码场景下「渲染什么」与「怎么加载」是两条独立演化的线
+ * （表格→看板→树形列表 / 分页→无限滚动→虚拟滚动）。分开才不会互相拖累。
+ *
+ * token 名用 --bv-load-*（不带 container）：这套状态区两端共用同一份密度，
+ * 差异只体现在「有 PC 才渲染分页条」上，不进 modes.css。
+ */
+:root,
+:host {
+    --bv-load-status-min-height: 44px;
+    --bv-load-status-padding-x: var(--bv-padding-md);
+    --bv-load-status-padding-y: var(--bv-padding-sm);
+    --bv-load-status-line-height: var(--bv-line-sm);
+    --bv-load-status-icon-gap: var(--bv-padding-xs);
+}

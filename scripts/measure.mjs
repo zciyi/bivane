@@ -244,6 +244,45 @@ const PROBE = `(() => {
       .filter(Boolean),
   );
 
+  // List / Table：模式 C / 模式 C。
+  // 判据是「token 真的落到盒子上」：List 行高 H5 48 / PC 36；
+  // Table 卡片 gap 与 PC 表头行高，以及排序/筛选控件是否真渲染。
+  out.list = [...document.querySelectorAll('[data-slot="list"]')].map((root) => {
+    const item = root.querySelector('[data-slot="list-item"], [data-slot="list-pc-item"]');
+    const scroll = root.querySelector('[data-slot="list-scroll"]');
+    return {
+      mode: root.getAttribute('data-mode'),
+      virtual: root.getAttribute('data-virtual'),
+      itemH: item ? px(getComputedStyle(item).height) : null,
+      itemFontSize: item ? getComputedStyle(item).fontSize : null,
+      scrollOverflowY: scroll ? getComputedStyle(scroll).overflowY : null,
+      hasRefresh: Boolean(root.querySelector('[data-slot="list-pc-refresh"]')),
+      renderedItems: root.querySelectorAll('[data-slot="list-item"], [data-slot="list-pc-item"]')
+        .length,
+    };
+  });
+
+  out.table = [...document.querySelectorAll('[data-slot="table"]')].map((root) => {
+    const card = root.querySelector('[data-slot="table-card"]');
+    const headCell = root.querySelector('[data-slot="table-pc-cell"]');
+    return {
+      mode: root.getAttribute('data-mode'),
+      isTable: Boolean(root.querySelector('table')),
+      cardGap: card
+        ? px(getComputedStyle(card.parentElement).rowGap || getComputedStyle(card.parentElement).gap)
+        : null,
+      cardTitleFontSize: card
+        ? getComputedStyle(card.querySelector('[data-slot="table-card-title"]')).fontSize
+        : null,
+      headCellH: headCell ? px(getComputedStyle(headCell).height) : null,
+      hasSort: Boolean(
+        root.querySelector('[data-slot="table-pc-sort"], [data-slot="table-card-sort-button"]'),
+      ),
+      hasFilter: Boolean(root.querySelector('[data-slot="table-pc-filter-trigger"]')),
+      hasSelect: Boolean(root.querySelector('[role="checkbox"]')),
+    };
+  });
+
   const root = getComputedStyle(document.documentElement);
   out.tokens = {
     'padding-md': root.getPropertyValue('--bv-padding-md').trim(),
@@ -261,6 +300,11 @@ const PROBE = `(() => {
     'nav-bar-height': root.getPropertyValue('--bv-nav-bar-height').trim(),
     'tabbar-height': root.getPropertyValue('--bv-tabbar-height').trim(),
     'tabbar-pc-item-height': root.getPropertyValue('--bv-tabbar-pc-item-height').trim(),
+    'list-item-min-height': root.getPropertyValue('--bv-list-item-min-height').trim(),
+    'list-pc-item-height': root.getPropertyValue('--bv-list-pc-item-height').trim(),
+    'list-status-min-height': root.getPropertyValue('--bv-list-status-min-height').trim(),
+    'table-card-gap': root.getPropertyValue('--bv-table-card-gap').trim(),
+    'table-pc-cell-padding-x': root.getPropertyValue('--bv-table-pc-cell-padding-x').trim(),
   };
   return JSON.stringify(out);
 })()`;
