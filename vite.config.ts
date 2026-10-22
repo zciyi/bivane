@@ -22,11 +22,12 @@ export default defineConfig({
      * 可执行的拆分动作，只会在第 4 门（stderr 必须为空）里制造常驻噪声。
      *
      * 这个阈值是**噪声地板**，不是预算：每加一批组件演示，单页 bundle 就实打实涨一截
-     * （450 → 518 引入 react-day-picker；→ 712 挂上 P3 的 Rate/Slider 等），
+     * （450 → 518 引入 react-day-picker；→ 712 挂上 P3 的 Rate/Slider 等；
+     * → 807.64 P3 表单与列表补齐后），
      * 越线就把地板抬到当前实际尺寸之上，保持「stderr 为空」这条门禁仍然只抓真警告
      * （缺 CSS 导入、解析失败之类），而不是抓一个必然增长的演示包体积。
      */
-    chunkSizeWarningLimit: 750,
+    chunkSizeWarningLimit: 850,
   },
   test: {
     environment: 'jsdom',

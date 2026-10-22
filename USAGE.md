@@ -69,6 +69,8 @@ npx shadcn@latest add @bivane/select
 @import "tailwindcss";
 @import "./styles/bivane/vant.css";
 @import "./styles/bivane/vant-dark.css"; /* 可选：深色主题 */
+@import "./styles/bivane/vant-ocean.css"; /* 可选：深海风格 */
+@import "./styles/bivane/vant-grape.css"; /* 可选：青莲风格 */
 @import "./styles/bivane/modes.css";
 @import "./styles/bivane/utilities.css";
 @import "./styles/bivane/theme.css"; /* ← 缺了它，所有 bg-bv-* 工具类都不会生成 */
@@ -76,9 +78,11 @@ npx shadcn@latest add @bivane/select
 
 `@import` 必须集中在文件最前面，中间插会被 CSS 规范忽略，症状同样是「token 全在、工具类全无」。
 
+后三个可选文件（`vant-dark` / `vant-ocean` / `vant-grape`）只含 `:root` 变量声明，加不加都不影响组件能否工作——**不想要就别 import**。import 了再用 class 激活，见下方「换风格 / 换深色」。
+
 路径**相对 globals.css 所在目录**，落点跟着你的目录布局走：
 
-| 你的项目               | token 落在           | globals.css 在           | 上面五行可直接用              |
+| 你的项目               | token 落在           | globals.css 在           | 上面的 import 可直接用        |
 | ---------------------- | -------------------- | ------------------------ | ----------------------------- |
 | 有 `src/` 目录         | `src/styles/bivane/` | `src/index.css`          | ✅                            |
 | 无 `src/` 目录         | `styles/bivane/`     | 根目录 `index.css`       | ✅                            |
@@ -115,6 +119,104 @@ createRoot(document.getElementById("root")!).render(
 | ------------- | ---------------------------------------------------------------------------------- |
 | `breakpoint`  | 判定断点，默认 `768`（`< 768px` 视为 H5）                                          |
 | `mode`        | `'auto'`（默认）自动判定；显式传 `'mobile'` / `'desktop'` 全局强制，文档站与测试用 |
+
+### 换风格 / 换深色
+
+三套内置品牌风格 + 深色，全部靠 **class 激活**，组件代码零改动：
+
+| class            | 效果                                       | 需要 import 的文件      |
+| ---------------- | ------------------------------------------ | ----------------------- |
+| （不加）         | Vant 复刻（默认）                          | `vant.css`              |
+| `bv-theme-ocean` | 深海：主色青蓝 `#0d8fa8`                   | `vant-ocean.css`        |
+| `bv-theme-grape` | 青莲：主色青莲紫 `#7a5af8`                 | `vant-grape.css`        |
+| `bv-theme-dark`  | 深色底（正交于风格，可叠加）               | `vant-dark.css`         |
+
+```tsx
+// 全局
+document.documentElement.className = "bv-theme-ocean";
+// 或 JSX：整页换色
+<html className="bv-theme-grape bv-theme-dark">
+```
+
+**class 要挂在 `document.documentElement`（`<html>`）上**，别挂在页面根 div：Dialog / Toast / Popup / Select 下拉都走 portal，容器挂在 `document.body` 下，**不在根 div 的子树里**——挂根 div 的症状是「页面按钮换了色，弹出来的浮层还是旧主色」。
+
+两点设计约定（想知道为什么可以这样做，看 `packages/tokens/styles/vant-ocean.css` 文件头）：
+
+- 风格只改**品牌色板**（`--bv-blue` / `--bv-green` / `--bv-red` / `--bv-orange` 及渐变），不碰中性灰阶、文本色、间距、字号、圆角。风格换的是调性，不是视觉基准。
+- 风格文件**不重定义** `--bv-primary` 等 4 个语义色 —— 它们在 `vant.css` 里写成 `var(--bv-blue)` 式间接引用，靠 CSS 自定义属性的延迟解析跟随色板。因此按钮、焦点环、选中态、滑块、标签页等 32 处引用语义色的组件 token 会整体换色，不需要逐个改组件。
+
+### 用 tweakcn 可视化调色（可选）
+
+tweakcn 是 shadcn 生态的可视化主题编辑器。它用 **44 个 shadcn 风格槽名**（`--primary` / `--background` / `--muted`…），Bivane 用 **Vant 风格语义槽**（`--bv-*`）—— 两套命名没有交集。
+
+> ⚠ 所以**别把 Bivane 的 CSS 直接粘进 tweakcn**：它的导入器只认字面量 `:root { }` / `.dark { }` 块和那 44 个变量名，Bivane 写的是 `:root, :host { }` 和 `--bv-*`。结果不是报错，而是**静默导入 0 个变量** —— 界面显示「导入成功」，但一个颜色都没变。
+
+本库提供双向桥接（**独立 item，可选安装**）：
+
+```bash
+npx shadcn@latest add @bivane/tweakcn
+```
+
+装到 `src/scripts/tweakcn-bridge.mjs`（零依赖，不需要装 postcss）与 `src/styles/bivane/tweakcn.css`。
+
+**① 把 Bivane 主题带进 tweakcn 调色**
+
+打开 [tweakcn.com/editor/theme](https://tweakcn.com/editor/theme) → Import → Custom CSS → 粘贴 `src/styles/bivane/tweakcn.css` 的内容。44 个槽会全部就位（含深色变体），调完导出。
+
+**② 把调好的主题转回 Bivane**
+
+```bash
+node src/scripts/tweakcn-bridge.mjs import my-theme.css --name my-theme
+```
+
+产出 `.bv-theme-my-theme` 风格类，与内置的 `bv-theme-ocean` / `bv-theme-grape` **同构**：
+
+```css
+.bv-theme-my-theme {
+    --bv-blue: #3b82f6;
+    --bv-red: #ef4444;
+    --bv-green: #10b981;
+    --bv-orange: #f59e0b;
+}
+```
+
+把它放进你的 CSS（`@import` 在 `vant.css` **之后**），然后 `<html class="bv-theme-my-theme">` 即可，可与 `bv-theme-dark` 叠加。
+
+> **导入产物只覆盖品牌槽**（主色 / 危险 / 成功 / 警告），**不改中性槽**（文本 / 边框 / 底色 / 间距 / 字号）。中性槽是 Vant 保真的基准，不允许被外部主题改写 —— 换风格换调性，不换基准。
+>
+> 体积影响：**零**。`tweakcn.css` **不要** import 到你的 `globals.css`（它只是给 tweakcn 粘贴用的）；不 import 就对产物没有任何影响。
+
+### 文档站
+
+仓库自带一个文档站（`apps/docs/`），每个组件一页，含 H5 / PC **并排**演示、props 表与用法片段。
+
+```bash
+npm run docs:dev      # 起本地文档站（http://localhost:5171）
+npm run docs:build    # 构建文档站到 apps/docs/dist
+npm run docs:props    # 从组件源码重新抽 props 表
+npm run docs:registry # 从响应矩阵重新抽组件清单
+npm run docs:examples # 从 demo 源码重新抽示例代码
+```
+
+它不是消费者要装的东西（消费 `shadcn` registry 即可），而是**组件的说明书与回归现场**。
+信息架构对标 Ant Design / Element：
+
+- **左侧导航带搜索框**，而且能按 **prop 名**反查 ——
+  输入 `onSortChange` 直接定位到 Table（Ant 的搜索只匹配组件名）。
+- **每个示例一张卡**：标题 + 说明 + H5/PC 并排演示 + 「查看代码」展开真实源码。
+  源码是自动从 demo 文件里抽的（`npm run docs:examples`），与实际渲染同源。
+- **API 表拆成「属性」「事件」两张** —— 上千个属性会把事件淹掉，
+  而回调恰恰是查阅时最常找的。
+- **右侧页内目录**跟着滚动高亮，**底部有上/下一个组件**。
+
+三条硬约定：
+
+- 文档里展示的 demo 与仓库里的验证台（`src/App.tsx`）是**同一份**（在 `demos/` 目录），
+  所以「文档里看到的」就是「验证台验证过的」，两边不会漂移。
+- props 表由脚本从**组件源码**自动提取（`npm run docs:props`），与实现始终同步。
+- 每个示例在 demo 文件里是一个**独立导出**（`XxxExampleN`），
+  验证台仍按原顺序渲染它们 —— 拆分不改变验证台的任何输出
+  （`npm run bench:snapshot` 可存全量 DOM 做前后比对）。
 
 ---
 

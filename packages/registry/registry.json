@@ -56,7 +56,7 @@
             "name": "tokens",
             "type": "registry:style",
             "title": "Vant 风格 token",
-            "description": "Vant 4 视觉基准的 --bv-* 语义 token，含深色主题、模式相关 token（modes.css）、样式原子层，以及 Tailwind @theme 映射（theme.css，缺了它任何 bg-bv-* 工具类都不会生成）。安装后在 globals.css 按 vant → vant-dark → modes → utilities → theme 的顺序 @import。",
+            "description": "Vant 4 视觉基准的 --bv-* 语义 token，含深色主题（vant-dark.css）、两套可切换品牌风格（vant-ocean.css 深海 / vant-grape.css 青莲）、模式相关 token（modes.css）、样式原子层，以及 Tailwind @theme 映射（theme.css，缺了它任何 bg-bv-* 工具类都不会生成）。安装后在 globals.css 按 vant → vant-dark → vant-ocean → vant-grape → modes → utilities → theme 的顺序 @import；品牌风格靠 class（bv-theme-ocean / bv-theme-grape）激活，可与 bv-theme-dark 自由组合，不需要哪个风格就别 import 那个文件。",
             "files": [
                 {
                     "path": "packages/tokens/styles/vant.css",
@@ -67,6 +67,16 @@
                     "path": "packages/tokens/styles/vant-dark.css",
                     "type": "registry:style",
                     "target": "styles/bivane/vant-dark.css"
+                },
+                {
+                    "path": "packages/tokens/styles/vant-ocean.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/vant-ocean.css"
+                },
+                {
+                    "path": "packages/tokens/styles/vant-grape.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/vant-grape.css"
                 },
                 {
                     "path": "packages/tokens/styles/modes.css",
@@ -82,6 +92,44 @@
                     "path": "packages/tokens/styles/theme.css",
                     "type": "registry:style",
                     "target": "styles/bivane/theme.css"
+                }
+            ]
+        },
+        {
+            "name": "tweakcn",
+            "type": "registry:lib",
+            "title": "tweakcn 主题桥接",
+            "description": "与 tweakcn（shadcn 主题编辑器）互转的工具链。tweakcn 用 44 个 shadcn 风格槽名（--primary/--background/--muted…），Bivane 用 Vant 风格语义槽（--bv-*），两套命名无交集 —— 把 Bivane 的 CSS 直接丢给 tweakcn 会**静默导入 0 个变量**（不报错，只是颜色没变）。本 item 提供双向转换：① bivane-tweakcn.css 是 Bivane 主题的 tweakcn 格式导出，贴进 tweakcn 的 Import Custom CSS 即可可视化调色；② tweakcn-bridge.mjs 是转换脚本，命令 `node tweakcn-bridge.mjs import <tweakcn.css> --name my-theme` 可把调好的主题转回 Bivane 品牌风格类（.bv-theme-my-theme，与内置 bv-theme-ocean/bv-theme-grape 同构，可与 bv-theme-dark 叠加）。**这些都是可选文件**：不 import bivane-tweakcn.css 则对产物体积零影响；转换脚本零依赖（不需要装 postcss），随 item 落到 scripts/ 下即可用 node 跑。",
+            "files": [
+                {
+                    "path": "packages/tokens/tweakcn/bivane-tweakcn.css",
+                    "type": "registry:style",
+                    "target": "styles/bivane/tweakcn.css"
+                },
+                {
+                    "path": "scripts/tweakcn-bridge.mjs",
+                    "type": "registry:lib",
+                    "target": "scripts/tweakcn-bridge.mjs"
+                },
+                {
+                    "path": "scripts/tweakcn/mapping.mjs",
+                    "type": "registry:lib",
+                    "target": "scripts/tweakcn/mapping.mjs"
+                },
+                {
+                    "path": "scripts/tweakcn/css-vars.mjs",
+                    "type": "registry:lib",
+                    "target": "scripts/tweakcn/css-vars.mjs"
+                },
+                {
+                    "path": "scripts/tweakcn/color.mjs",
+                    "type": "registry:lib",
+                    "target": "scripts/tweakcn/color.mjs"
+                },
+                {
+                    "path": "scripts/tweakcn/tweakcn-parser.mjs",
+                    "type": "registry:lib",
+                    "target": "scripts/tweakcn/tweakcn-parser.mjs"
                 }
             ]
         },

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import './packages/tokens/styles/vant.css';
 @import './packages/tokens/styles/vant-dark.css';
+@import './packages/tokens/styles/vant-ocean.css';
+@import './packages/tokens/styles/vant-grape.css';
 @import './packages/tokens/styles/modes.css';
 @import './packages/tokens/styles/utilities.css';
 @import './packages/tokens/styles/theme.css';
@@ -11,12 +13,16 @@
  * 内容已按「是否随 registry 分发」拆干净，避免出现
  * 「demo 能跑、装到消费者项目里样式全白」的分叉：
  *
- *   --bv-* 变量定义              -> tokens/styles/vant.css · vant-dark.css · modes.css
+ *   --bv-* 变量定义              -> tokens/styles/vant.css · vant-dark.css
+ *   品牌风格（class 激活，可选）  -> tokens/styles/vant-ocean.css · vant-grape.css
+ *   随模式变化的变量              -> tokens/styles/modes.css
  *   样式原子层（安全区、动画）    -> tokens/styles/utilities.css
  *   主题映射 + 双模式变体 + 基础层 -> tokens/styles/theme.css
  *
- * 上面 6 行 @import 就是消费者在 globals.css 里需要写的全部内容
+ * 上面 8 行 @import 就是消费者在 globals.css 里需要写的全部内容
  * （把 './packages/tokens/styles/' 换成 shadcn 落盘的 './styles/bivane/'）。
+ * 两个品牌风格是可选的：不需要就别 import，用 class 激活（bv-theme-ocean / bv-theme-grape），
+ * 且可与 bv-theme-dark 叠加。
  *
  * 注：Tailwind 的 @import 必须集中在文件顶部 —— 中间插 @import 会被 CSS 规范忽略，
  * 症状同样是「token 全在、工具类全无」。
@@ -33,3 +39,19 @@
  */
 @source not "./docs";
 @source not "./.workbuddy";
+/**
+ * scripts/ 是构建与校验工具（measure / consumer-check / tweakcn 桥接），
+ * 不是组件源码。里面的**字符串字面量**会被 Tailwind 当成类名候选：
+ * tweakcn 桥接的映射表里写着 'font-sans' / 'font-serif' / 'font-mono'
+ * （那是 tweakcn 的槽名，不是 Tailwind 类），结果被编译进产物 ——
+ * 实测多出 195 字节的 .font-sans/.font-serif/.font-mono 死规则。
+ * 同理 packages/tokens/tweakcn/ 里的导出产物（--font-sans: …）也不该被扫。
+ */
+@source not "./scripts";
+@source not "./packages/tokens/tweakcn";
+/**
+ * apps/docs 是**另一个应用**（文档站），验证台不渲染它。
+ * 不排除的话，文档站自己的类名（max-w-[960px] / sm:grid-cols-2 …）
+ * 会被编进验证台的 CSS —— 实测多出 2.4 kB 死规则。
+ */
+@source not "./apps/docs";

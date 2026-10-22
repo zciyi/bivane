@@ -35,7 +35,11 @@
 
 ```
 bivane/
-├── apps/docs/                       # 文档站：每个组件提供 H5/PC 双模式 demo
+├── apps/docs/                       # 文档站：每个组件一页，H5/PC 双模式并排 demo
+│   ├── src/catalog.ts               # 手写：哪些组件、怎么分类、对应哪个 demo
+│   ├── src/registry.generated.json  # 生成：分类 + 矩阵抽来的两端行为描述
+│   ├── src/props.generated.json     # 生成：从组件源码抽的 props 表
+│   └── src/pages/                   # 首页 + 通用组件页
 ├── packages/
 │   ├── registry/                    # registry.json + r/<name>.json
 │   └── tokens/styles/               # vant.css / vant-dark.css / modes.css / utilities.css / theme.css
@@ -45,6 +49,9 @@ bivane/
 │   ├── pc/                          # 大屏实现（锚定浮层、日历面板、键盘导航）
 │   ├── ui/                          # 无交互差异的共用件（Button、Cell、PanelHeader、Overlay…）
 │   └── providers/                   # responsive-provider
+├── demos/                           # 共享 demo：验证台与文档站展示同一份
+│   ├── layout.tsx                   # Section / Block / Row 布局原语
+│   └── <组件>.tsx                   # 每个组件一份 demo
 ├── hooks/                           # 共享逻辑（use-device-mode / use-lock-scroll / use-picker-column …）
 ├── lib/utils.ts                     # cn() 等
 └── tests/
@@ -107,7 +114,80 @@ Vant `--van-*` 完整映射为 `--bv-*` 语义变量；**组件只允许引用�
 ```
 
 优先用模式相关 token（`py-bv-block`）；需要显式分支写 `bv-pc:py-bv-lg`，不写 `md:`。
-多风格机制：每套风格 = 一个只含 `:root` 变量的 CSS 文件，组件代码零改动；格式兼容 tweakcn。
+
+### 3.3.1 多风格机制
+
+**每套风格 = 一个只含变量声明的 CSS 文件，组件代码零改动。** 风格与深色主题都靠 **class 激活**，不正交写法上的 `:root` 覆盖。
+
+| 文件                 | class            | 覆盖范围                                                     |
+| -------------------- | ---------------- | ------------------------------------------------------------ |
+| `vant.css`           | —（默认）        | 全量基座：色板 + 间距 + 字号 + 圆角 + 全部组件级 token        |
+| `vant-dark.css`      | `bv-theme-dark`  | 仅中性槽（`--bv-text` / `--bv-background` / `--bv-border`…）  |
+| `vant-ocean.css`     | `bv-theme-ocean` | 仅品牌槽（8 个色板槽 + `--bv-rate-icon-full-color`）          |
+| `vant-grape.css`     | `bv-theme-grape` | 同上                                                           |
+
+三条硬约定，违反即**静默半风格化**（类型 / 单测 / 构建全绿，用户切 class 看到半新半旧）：
+
+1. **风格只改品牌槽，绝不碰中性槽。** 灰阶 / 文本 / 边框 / 底色 / 间距 / 字号是视觉基准，
+   风格换的是调性。换风格顺带改了基准 = 破坏 Vant 保真承诺。
+2. **风格不重定义 `--bv-primary/success/danger/warning`。** 它们在 `vant.css` 里写成
+   `var(--bv-blue)` 式**间接引用**，靠 CSS 自定义属性的延迟解析跟随色板 ——
+   改了色板，全库 32 处引用语义色的组件 token 自动跟随。风格里写死 primary 会让这层链断掉。
+3. **`vant.css` 里写死 Vant 原值、不走语义引用的品牌槽**（当前只有 `--bv-rate-icon-full-color`）
+   必须在每套风格里一并覆盖，否则该组件在非默认风格下仍是 Vant 原色。
+   该清单由 `tests/theme-presets.test.ts` **从 vant.css 正则提取**（不手维护），
+   半透明黑 `rgba(0,0,0,*)` 按「结构色」排除。
+
+**为什么用 class 而不是 `:root` 覆盖**：深色改中性槽、风格改品牌槽，本就不重叠；
+但若都用 `:root` + 同等特异性覆盖，先后顺序就决定谁赢，**无法叠加**。
+改成 class 后两者走不同属性、可自由组合（`class="bv-theme-ocean bv-theme-dark"`）。
+
+⚠ 激活 class 必须挂在 `document.documentElement` 上：portal 容器挂在 `document.body` 下，
+不在页面根 div 子树内，挂根 div 会导致「页面换了色、浮层还是旧色」。
+
+### 3.3.2 tweakcn 桥接（P4-2）
+
+tweakcn 是 shadcn 生态的可视化主题编辑器。它用 **44 个 shadcn 风格槽名**
+（`--primary` / `--background` / `--muted`…），本库用 **Vant 风格语义槽**（`--bv-*`）——
+两套命名无交集。
+
+**关键事实（来自 tweakcn 源码，非推测）**：
+
+| 事实 | 源码位置 | 后果 |
+| ---- | -------- | ---- |
+| 导入只认**字面量** `:root { }` 与 `.dark { }` 两块 | `utils/parse-css-input.ts` 的 `extractCssBlockContent`（正则 `${selector}\s*{([^}]+)}`） | 本库的 `:root, :host { }` / `.bv-theme-dark { }` **匹配不上** |
+| 变量名必须是那 44 个，不在名单里**直接丢弃** | 同上，`validNames.includes(cleanName)` | `--bv-*` 一个都不认 |
+| 颜色值交给 `culori` 解析，失败则**原样返回**不抛 | `utils/color-converter.ts` | `var(--bv-primary)` 这种引用会被静默丢弃 |
+| 导入**从不报错** | 整个 `parseCssInput` | 症状是「导入成功但一个颜色都没变」 |
+
+所以「把 Bivane 的 CSS 丢给 tweakcn」是**静默失败**，不是报错。
+
+**本库的应对：双向桥接**（`scripts/tweakcn-bridge.mjs` + `scripts/tweakcn/`）
+
+| 方向 | 产物 | 说明 |
+| ---- | ---- | ---- |
+| Bivane → tweakcn | `packages/tokens/tweakcn/bivane-tweakcn.css` | 字面量 `:root` / `.dark` 两块 + 44 个槽的**字面量值**（不能是 `var()` 引用） |
+| tweakcn → Bivane | `.bv-theme-<name>` 风格类 | 按映射表翻译回品牌槽，产物与 §3.3.1 的内置风格**同构** |
+
+**硬约束**：
+
+1. **导出必须是字面量**。tweakcn 的 `culori` 解析 `var(--bv-x)` 会失败并静默丢弃。
+   导出前用 `assertExportIsImportable()` 自查 —— 用**tweakcn 自己的解析器**
+   （`scripts/tweakcn/tweakcn-parser.mjs` 是其源码的逐字复刻）回读产物，
+   确认 44 个槽都在、颜色都是合法字面量，不合格直接抛错不出文件。
+2. **导入只覆盖品牌槽**，不改中性槽（理由同 §3.3.1 第 1 条）。
+   映射表在 `scripts/tweakcn/mapping.mjs`（唯一事实源）。
+3. **tweakcn 缺 success / warning 语义槽**（只有 `destructive`）。
+   约定用图表色槽承载：`chart-1`=主色 / `chart-2`=成功绿 / `chart-3`=警告橙。
+   `ring` **不导入** —— 本库的 `--bv-focus-ring-color = var(--bv-primary)` 会自动跟随。
+4. **桥接脚本零依赖**。消费者 `npx shadcn add @bivane/tweakcn` 后直接
+   `node scripts/tweakcn-bridge.mjs import ...` 即可，不需要装 postcss。
+   CSS 解析用手写的零依赖实现（`scripts/tweakcn/css-vars.mjs`），
+   正解性由 `tests/tweakcn-bridge.test.ts` 用 **postcss 交叉验证**保证。
+5. **产物零体积增量**：`bivane-tweakcn.css` 只给 tweakcn 粘贴用，
+   **不进** `index.css` 的 `@import` 链，**不进** `tokens` item 的 `files`。
+   它是独立的 `@bivane/tweakcn` item（`registry:lib` 类型），
+   消费者不装就没有、装了也不 import 就不进产物。
 
 ### 3.4 Token 消费的三类静默失效
 
@@ -148,12 +228,75 @@ demo 与消费者走同一条链路：`index.css` 只保留顶部集中的 6 行
 | --------------- | ------------------------------------------------------ | ------------------------------------------ |
 | `vant.css`      | `--bv-*` 实际值                                        | 变量未定义                                 |
 | `vant-dark.css` | `.bv-theme-dark` 深色覆盖                              | 无深色主题                                 |
+| `vant-ocean.css` | `.bv-theme-ocean` 深海品牌风格                        | 切 class 无反应                           |
+| `vant-grape.css` | `.bv-theme-grape` 青莲品牌风格                        | 切 class 无反应                           |
 | `modes.css`     | 随 `data-mode` 变化的变量                              | 两端视觉无差异                             |
 | `utilities.css` | 安全区 + 弹层动画原子层                                | 刘海屏遮挡、动画不跑                       |
 | `theme.css`     | `@theme inline` 映射 + `bv-h5:`/`bv-pc:` 变体 + 基础层 | **所有 `bg-bv-*` / `p-bv-*` 工具类不生成** |
 
+新增 token 文件时**必须同时改四处**：`registry.json` 的 tokens item `files`、
+`index.css` 的 `@import`、`scripts/consumer-check.mjs` 的 `EXPECTED` 与 CSS 探针、
+本节表格。漏任一处的症状都是「仓库里正常、消费者项目里没生效」。
+
 另：`index.css` 用 `@source not "./docs"` / `@source not "./.workbuddy"` 排除非源码目录，
 否则文档里的 Tailwind 类名示例会被编译进产物（非法 CSS warning + 死规则）。
+
+### 3.4 文档站（apps/docs）
+
+文档站的价值是「能查、能看双端、能抄代码」。**信息架构对标 Ant Design / Element**：
+
+```
+┌────────────┬──────────────────────────────┬───────────────┐
+│ 左：组件导航 │ 中：组件页                     │ 右：页内目录    │
+│  + 搜索框   │  标题 + 简介                    │  （滚动高亮）  │
+│  按分类分组 │  示例：一张卡一个用法            │               │
+│  **能按    │    + H5/PC 并排演示              │               │
+│   prop 名  │    + 「查看代码」展开真实源码      │               │
+│   反查**   │  两端行为                        │               │
+│            │  API：属性表 / 事件表（分开）      │               │
+│            │  上一个 / 下一个组件              │               │
+└────────────┴──────────────────────────────┴───────────────┘
+```
+
+五条设计约定：
+
+1. **demo 与验证台共用同一份**（`demos/` 目录）。
+   两边各写一份 → 文档展示的行为与实际验证过的行为会漂移，而漂移是静默的。
+   `demos/layout.tsx` 的 `Section` / `Block` / `Row` 与验证台原本的同名件**逐字一致**
+   —— 因为 `scripts/visual-check.mjs` 是靠 h2 的**文本内容**定位节点的
+   （`scrollToSection('P3 · Rate')`），改了标题/层级视觉门禁会直接找不到节点。
+
+2. **一个示例 = 一个可独立寻址的组件**。
+   `demos/<组件>.tsx` 里每个 `<Block>` 抽成 `export function XxxExampleN()`，
+   父组件 `XxxDemos()` 仍按原顺序渲染它们 →
+   **验证台 DOM 逐字不变**（用 `scripts/bench-snapshot.mjs` 存全量 innerHTML 比对证明），
+   而文档站能把每个示例单独渲染成一张卡。
+   抽不动的唯一情形是**跨示例共享 hook 状态**（如 switch 的 `notice`）——
+   hook 不能提到模块作用域，要共享就得父组件持有并往下传，那是产品决策，脚本不替开发者定。
+
+3. **内容分「生成」与「手写」三半**：
+   - 手写：`apps/docs/src/catalog.ts`（哪些组件、怎么分类、对应哪个 demo）、
+     `apps/docs/src/examples.ts`（每个示例叫什么、演示什么）
+   - 生成：`props.generated.json`（从**组件源码**抽的 props 表，脚本
+     `scripts/extract-props.mjs` 用 TypeScript 编译器 API 解析）、
+     `registry.generated.json`（从 `docs/bivane-responsive-matrix.md` 抽的两端行为描述）、
+     `example-code.generated.json`（从 demo 源码抽的示例代码，
+     `scripts/extract-examples.mjs`）
+   三半的漂移由 `tests/docs-registry.test.ts` 挡住（生成物与源码不一致 → 测试红）。
+   **示例代码是自动抽的**，且剥掉 `<Block>` / `<Row>` ——
+   那两个是验证台的排版辅助，读者项目里没有，留着等于给一段抄不走的代码。
+
+4. **零新依赖**：hash 路由手写（不引 react-router —— 运行时依赖白名单是 9 个），
+   props 提取靠已有的 `typescript`（devDependency），颜色/文档站的 UI 全部用 Bivane 自己的 token。
+
+5. **API 表拆成「属性」「事件」两张**（Ant/Element 都这么分）：
+   1197 个属性会把 228 个事件淹掉，而回调恰恰是查阅时最常找的。
+   判据是「名字形如 `onXxx`」且「类型是函数」。
+
+**双模式展示的两条硬约定**：
+- 两个实例**各自独立持有 state**（同一 demo 渲染两次 → React 建两个实例 → 天然隔离）；
+- 用 `ResponsiveProvider mode="mobile" | "desktop"` 强制模式，**不给组件传 `forceMode`**
+  （Provider 自己的注释就写着「文档站、测试用」；`forceMode` 是留给业务方的逃生舱）。
 
 ## 4. 组件硬性契约（生成后逐条自检）
 
@@ -331,7 +474,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 - **P1′ 弹层补全** ✅：ActionSheet（Popup+列表）→ Alert/Confirm（Dialog preset）→ Notify（Toast 换信息模型）→ Loading
 - **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker ✅ / Cascader ✅ → Calendar ✅
 - **P3 表单与列表** ✅：Field/Input/Textarea ✅ → Switch/Checkbox/Radio ✅ → Rate/Slider ✅ → InputNumber ✅ → Uploader ✅ → **Search ✅（2026-10-20，模式 C）** → **Tabs/NavBar ✅（2026-10-20，模式 B）→ Tabbar ✅（2026-10-20，模式 C）** → **List ✅ / Table ✅（2026-10-20，模式 C / C，闭环 P3）**
-- **P4 生态** ⬜：第 2/3 套风格 → tweakcn 适配 → 文档站 → registry 发布验证
+- **P4 生态** 🔨 进行中：**第 2/3 套风格 ✅（2026-10-21，`vant-ocean.css` / `vant-grape.css`，class 激活可与深色叠加）** → tweakcn 适配 ⬜ → 文档站 `apps/docs` ⬜ → registry 发布验证 ⬜
 
 ## 9. 验证与质量门
 

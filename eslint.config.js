@@ -7,13 +7,21 @@ export default tseslint.config(
   {
     ignores: [
       'node_modules/**',
-      'dist/**',
+      // ⚠ 用 **/dist/** 而不是 dist/** ——
+      //    根 dist（验证台产物）之外的 apps/docs/dist（文档站产物）
+      //    也要排除，否则打包后的 minified bundle 会被当源码 lint，
+      //    一次刷出几千个 no-undef / no-unused-expressions 假错。
+      '**/dist/**',
       'packages/registry/r/**',
       'scripts/_install_deps.py',
       // 与 .gitignore 对齐：视觉验证的输出目录不属于源码，不应参与 lint。
       // 曾因把参考源码（Vant 的 popup.tsx）临时下载到 .visual/ 而让 lint 报 6 个假错。
       '.visual/**',
       '.chrome-profile*/**',
+      // 临时工作目录：重构过程中的中间产物与截图。
+      // 不排除的话，里面的旧版源码会被 lint 一次刷出几千个假错
+      // （与 .visual/ 当初的情况同源）。
+      '.tmp/**',
       // 第 8 门的夹具项目同理：它是「消费者侧」的产物（含 dist/ 构建输出），
       // 不属于本仓库源码。漏了这条会被夹具的 bundle 一次刷出上百个假错
       // （no-undef / no-unused-expressions），看起来像组件库挂了。

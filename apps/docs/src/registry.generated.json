@@ -1,0 +1,6479 @@
+{
+  "generatedFrom": "docs/bivane-responsive-matrix.md",
+  "categories": [
+    {
+      "id": "basic",
+      "title": "基础"
+    },
+    {
+      "id": "form",
+      "title": "表单"
+    },
+    {
+      "id": "feedback",
+      "title": "弹层与反馈"
+    },
+    {
+      "id": "select",
+      "title": "选择与输入"
+    },
+    {
+      "id": "nav",
+      "title": "导航与数据"
+    }
+  ],
+  "entries": [
+    {
+      "name": "Button",
+      "slug": "button",
+      "title": "Button 按钮",
+      "category": "basic",
+      "propsType": "ButtonProps",
+      "demo": "ButtonDemos",
+      "summary": "五种类型（默认/主要/成功/危险/警告）+ 四种形态（朴素/圆角/直角/块级）+ 加载态。",
+      "install": "npx shadcn@latest add @bivane/button",
+      "importPath": "@/components/ui/button",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/ui/button.tsx",
+      "props": [
+        {
+          "name": "type",
+          "type": "ButtonType",
+          "optional": true,
+          "description": "按钮类型，默认 default",
+          "default": "'default'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "ButtonSize",
+          "optional": true,
+          "description": "尺寸；不传为 base（44px 高）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "plain",
+          "type": "boolean",
+          "optional": true,
+          "description": "朴素按钮（透明背景 + 类型主色文字）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "round",
+          "type": "boolean",
+          "optional": true,
+          "description": "圆角按钮",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "square",
+          "type": "boolean",
+          "optional": true,
+          "description": "直角按钮",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "block",
+          "type": "boolean",
+          "optional": true,
+          "description": "块级按钮（宽度 100%）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "hairline",
+          "type": "boolean",
+          "optional": true,
+          "description": "细边线按钮（0.5px 物理边框）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "description": "加载中",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loadingText",
+          "type": "string",
+          "optional": true,
+          "description": "加载时替代显示的文案",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "iconPosition",
+          "type": "\"left\" | \"right\"",
+          "optional": true,
+          "description": "图标位置，默认 left",
+          "default": "'left'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "nativeType",
+          "type": "\"button\" | \"submit\" | \"reset\"",
+          "optional": true,
+          "description": "原生 type 属性（与组件 type 语义冲突，故改名）",
+          "default": "'button'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Cell",
+      "slug": "cell",
+      "title": "Cell 单元格",
+      "category": "basic",
+      "propsType": "CellProps",
+      "demo": "CellDemos",
+      "summary": "列表行容器：标题 / 值 / 说明 / 箭头，支持分组与卡片式 inset。",
+      "install": "npx shadcn@latest add @bivane/cell",
+      "importPath": "@/components/ui/cell",
+      "h5": "4 列网格，cell 行高 44~48px",
+      "pc": "4~6 列，cell 行高 40px，hover 态",
+      "mode": "A",
+      "shared": "数据结构",
+      "difference": "",
+      "propsFile": "components/ui/cell.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧标题",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "右侧内容",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "标题下方的描述信息",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rightIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "右侧图标（isLink 时默认展示箭头）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "isLink",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示右侧箭头并开启点击反馈",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "border",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否展示下边框，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clickable",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否开启点击反馈（按压态）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "center",
+          "type": "boolean",
+          "optional": true,
+          "description": "垂直居中",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "optional": true,
+          "description": "必填项（标题左侧红星）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "large",
+          "type": "boolean",
+          "optional": true,
+          "description": "大号单元格",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onClick",
+          "type": "MouseEventHandler<HTMLDivElement>",
+          "optional": true,
+          "description": "点击回调；传入即视为可点击",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "slug": "tag",
+      "title": "Tag 标签",
+      "category": "basic",
+      "propsType": "TagProps",
+      "demo": "TagBadgeDemos",
+      "summary": "紧凑的信息标记，支持类型色、朴素态、圆角与大小。",
+      "install": "npx shadcn@latest add @bivane/tag",
+      "importPath": "@/components/ui/tag",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/ui/tag.tsx",
+      "props": [
+        {
+          "name": "type",
+          "type": "TagType",
+          "optional": true,
+          "description": "类型，默认 default",
+          "default": "'default'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "TagSize",
+          "optional": true,
+          "description": "尺寸；不传为 base",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "plain",
+          "type": "boolean",
+          "optional": true,
+          "description": "朴素样式",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "round",
+          "type": "boolean",
+          "optional": true,
+          "description": "圆角标签",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "mark",
+          "type": "boolean",
+          "optional": true,
+          "description": "标记样式（左侧直角、右侧圆角）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeable",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否可关闭",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onClose",
+          "type": "(event: MouseEvent<SVGElement, MouseEvent>) => void",
+          "optional": true,
+          "description": "关闭回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "description": "自定义背景色（覆盖 type）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "textColor",
+          "type": "string",
+          "optional": true,
+          "description": "自定义文字色（覆盖 type）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Badge",
+      "slug": "badge",
+      "title": "Badge 徽标",
+      "category": "basic",
+      "propsType": "BadgeProps",
+      "demo": "TagBadgeDemos",
+      "summary": "挂在图标/按钮角上的数量或状态点，定位档位可选。",
+      "install": "npx shadcn@latest add @bivane/badge",
+      "importPath": "@/components/ui/badge",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/ui/badge.tsx",
+      "props": [
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "展示内容；数字超过 max 时显示 max+",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "dot",
+          "type": "boolean",
+          "optional": true,
+          "description": "小圆点模式",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "description": "数字上限，默认 99",
+          "default": "99",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showZero",
+          "type": "boolean",
+          "optional": true,
+          "description": "内容为 0 时是否展示，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "description": "自定义背景色",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "position",
+          "type": "BadgePosition",
+          "optional": true,
+          "description": "位置（仅在有 children 包裹时生效）",
+          "default": "'top-right'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Icon",
+      "slug": "icon",
+      "title": "Icon 图标",
+      "category": "basic",
+      "propsType": "IconProps",
+      "demo": "IconDemos",
+      "summary": "内置图标集，纯 SVG，无字体依赖。",
+      "install": "npx shadcn@latest add @bivane/icon",
+      "importPath": "@/components/ui/icon",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/ui/icon.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "\"loading\" | \"plus\" | \"minus\" | \"success\" | \"warning\" | \"message\" | \"user\" | \"search\" | \"arrow\" | \"arrow-left\" | \"arrow-down\" | \"arrow-up\" | \"check\" | \"clock\" | \"cross\" | \"fail\" | ... 8 more ... | \"setting\"",
+          "optional": false,
+          "description": "图标名，取值见 iconNames",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "string | number",
+          "optional": true,
+          "description": "尺寸，接受数字（px）或任意 CSS 长度，默认 1em 跟随字号",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "description": "颜色，默认 currentColor",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍标签；不传时按装饰性图标处理（aria-hidden）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Field",
+      "slug": "field",
+      "title": "Field 输入框",
+      "category": "form",
+      "propsType": "FieldProps",
+      "demo": "FieldDemos",
+      "summary": "Cell 行形态的输入外壳：label / 图标 / 清除 / 错误 / 字数 / action。",
+      "install": "npx shadcn@latest add @bivane/field",
+      "importPath": "@/components/ui/field",
+      "h5": "Cell 行（左 label + 右输入区），44px 触控热区；`digit` 用 text+inputmode=decimal 并过滤非数字；focus 时 label/左图标转 primary；clearable 聚焦显示清除；textarea autosize + 字数；error 红字；rules 失焦校验",
+      "pc": "同形；精确指针设备（`@media (pointer:fine)`，触屏永不生效）额外：键盘焦点环 + 控件默认 gray-4 边框（Field 由 field-box 出框包住输入区/清除/箭头，action 留框外；行底线隐藏；hover/聚焦 primary、错误 danger）",
+      "mode": "A",
+      "shared": "digit/number 过滤与 min/max 夹紧、rules 校验、autosize 测量、字数",
+      "difference": "打字输入两端同范式：Field 是 Cell 行外壳（label/图标/清除/错误/字数/action），Input/Textarea 是拆出公开的无壳基础件；PC（pointer:fine）差异仅 CSS：`:focus-visible` 焦点环 + 控件/field-box 默认 gray-4 边框（触屏保持 Vant 无框行）",
+      "propsFile": "components/ui/field.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "string | number",
+          "optional": true,
+          "description": "输入值（受控）；number 会归一化为字符串展示",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | number",
+          "optional": true,
+          "description": "非受控初值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string) => void",
+          "optional": true,
+          "description": "值变更回调（已完成数字过滤与 formatter）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "type",
+          "type": "FieldType | \"textarea\"",
+          "optional": true,
+          "description": "类型；textarea 渲染多行控件，digit 为纯数字键盘输入",
+          "default": "\"text\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧标题",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelWidth",
+          "type": "string | number",
+          "optional": true,
+          "description": "label 宽度，默认 6.2em（Vant 值）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelAlign",
+          "type": "\"top\" | FieldTextAlign",
+          "optional": true,
+          "description": "label 对齐；top 时标题独占一行",
+          "default": "\"left\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "colon",
+          "type": "boolean",
+          "optional": true,
+          "description": "label 后展示冒号",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "optional": true,
+          "description": "只画必填红星（校验语义归 rules）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelClassName",
+          "type": "string",
+          "optional": true,
+          "description": "label 自定义类名",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "inputAlign",
+          "type": "FieldTextAlign",
+          "optional": true,
+          "description": "输入内容对齐",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "description": "占位文案",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true,
+          "description": "原生 name（表单提交标识）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "控件 id；不传时用 useId 自动生成并关联 label",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "maxlength",
+          "type": "string | number",
+          "optional": true,
+          "description": "最大字符数，同时透传原生 maxlength",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "description": "number/digit 专用：失焦夹紧下界",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "description": "number/digit 专用：失焦夹紧上界",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "description": "textarea 可见行数",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "autosize",
+          "type": "boolean | FieldAutosizeConfig",
+          "optional": true,
+          "description": "textarea 自适应高度",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readOnly",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "center",
+          "type": "boolean",
+          "optional": true,
+          "description": "垂直居中（默认 true，对齐 Vant）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "border",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否展示下边框（默认 true；PC 下底线让位给边框盒）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "\"large\" | \"normal\"",
+          "optional": true,
+          "description": "大号行（同 Cell large：纵向 12px、字号 16px）",
+          "default": "\"normal\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "arrowDirection",
+          "type": "\"left\" | \"right\" | \"up\" | \"down\"",
+          "optional": true,
+          "description": "右侧箭头方向（配合 readOnly 做选择器入口）",
+          "default": "\"right\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "isLink",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示右侧箭头",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clickable",
+          "type": "boolean",
+          "optional": true,
+          "description": "行按压反馈（readOnly 选择器入口时用）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "可清空",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearTrigger",
+          "type": "FieldClearTrigger",
+          "optional": true,
+          "description": "清除图标出现时机：聚焦（默认）/ 常显",
+          "default": "\"focus\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义清除图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "leftIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rightIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "右侧图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "formatter",
+          "type": "(value: string) => string",
+          "optional": true,
+          "description": "值格式化器",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "formatTrigger",
+          "type": "FieldFormatTrigger",
+          "optional": true,
+          "description": "格式化时机",
+          "default": "\"onChange\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "error",
+          "type": "boolean",
+          "optional": true,
+          "description": "受控错误态（优先级高于 rules 校验结果）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "errorMessage",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "受控错误文案（不传时展示 rules 产生的文案）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "errorMessageAlign",
+          "type": "FieldTextAlign",
+          "optional": true,
+          "description": "错误文案对齐",
+          "default": "\"left\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rules",
+          "type": "readonly FieldRule[]",
+          "optional": true,
+          "description": "校验规则",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "validateTrigger",
+          "type": "FieldValidateTrigger",
+          "optional": true,
+          "description": "校验时机，默认失焦",
+          "default": "\"onBlur\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showWordLimit",
+          "type": "boolean",
+          "optional": true,
+          "description": "配合 maxlength 展示「n/max」字数",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "action",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "右侧动作区（Vant #button 插槽，如「发送验证码」），PC 下留在边框盒外",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义控件体：传入后不再渲染原生输入框（Vant #input 插槽语义）， 用于 readOnly Field 内嵌选择器触发器；rules 仍按 value 字符串校验。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onClick",
+          "type": "MouseEventHandler<HTMLDivElement>",
+          "optional": true,
+          "description": "整行点击",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClickInput",
+          "type": "MouseEventHandler<HTMLDivElement>",
+          "optional": true,
+          "description": "控件区域点击（自定义控件体场景下等价于 Vant click-input）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClickLeftIcon",
+          "type": "MouseEventHandler<HTMLElement>",
+          "optional": true,
+          "description": "点左图标",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClickRightIcon",
+          "type": "MouseEventHandler<HTMLElement>",
+          "optional": true,
+          "description": "点右图标",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClear",
+          "type": "MouseEventHandler<HTMLButtonElement>",
+          "optional": true,
+          "description": "点清除图标",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onFocus",
+          "type": "FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onBlur",
+          "type": "FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "autoComplete",
+          "type": "string",
+          "optional": true,
+          "description": "透传给原生控件的常用属性",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "autoFocus",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "enterKeyHint",
+          "type": "\"search\" | \"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"send\" | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "spellCheck",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "autoCapitalize",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "autoCorrect",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Input",
+      "slug": "input",
+      "title": "Input / Textarea 输入",
+      "category": "form",
+      "propsType": "InputProps",
+      "demo": "FieldDemos",
+      "summary": "无壳输入基础件，支持 digit 过滤、autosize 与字数限制。",
+      "install": "npx shadcn@latest add @bivane/input",
+      "importPath": "@/components/ui/input",
+      "h5": "Cell 行（左 label + 右输入区），44px 触控热区；`digit` 用 text+inputmode=decimal 并过滤非数字；focus 时 label/左图标转 primary；clearable 聚焦显示清除；textarea autosize + 字数；error 红字；rules 失焦校验",
+      "pc": "同形；精确指针设备（`@media (pointer:fine)`，触屏永不生效）额外：键盘焦点环 + 控件默认 gray-4 边框（Field 由 field-box 出框包住输入区/清除/箭头，action 留框外；行底线隐藏；hover/聚焦 primary、错误 danger）",
+      "mode": "A",
+      "shared": "digit/number 过滤与 min/max 夹紧、rules 校验、autosize 测量、字数",
+      "difference": "",
+      "propsFile": "components/ui/input.tsx",
+      "props": [
+        {
+          "name": "type",
+          "type": "FieldType",
+          "optional": true,
+          "description": "输入类型；digit = 纯数字键盘且按键即过滤（Vant 语义）",
+          "default": "'text'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "description": "错误态：输入文字转 danger（Field 内部受控，也可单独使用）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Switch",
+      "slug": "switch",
+      "title": "Switch 开关",
+      "category": "form",
+      "propsType": "SwitchProps",
+      "demo": "SwitchDemos",
+      "summary": "布尔开关，H5 整行可点，PC 多键盘焦点环。",
+      "install": "npx shadcn@latest add @bivane/switch",
+      "importPath": "@/components/ui/switch",
+      "h5": "行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）",
+      "pc": "标准控件 16~20px，label 可点，键盘空格",
+      "mode": "A",
+      "shared": "受控状态",
+      "difference": "",
+      "propsFile": "components/ui/switch.tsx",
+      "props": [
+        {
+          "name": "checked",
+          "type": "boolean",
+          "optional": true,
+          "description": "布尔受控快捷方式：等价于 value={checked ? activeValue : inactiveValue}。 与 value 同时传入时以 checked 为准。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "SwitchValue",
+          "optional": true,
+          "description": "当前值（受控）；与 activeValue 全等即为开",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "SwitchValue",
+          "optional": true,
+          "description": "初始值（非受控），默认 inactiveValue",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: SwitchValue) => void",
+          "optional": true,
+          "description": "值变更回调，回传切换后的值",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "activeValue",
+          "type": "SwitchValue",
+          "optional": true,
+          "description": "开态对应的值（默认 true）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "inactiveValue",
+          "type": "SwitchValue",
+          "optional": true,
+          "description": "关态对应的值（默认 false）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "禁用（Vant disabled）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "description": "加载态：节点内显示转菊且拒绝切换（Vant loading）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "string | number",
+          "optional": true,
+          "description": "节点基准尺寸，默认 30px（轨道按 2:1 等比）；数字按 px",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "activeColor",
+          "type": "string",
+          "optional": true,
+          "description": "开态轨道色，默认 primary",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "inactiveColor",
+          "type": "string",
+          "optional": true,
+          "description": "关态轨道色，默认白底轻黑边",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "beforeChange",
+          "type": "() => boolean | Promise<boolean>",
+          "optional": true,
+          "description": "切换前钩子：返回 false / Promise<false> / 抛异常都会放弃切换。 等待期间自动进入 loading 态，防止重复点击（Vant before-change）。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "slug": "checkbox",
+      "title": "Checkbox 复选框",
+      "category": "form",
+      "propsType": "CheckboxProps",
+      "demo": "CheckboxDemos",
+      "summary": "多选控件，支持分组、禁用与半选。",
+      "install": "npx shadcn@latest add @bivane/checkbox",
+      "importPath": "@/components/ui/checkbox",
+      "h5": "行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）",
+      "pc": "标准控件 16~20px，label 可点，键盘空格",
+      "mode": "A",
+      "shared": "受控状态",
+      "difference": "",
+      "propsFile": "components/ui/checkbox.tsx",
+      "props": [
+        {
+          "name": "checked",
+          "type": "boolean",
+          "optional": true,
+          "description": "选中态（受控；组内时由组值派生，此值忽略）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultChecked",
+          "type": "boolean",
+          "optional": true,
+          "description": "初始选中态（非受控；组内时忽略）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "name",
+          "type": "CheckboxName",
+          "optional": true,
+          "description": "在组内的唯一标识（Vant name）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "shape",
+          "type": "CheckboxShape",
+          "optional": true,
+          "description": "外形：圆（默认）/ 方",
+          "default": "\"round\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelDisabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "文字不可点，只有图标可点（Vant label-disabled）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelPosition",
+          "type": "CheckboxLabelPosition",
+          "optional": true,
+          "description": "文字位置，默认右侧",
+          "default": "\"right\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "iconSize",
+          "type": "string | number",
+          "optional": true,
+          "description": "图标尺寸，默认 20px",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "checkedColor",
+          "type": "string",
+          "optional": true,
+          "description": "选中色，默认 primary",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "indeterminate",
+          "type": "boolean",
+          "optional": true,
+          "description": "半选态：只改图标与 aria，不改 checked 值",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "bindGroup",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否与外层 CheckboxGroup 联动，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无文字（如嵌在 Cell 行内）时给原生 input 的无障碍名",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(checked: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "文案；为空时只渲染图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Radio",
+      "slug": "radio",
+      "title": "Radio 单选框",
+      "category": "form",
+      "propsType": "RadioProps",
+      "demo": "RadioDemos",
+      "summary": "单选控件，支持分组与整行触发。",
+      "install": "npx shadcn@latest add @bivane/radio",
+      "importPath": "@/components/ui/radio",
+      "h5": "行高 ≥ 48px，整行可点（Radio 在 Cell 内整行触发）",
+      "pc": "标准控件 16~20px，label 可点，键盘空格",
+      "mode": "A",
+      "shared": "受控状态",
+      "difference": "",
+      "propsFile": "components/ui/radio.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "RadioName",
+          "optional": true,
+          "description": "在组内的唯一标识（Vant name）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "checked",
+          "type": "boolean",
+          "optional": true,
+          "description": "独立使用时的选中态（受控）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultChecked",
+          "type": "boolean",
+          "optional": true,
+          "description": "独立使用时的初始选中态（非受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelDisabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "文字不可点，只有图标可点（Vant label-disabled）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "labelPosition",
+          "type": "RadioLabelPosition",
+          "optional": true,
+          "description": "文字位置，默认右侧",
+          "default": "\"right\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "iconSize",
+          "type": "string | number",
+          "optional": true,
+          "description": "图标尺寸，默认 20px",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "checkedColor",
+          "type": "string",
+          "optional": true,
+          "description": "选中色，默认 primary",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无文字（如嵌在 Cell 行内）时给原生 input 的无障碍名",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(checked: boolean) => void",
+          "optional": true,
+          "description": "独立使用（无 Group）时的变更回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "文案；为空时只渲染图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Rate",
+      "slug": "rate",
+      "title": "Rate 评分",
+      "category": "form",
+      "propsType": "RateProps",
+      "demo": "RateDemos",
+      "summary": "星级评分，H5 滑动连续选，PC 点击 + hover 预览 + 键盘。",
+      "install": "npx shadcn@latest add @bivane/rate",
+      "importPath": "@/components/responsive/rate",
+      "h5": "点击/滑动选择，热区 44px",
+      "pc": "点击/悬停预览 + 键盘方向键",
+      "mode": "C",
+      "shared": "值语义",
+      "difference": "",
+      "propsFile": "components/responsive/rate.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "optional": true,
+          "description": "受控分值，默认 0",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "number",
+          "optional": true,
+          "description": "初始分值，默认 0",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "count",
+          "type": "number",
+          "optional": true,
+          "description": "星数，默认 5",
+          "default": "5",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "allowHalf",
+          "type": "boolean",
+          "optional": true,
+          "description": "允许半星，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "description": "只读：不可选",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "size",
+          "type": "string | number",
+          "optional": true,
+          "description": "星尺寸，数字按 px，默认 20",
+          "default": "20",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "gutter",
+          "type": "string | number",
+          "optional": true,
+          "description": "星间距，数字按 px，默认 4",
+          "default": "4",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "description": "实心星颜色，默认星黄 token",
+          "default": "\"var(--bv-rate-icon-full-color)\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "voidColor",
+          "type": "string",
+          "optional": true,
+          "description": "空星颜色，默认 gray-5 token",
+          "default": "\"var(--bv-rate-icon-void-color)\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabledColor",
+          "type": "string",
+          "optional": true,
+          "description": "禁用星颜色，默认 gray-5 token",
+          "default": "\"var(--bv-rate-icon-disabled-color)\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "再次点击当前分值清零（Vant clearable），默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "touchable",
+          "type": "boolean",
+          "optional": true,
+          "description": "触屏滑动选择，默认 true（PC 忽略）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义实心星节点（覆盖默认五角星）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "voidIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义空星节点",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: number) => void",
+          "optional": true,
+          "description": "分值变化回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍标签（渲染到 role=\"slider\" 容器上），与全库其余组件一致用 ariaLabel",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Slider",
+      "slug": "slider",
+      "title": "Slider 滑块",
+      "category": "form",
+      "propsType": "SliderProps",
+      "demo": "SliderDemos",
+      "summary": "单值/区间滑块，H5 触摸拖拽，PC 点轨 + 拖拽 + 方向键。",
+      "install": "npx shadcn@latest add @bivane/slider",
+      "importPath": "@/components/responsive/slider",
+      "h5": "触摸拖拽，禁页面滚动（`touch-action: none`），热区放大到 44px",
+      "pc": "点轨道跳转 + 拖拽 + 方向键微调（±step）",
+      "mode": "C",
+      "shared": "值换算、步长、区间",
+      "difference": "",
+      "propsFile": "components/responsive/slider.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "SliderValue",
+          "optional": true,
+          "description": "受控值；range 时为 [number, number]",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "SliderValue",
+          "optional": true,
+          "description": "初始值，默认 0（range 默认 [min, max]）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "description": "",
+          "default": "0",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "description": "",
+          "default": "100",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "optional": true,
+          "description": "",
+          "default": "1",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "barHeight",
+          "type": "string | number",
+          "optional": true,
+          "description": "轨道/填充条厚度，数字按 px，默认 2",
+          "default": "2",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "buttonSize",
+          "type": "string | number",
+          "optional": true,
+          "description": "滑块钮边长，数字按 px，默认 24",
+          "default": "24",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "activeColor",
+          "type": "string",
+          "optional": true,
+          "description": "填充条颜色，默认 primary token",
+          "default": "\"var(--bv-slider-active-background)\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "inactiveColor",
+          "type": "string",
+          "optional": true,
+          "description": "轨道底色，默认 gray-3 token",
+          "default": "\"var(--bv-slider-inactive-background)\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "range",
+          "type": "boolean",
+          "optional": true,
+          "description": "双拇指区间，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "reverse",
+          "type": "boolean",
+          "optional": true,
+          "description": "反向（右/上为最小值），默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "vertical",
+          "type": "boolean",
+          "optional": true,
+          "description": "竖直滑块，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: SliderValue) => void",
+          "optional": true,
+          "description": "值变化回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onDragStart",
+          "type": "(value: SliderValue) => void",
+          "optional": true,
+          "description": "拖拽开始（受控值变更前触发）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onDragEnd",
+          "type": "(value: SliderValue) => void",
+          "optional": true,
+          "description": "拖拽结束",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍标签（渲染到每个滑块钮上），与全库其余组件一致用 ariaLabel",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "InputNumber",
+      "slug": "input-number",
+      "title": "InputNumber 数量步进器",
+      "category": "form",
+      "propsType": "InputNumberProps",
+      "demo": "InputNumberDemos",
+      "summary": "离散数量录入，H5 横排 ±，PC 竖排 ▲▼。值语义对齐 Vant van-stepper。",
+      "install": "npx shadcn@latest add @bivane/input-number",
+      "importPath": "@/components/responsive/input-number",
+      "h5": "输入框唤起数字键盘，加减按钮热区 44px",
+      "pc": "输入框 + 竖排 ▲▼ 微调列 + 键盘微调",
+      "mode": "B",
+      "shared": "边界与步长",
+      "difference": "离散数量录入（− 输入框 ＋）：H5 横排 ±（数字键盘、44px 热区、长按连发）/ PC 输入框 + 竖排 ▲▼（↑↓/Home/End 键盘），同一份值模型换壳（§6.5-2 模式 B），值语义逐字对齐 Vant van-stepper",
+      "propsFile": "components/responsive/input-number.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "InputNumberValue",
+          "optional": true,
+          "description": "受控值；allowEmpty 时清空得到 null",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "InputNumberValue",
+          "optional": true,
+          "description": "初始值，默认 min（Vant defaultValue=1）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: InputNumberValue) => void",
+          "optional": true,
+          "description": "值变化（键入完整数字、加减、失焦收口都会触发）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "description": "最小值，默认 1",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "description": "最大值，默认 Infinity",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "optional": true,
+          "description": "步长，默认 1（浮点安全：0.1 连加不出 0.30000000004）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "inputWidth",
+          "type": "string | number",
+          "optional": true,
+          "description": "输入框宽，数字按 px；默认 32px",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "buttonSize",
+          "type": "string | number",
+          "optional": true,
+          "description": "控件高 / 按钮尺寸，数字按 px；默认 28px",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "decimalLength",
+          "type": "number",
+          "optional": true,
+          "description": "固定小数位；传入后失焦与步进结果补零定位（如 1 → \"1.00\"）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "theme",
+          "type": "InputNumberTheme",
+          "optional": true,
+          "description": "圆角风格：default 连体方块 / round 圆形独立按钮（仅 H5 壳生效）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disableInput",
+          "type": "boolean",
+          "optional": true,
+          "description": "禁止键入（输入框只读，仍可点加减；焦点会被弹回，对齐 Vant）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disablePlus",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disableMinus",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showPlus",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showMinus",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showInput",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "integer",
+          "type": "boolean",
+          "optional": true,
+          "description": "只允许非负整数，默认 false（唤起不带小数点的数字键盘）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "allowEmpty",
+          "type": "boolean",
+          "optional": true,
+          "description": "允许清空：清空后值为 null、失焦不回填，默认 false",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "longPress",
+          "type": "boolean",
+          "optional": true,
+          "description": "长按加减按钮连发，默认 true（触屏连发，鼠标按住同样生效）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "autoFixed",
+          "type": "boolean",
+          "optional": true,
+          "description": "失焦时是否夹回 min/max，默认 true；关掉后允许暂留越界值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "beforeChange",
+          "type": "(value: InputNumberValue) => boolean | Promise<boolean>",
+          "optional": true,
+          "description": "变更前闸门：返回 false / Promise<false> / 抛异常都放弃本次变更， 异步等待期间控件锁定（与 Switch.beforeChange 同一套兜底）。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOverlimit",
+          "type": "(direction: InputNumberDirection) => void",
+          "optional": true,
+          "description": "已在边界仍点同方向时触发（可用于抖动提示）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onPlus",
+          "type": "() => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onMinus",
+          "type": "() => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onFocus",
+          "type": "FocusEventHandler<HTMLInputElement>",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onBlur",
+          "type": "FocusEventHandler<HTMLInputElement>",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Uploader",
+      "slug": "uploader",
+      "title": "Uploader 上传",
+      "category": "form",
+      "propsType": "UploaderProps",
+      "demo": "UploaderDemos",
+      "summary": "H5 宫格 + 相机，PC 拖拽区 + 列表 + 粘贴。",
+      "install": "npx shadcn@latest add @bivane/uploader",
+      "importPath": "@/components/responsive/uploader",
+      "h5": "点击唤起相机/相册（`capture`），压缩上传，宫格预览",
+      "pc": "拖拽上传区 + 文件选择器，多选/粘贴，列表视图",
+      "mode": "C",
+      "shared": "上传队列、进度、校验",
+      "difference": "",
+      "propsFile": "components/responsive/uploader.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "UploaderFileItem[]",
+          "optional": true,
+          "description": "受控文件列表（含 status/percent），默认 undefined",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "UploaderFileItem[]",
+          "optional": true,
+          "description": "初始文件列表",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(list: UploaderFileItem[]) => void",
+          "optional": true,
+          "description": "文件列表变化回调（上传中状态/进度变化也会触发）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "optional": true,
+          "description": "允许多选，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "maxCount",
+          "type": "number",
+          "optional": true,
+          "description": "最大个数，默认 undefined（不限）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "maxSize",
+          "type": "number",
+          "optional": true,
+          "description": "单文件最大字节数，超出不入列并触发 onOversize",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "accept",
+          "type": "string",
+          "optional": true,
+          "description": "accept 属性，如 'image/*' 或 '.jpg,.png'",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "capture",
+          "type": "boolean | \"user\" | \"environment\"",
+          "optional": true,
+          "description": "H5 直接唤起相机（透传给 input），PC 忽略",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "description": "只读：不可增删/重试",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "compress",
+          "type": "boolean | { maxWidth?: number | undefined; quality?: number | undefined; }",
+          "optional": true,
+          "description": "图片压缩（canvas），默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "optional": true,
+          "description": "上传地址（内置 XHR）。传了 action 且无 afterRead 时走它",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "headers",
+          "type": "Record<string, string>",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true,
+          "description": "上传表单字段名，默认 'file'",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "data",
+          "type": "Record<string, string> | ((item: UploaderFileItem) => Record<string, string>)",
+          "optional": true,
+          "description": "上传额外表单字段（或返回字段的函数）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "withCredentials",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "afterRead",
+          "type": "UploaderAfterRead",
+          "optional": true,
+          "description": "业务自理上传：resolve→完成 / reject→失败。优先于 action。 第二个参数 onProgress 用于上报真实进度，不调用则上传中只转圈不显示百分比。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "beforeRead",
+          "type": "(file: File | File[]) => boolean | Promise<boolean>",
+          "optional": true,
+          "description": "读取前钩子，返回 false 拦截整批（Vant 语义）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "beforeDelete",
+          "type": "(item: UploaderFileItem) => boolean | Promise<boolean>",
+          "optional": true,
+          "description": "删除前钩子，返回 false 拦截",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOversize",
+          "type": "(file: File | File[]) => void",
+          "optional": true,
+          "description": "单文件超 maxSize 回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onExceed",
+          "type": "(files: File[]) => void",
+          "optional": true,
+          "description": "超出 maxCount 回调（参数为被丢弃的文件）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onPickRequest",
+          "type": "(handle: UploaderHandle) => void",
+          "optional": true,
+          "description": "自定义选文件触发：传了它，点「+」/拖拽区不再打开系统弹窗，改为回调 consumer。 典型是 App WebView 对接 JSBridge：回调里拿到文件后 handle.addFiles(file) 回填。",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍标签，与全库一致用 ariaLabel",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "slug": "search",
+      "title": "Search 搜索",
+      "category": "form",
+      "propsType": "SearchProps",
+      "demo": "SearchDemos",
+      "summary": "H5 聚焦展开全屏页 + 历史，PC 内联输入 + 建议浮层。",
+      "install": "npx shadcn@latest add @bivane/search",
+      "importPath": "@/components/responsive/search",
+      "h5": "内联搜索条 → 聚焦展开全屏搜索页（返回键退出），展示历史记录，输入时切建议列表",
+      "pc": "内联输入框 + 建议浮层（Radix Popover 锚定 + 键盘巡航），**不设快捷键聚焦**",
+      "mode": "C",
+      "shared": "防抖、历史/建议源（静态 + 异步）",
+      "difference": "",
+      "propsFile": "components/responsive/search.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "optional": true,
+          "description": "受控搜索词",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "optional": true,
+          "description": "非受控初始搜索词",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string) => void",
+          "optional": true,
+          "description": "搜索词变化（每次输入）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onSearch",
+          "type": "(keyword: string) => void",
+          "optional": true,
+          "description": "提交（回车 / 点建议 / 点历史）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClear",
+          "type": "() => void",
+          "optional": true,
+          "description": "点击清除键",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": "'搜索'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除键，默认 true（对齐 Vant van-search）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "shape",
+          "type": "SearchShape",
+          "optional": true,
+          "description": "胶囊形状，默认 round（对齐 Vant）",
+          "default": "'round'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧固定文案（Vant 的 label）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "suggestions",
+          "type": "string[]",
+          "optional": true,
+          "description": "静态建议词；与 onFetchSuggestions 二选一，同时提供以异步为准",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onFetchSuggestions",
+          "type": "(keyword: string) => string[] | Promise<string[]>",
+          "optional": true,
+          "description": "异步建议源；空关键词不触发，返回值防抖后才请求",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "debounce",
+          "type": "number",
+          "optional": true,
+          "description": "异步建议防抖毫秒，默认 300",
+          "default": "300",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "history",
+          "type": "string[]",
+          "optional": true,
+          "description": "历史记录（受控）；不传则组件内内存维护（卸载即失）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onHistoryChange",
+          "type": "(history: string[]) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "showHistory",
+          "type": "boolean",
+          "optional": true,
+          "description": "H5 全屏页是否展示历史记录区，默认 true（PC 恒不展示）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "historyLimit",
+          "type": "number",
+          "optional": true,
+          "description": "历史条数上限，默认 10",
+          "default": "SEARCH_HISTORY_LIMIT",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "emptyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "建议为空时的文案",
+          "default": "'没有找到相关结果'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loadingText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "异步建议加载中的文案",
+          "default": "'搜索中…'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "historyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "历史区标题",
+          "default": "'历史记录'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearHistoryText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "清空历史按钮文案",
+          "default": "'清空'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Popup",
+      "slug": "popup",
+      "title": "Popup 弹层",
+      "category": "feedback",
+      "propsType": "PopupProps",
+      "demo": "PopupDemos",
+      "summary": "H5 四向滑入 + 安全区，PC 一律降级为居中模态。",
+      "install": "npx shadcn@latest add @bivane/popup",
+      "importPath": "@/components/responsive/popup",
+      "h5": "四向滑入，默认 bottom，圆角 + 安全区，下拉关闭",
+      "pc": "`position` 一律降级为居中模态（原值留 `data-position`，实态记 `data-position-resolved`）",
+      "mode": "B",
+      "shared": "进出场动画时长",
+      "difference": "同一 position 状态机 + 内容，H5 贴边滑入壳 / PC 居中模态壳",
+      "propsFile": "components/responsive/popup.tsx",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "受控开合",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "非受控初始开合",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClose",
+          "type": "() => void",
+          "optional": true,
+          "description": "关闭后回调（与 onOpenChange 的区别：仅关闭时触发）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onOpened",
+          "type": "() => void",
+          "optional": true,
+          "description": "进场动画结束后回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClosed",
+          "type": "() => void",
+          "optional": true,
+          "description": "退场动画结束、节点卸载后回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "position",
+          "type": "PopupPosition",
+          "optional": true,
+          "description": "弹出方向，默认 bottom；PC 模式下一律渲染为 center",
+          "default": "\"bottom\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "round",
+          "type": "boolean",
+          "optional": true,
+          "description": "圆角；不传时 H5 底部形态默认开启（矩阵规定），PC 形态忽略此值走 --bv-popup-pc-radius",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "overlay",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否渲染遮罩，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnClickOverlay",
+          "type": "boolean",
+          "optional": true,
+          "description": "点击遮罩是否关闭；不传时 H5 默认 true、PC 默认 false（矩阵 §2.1）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "lockScroll",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否锁定背景滚动，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnPressEscape",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否按 ESC 关闭，默认 true（两端一致：平板外接键盘、PC 无障碍都需要）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeable",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否显示右上角关闭按钮，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeIcon",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义关闭图标",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeIconPosition",
+          "type": "PopupCloseIconPosition",
+          "optional": true,
+          "description": "关闭按钮位置，默认 top-right",
+          "default": "\"top-right\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "safeAreaInsetBottom",
+          "type": "boolean",
+          "optional": true,
+          "description": "底部安全区内边距（仅 H5 底部/居中形态生效），默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "scrollable",
+          "type": "boolean",
+          "optional": true,
+          "description": "内容是否由 Popup 包裹一层滚动容器（默认 true）。 传 false 时 children 直接进入面板，由内容自己决定滚动区域 —— Dialog 需要「按钮区固定、正文单独滚动」时用这个。",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": true,
+          "description": "进出场时长（ms），同时覆盖 CSS 变量；传 0 表示不做动画（测试与低性能场景）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "zIndex",
+          "type": "number",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Dialog",
+      "slug": "dialog",
+      "title": "Dialog 对话框",
+      "category": "feedback",
+      "propsType": "DialogProps",
+      "demo": "DialogDemos",
+      "summary": "H5 底部抽屉可下拉关，PC 居中模态 + 焦点陷阱。声明式与命令式双轨 API。",
+      "install": "npx shadcn@latest add @bivane/dialog",
+      "importPath": "@/components/responsive/dialog",
+      "h5": "底部抽屉，可下拉关闭，顶部圆角 16px，内容随高度增长",
+      "pc": "居中模态 520px，遮罩/ESC 关闭，焦点陷阱",
+      "mode": "B",
+      "shared": "open 状态机、关闭时机",
+      "difference": "H5 复用 Popup bottom；PC 用 Radix Dialog",
+      "propsFile": "components/responsive/dialog.tsx",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "message",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "主体文案（Vant 命名）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "主体文案（矩阵命名，与 message 同义且优先）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义底部，覆盖默认按钮区",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showConfirmButton",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmText",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": "'确认'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showCancelButton",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "cancelText",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": "'取消'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "beforeClose",
+          "type": "(action: DialogAction) => boolean | Promise<boolean>",
+          "optional": true,
+          "description": "返回 false 可阻止关闭，支持异步（异步期间确认按钮进入 loading）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onConfirm",
+          "type": "() => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onCancel",
+          "type": "() => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClosed",
+          "type": "() => void",
+          "optional": true,
+          "description": "退场动画结束后回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "closeOnClickOverlay",
+          "type": "boolean",
+          "optional": true,
+          "description": "点击遮罩关闭；不传时 H5 默认 true、PC 默认 false",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnPressEscape",
+          "type": "boolean",
+          "optional": true,
+          "description": "ESC 关闭，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "overlay",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "lockScroll",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": true,
+          "description": "进出场时长（ms），传 0 关闭动画",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "zIndex",
+          "type": "number",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "ActionSheet",
+      "slug": "action-sheet",
+      "title": "ActionSheet 动作面板",
+      "category": "feedback",
+      "propsType": "ActionSheetProps",
+      "demo": "ActionSheetDemos",
+      "summary": "H5 底部动作列表，PC 居中列表或上下文菜单。",
+      "install": "npx shadcn@latest add @bivane/action-sheet",
+      "importPath": "@/components/responsive/action-sheet",
+      "h5": "底部动作列表 + 取消按钮分离，项高 48px",
+      "pc": "居中对话框纵向列表，或上下文菜单（≤5 项用 Popover）",
+      "mode": "B",
+      "shared": "选项数据结构",
+      "difference": "",
+      "propsFile": "components/responsive/action-sheet.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "actions",
+          "type": "ActionSheetAction[] | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "cancelText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "取消按钮文案；传 null / false 隐藏取消",
+          "default": "'取消'",
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnClickAction",
+          "type": "boolean | undefined",
+          "optional": true,
+          "description": "点击选项后是否自动关闭，默认 true",
+          "default": "true",
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnClickOverlay",
+          "type": "boolean | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnPressEscape",
+          "type": "boolean | undefined",
+          "optional": true,
+          "description": "",
+          "default": "true",
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "zIndex",
+          "type": "number | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "onSelect",
+          "type": "((action: ActionSheetAction, index: number) => void | Promise<void>) | undefined",
+          "optional": true,
+          "description": "选中某项（在关闭之前触发）",
+          "default": null,
+          "inherited": true,
+          "kind": "event"
+        },
+        {
+          "name": "onCancel",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "event"
+        },
+        {
+          "name": "onClosed",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "event"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "name": "Toast",
+      "slug": "toast",
+      "title": "Toast 轻提示",
+      "category": "feedback",
+      "propsType": "ToastProps",
+      "demo": "ToastDemos",
+      "summary": "H5 单例胶囊，PC 可并存卡片栈。",
+      "install": "npx shadcn@latest add @bivane/toast",
+      "importPath": "@/components/responsive/toast",
+      "h5": "顶部居中胶囊，单例（新覆盖旧），2s 自关",
+      "pc": "右上卡片栈，带关闭按钮，可多条并存",
+      "mode": "C",
+      "shared": "队列与生命周期",
+      "difference": "信息模型不同：H5 单例胶囊 vs PC 可并存卡片栈",
+      "propsFile": "components/responsive/toast.tsx",
+      "props": [
+        {
+          "name": "message",
+          "type": "ReactNode",
+          "optional": false,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "name": "Notify",
+      "slug": "notify",
+      "title": "Notify 消息通知",
+      "category": "feedback",
+      "propsType": "NotifyProps",
+      "demo": "NotifyDemos",
+      "summary": "H5 顶部横幅，PC 右上角标通知。",
+      "install": "npx shadcn@latest add @bivane/notify",
+      "importPath": "@/components/responsive/notify",
+      "h5": "顶部横幅滑入",
+      "pc": "右上角角标通知",
+      "mode": "C",
+      "shared": "队列管理",
+      "difference": "",
+      "propsFile": "components/responsive/notify.tsx",
+      "props": [
+        {
+          "name": "message",
+          "type": "ReactNode",
+          "optional": false,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "type",
+          "type": "NotifyType | undefined",
+          "optional": true,
+          "description": "语义类型，默认 danger（对齐 Vant notify 默认值）",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "duration",
+          "type": "number | undefined",
+          "optional": true,
+          "description": "自动关闭毫秒数，默认 3000；传 0 表示不自动关闭",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "color",
+          "type": "string | undefined",
+          "optional": true,
+          "description": "自定义文字色，覆盖 type 配色",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "background",
+          "type": "string | undefined",
+          "optional": true,
+          "description": "自定义背景色，覆盖 type 配色",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "onClick",
+          "type": "((event: MouseEvent<HTMLDivElement, MouseEvent>) => void) | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "event"
+        },
+        {
+          "name": "onClose",
+          "type": "(() => void) | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "event"
+        },
+        {
+          "name": "zIndex",
+          "type": "number | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        }
+      ]
+    },
+    {
+      "name": "Loading",
+      "slug": "loading",
+      "title": "Loading 加载",
+      "category": "feedback",
+      "propsType": "LoadingProps",
+      "demo": "LoadingDemos",
+      "summary": "H5 全屏遮罩 + 转圈，PC 局部骨架屏优先。",
+      "install": "npx shadcn@latest add @bivane/loading",
+      "importPath": "@/components/responsive/loading",
+      "h5": "全屏遮罩 + 居中转圈",
+      "pc": "局部骨架屏优先，全屏遮罩降级",
+      "mode": "A/B",
+      "shared": "展示时机",
+      "difference": "",
+      "propsFile": "components/responsive/loading.tsx",
+      "props": [
+        {
+          "name": "text",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "提示文案；不传则只显示转圈",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "mask",
+          "type": "boolean | undefined",
+          "optional": true,
+          "description": "是否渲染遮罩，默认 true",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "forbidClick",
+          "type": "boolean | undefined",
+          "optional": true,
+          "description": "是否阻断下层点击，默认 false（逐字对齐 Vant Toast）。 true 时遮罩吃事件，false 时底层仍可点（但遮罩依旧盖在上面）。",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "zIndex",
+          "type": "number | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "duration",
+          "type": "number | undefined",
+          "optional": true,
+          "description": "自动关闭毫秒数；不传则常驻",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": true,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Tooltip",
+      "slug": "tooltip",
+      "title": "Tooltip 文字提示",
+      "category": "feedback",
+      "propsType": "TooltipProps",
+      "demo": "TooltipDemos",
+      "summary": "H5 无浮层（常驻 ⓘ 说明条），PC hover/focus 跟随气泡。",
+      "install": "npx shadcn@latest add @bivane/tooltip",
+      "importPath": "@/components/responsive/tooltip",
+      "h5": "**无浮层**：说明直接常驻——主体下方一条行首 ⓘ 的信息提示条，全文展示；超长用 Ellipsis 展开/收起",
+      "pc": "hover 触发 200ms 延迟，跟随鼠标，focus 锚定，ESC 关",
+      "mode": "B",
+      "shared": "同一份说明文案（content）",
+      "difference": "同一份说明文案、容器密度不同：H5 无浮层，常驻成主体下方的 ⓘ 信息提示条（超长交 Ellipsis 折叠）vs PC hover/focus 触发的跟随气泡；恒纯展示不可交互（2026-10-09 由 C/B 改判：H5 长按气泡不符合触屏惯例，改常驻）",
+      "propsFile": "components/responsive/tooltip.tsx",
+      "props": [
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "optional": false,
+          "description": "提示内容（两端共享的唯一信息：内容渲染）；H5 全文常驻，超长折叠可传 <Ellipsis>",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "children",
+          "type": "ReactElement<unknown, string | JSXElementConstructor<any>>",
+          "optional": false,
+          "description": "被说明的主体，必须是单个 React 元素",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "受控开合（仅 PC 浮层有意义；H5 说明常驻）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "非受控初始开合（仅 PC）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "PC 禁用时不响应 hover/focus（不影响 children 自身禁用态）；H5 恒展示说明条",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "透传给 PC 气泡 / H5 信息提示条的 className",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Popover",
+      "slug": "popover",
+      "title": "Popover 气泡菜单",
+      "category": "feedback",
+      "propsType": "PopoverProps",
+      "demo": "PopoverDemos",
+      "summary": "H5 ≤3 行气泡 / >3 行降级底部抽屉，PC 锚定浮层。",
+      "install": "npx shadcn@latest add @bivane/popover",
+      "importPath": "@/components/responsive/popover",
+      "h5": "底部抽屉（内容 > 3 行）或轻量气泡（≤ 3 行）",
+      "pc": "锚定浮层，Radix Popper 翻转防溢出，键盘可导航",
+      "mode": "C",
+      "shared": "内容渲染",
+      "difference": "容器范式不同：H5 ≤3 行轻量气泡 / >3 行降级 Popup 底部抽屉（打开瞬间按实测高度定形态）vs PC Radix 锚定浮层；面板内容（自定义区 + actions 行）两端同源",
+      "propsFile": "components/responsive/popover.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactElement<unknown, string | JSXElementConstructor<any>>",
+          "optional": false,
+          "description": "触发元素，必须是单个 React 元素",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义面板内容；与 actions 同时给出时渲染在列表上方",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "actions",
+          "type": "PopoverAction[]",
+          "optional": true,
+          "description": "动作行列表；H5 行数超过 maxRows（或自定义内容实测超过阈值高度）自动改走底部抽屉",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placement",
+          "type": "PopoverPlacement",
+          "optional": true,
+          "description": "气泡优先展开方向，默认 bottom；碰撞时由 Radix Popper 翻转。H5 抽屉形态忽略",
+          "default": "\"bottom\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "受控开合",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "非受控初始开合",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "closeOnClickAction",
+          "type": "boolean",
+          "optional": true,
+          "description": "点动作行后是否关闭面板，默认 true（两端一致）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "禁用时触发器不响应开合",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "面板的无障碍名称；内容没有可见标题时建议传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "透传给面板的 className",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "h5Form",
+          "type": "PopoverFormPreference",
+          "optional": true,
+          "description": "H5 形态偏好，默认 auto（行数 ≤ maxRows 气泡，超出抽屉）； 显式 bubble/drawer 强制形态。仅 H5 生效，PC 恒为锚定浮层",
+          "default": "\"auto\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "maxRows",
+          "type": "number",
+          "optional": true,
+          "description": "H5 自动分界时气泡允许的最大动作行数，仅 h5Form=\"auto\" 时生效。 缺省读 token --bv-popover-h5-bubble-max-rows（默认 3）。仅 H5 生效",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Ellipsis",
+      "slug": "ellipsis",
+      "title": "Ellipsis 多行截断",
+      "category": "feedback",
+      "propsType": "EllipsisProps",
+      "demo": "EllipsisDemos",
+      "summary": "按行数截断，实测溢出才出现「展开 / 收起」。与 Tooltip 解耦。",
+      "install": "npx shadcn@latest add @bivane/ellipsis",
+      "importPath": "@/components/ui/ellipsis",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/ui/ellipsis.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "description": "文本内容；也接受行内节点，但块级嵌套会破坏行数测量",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "description": "收起态最多显示的行数，默认 2；非法值（<1）回落 1",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "expandText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "展开按钮文案，默认「展开」",
+          "default": "\"展开\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "collapseText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "收起按钮文案，默认「收起」",
+          "default": "\"收起\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "expanded",
+          "type": "boolean",
+          "optional": true,
+          "description": "受控展开态",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultExpanded",
+          "type": "boolean",
+          "optional": true,
+          "description": "非受控初始展开态，默认收起",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onExpandedChange",
+          "type": "(expanded: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Select",
+      "slug": "select",
+      "title": "Select 选择器",
+      "category": "select",
+      "propsType": "SelectProps",
+      "demo": "SelectDemos",
+      "summary": "H5 底部热区单选即关，PC 锚定浮层键盘巡航 / 多选不关。",
+      "install": "npx shadcn@latest add @bivane/select",
+      "importPath": "@/components/responsive/select",
+      "h5": "底部弹层列表，项高 48px，选项 > 10 才出搜索框，单选即关",
+      "pc": "锚定浮层 + 虚拟滚动，键盘 ↑↓/回车/输入过滤，多选保持展开",
+      "mode": "C",
+      "shared": "过滤、受控值、分组",
+      "difference": "信息模型不同：底部热区单选即关 vs 锚定浮层键盘巡航/多选不关",
+      "propsFile": "components/responsive/select.tsx",
+      "props": [
+        {
+          "name": "options",
+          "type": "SelectItem[]",
+          "optional": false,
+          "description": "选项或分组；分组形如 { group: '标题', options: [...] }",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "SelectValueInput",
+          "optional": true,
+          "description": "受控值：单选给单值，多选给数组",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "SelectValueInput",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: SelectValueInput) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "optional": true,
+          "description": "多选：触发时翻转该项，且浮层保持展开",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "searchable",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否允许过滤。呈现阈值两端不同，见下方注释",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无选中值时展示",
+          "default": "'请选择'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除按钮（仅在有选中值、且未禁用时出现）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "emptyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无匹配项时的文案",
+          "default": "'暂无数据'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "optional": true,
+          "description": "内置搜索框的占位文案",
+          "default": "'搜索'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题栏文案。PC 不渲染标题栏（浮层由触发器说明自己是什么）。 只在 H5 走暂存确认（confirmable）时才会随工具栏一起出现； 不传 title 只有「取消 / 确定」两个按钮。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmable",
+          "type": "boolean",
+          "optional": true,
+          "description": "H5 是否走「暂存 → 确定」：点选项只在面板里打勾，点「确定」才提交并关闭， 「取消」放弃暂存。默认 false（点选即生效，兼容既有行为）。 PC 恒为点选即生效，此 props 不影响 PC。",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "工具栏右键文案（H5 暂存确认时）",
+          "default": "'确定'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "cancelText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "工具栏左键文案（H5 暂存确认时；行为是关闭并放弃暂存）",
+          "default": "'取消'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "DropdownMenu",
+      "slug": "dropdown-menu",
+      "title": "DropdownMenu 下拉菜单",
+      "category": "select",
+      "propsType": "DropdownMenuProps",
+      "demo": "DropdownMenuDemos",
+      "summary": "H5 面板栈替换视野，PC 子菜单右展、父层留原地。",
+      "install": "npx shadcn@latest add @bivane/dropdown-menu",
+      "importPath": "@/components/responsive/dropdown-menu",
+      "h5": "底部抽屉，子菜单面板推入；可选值按 value 匹配**完整层级路径**回填，展开自动下钻到选中层并滚入视野，头部铺**可点层级链**；`confirmable` 走暂存 → 确定",
+      "pc": "锚定菜单，子菜单向右展开，快捷键提示；可选值点选即生效、同套路径回填，展开自动铺开选中子菜单链，**无工具栏**",
+      "mode": "C",
+      "shared": "菜单树结构",
+      "difference": "导航范式不同：面板栈替换视野 vs 子菜单右展、父层留原地",
+      "propsFile": "components/responsive/dropdown-menu.tsx",
+      "props": [
+        {
+          "name": "items",
+          "type": "MenuItem[]",
+          "optional": false,
+          "description": "菜单树。用 `{ divider: true }` 表示分隔线",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "trigger",
+          "type": "ReactNode",
+          "optional": false,
+          "description": "触发器文案。有 value 且匹配到树中节点时，回填「根 → … → 选中项」的层级路径覆盖它（顶层项即其 label）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onSelect",
+          "type": "(value: string, option: MenuOption) => void",
+          "optional": true,
+          "description": "叶子项被激活（父项只是下钻，不触发它）。暂存模式下点叶子**不**触发，确定时才走 onChange",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "optional": true,
+          "description": "可选值场景：受控选中项的 value（树中某叶子项的 value）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "optional": true,
+          "description": "可选值场景：非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string, option: MenuOption) => void",
+          "optional": true,
+          "description": "可选值场景：选中项变化。H5 暂存模式下点「确定」才触发；PC 点选即触发",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "confirmable",
+          "type": "boolean",
+          "optional": true,
+          "description": "H5 是否走「暂存 → 确定」，默认 false（点选即生效）。PC 恒为点选即生效",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "工具栏右键文案（H5 暂存确认时）",
+          "default": "\"确定\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "cancelText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "工具栏左键文案（H5 暂存确认时；行为是关闭并放弃暂存）",
+          "default": "\"取消\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 抽屉根层的标题栏文案；PC 不渲染标题栏（浮层由触发器说明自己是什么）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placement",
+          "type": "\"bottom-start\" | \"bottom-end\"",
+          "optional": true,
+          "description": "PC 浮层与触发器的对齐方向，默认 bottom-start",
+          "default": "\"bottom-start\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "closeOnSelect",
+          "type": "boolean",
+          "optional": true,
+          "description": "叶子项选中后是否关闭菜单，默认 true（暂存模式恒不关闭，由「确定」关）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "emptyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "某一层没有可交互条目时的文案",
+          "default": "\"暂无选项\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "DatePicker",
+      "slug": "date-picker",
+      "title": "DatePicker 日期选择",
+      "category": "select",
+      "propsType": "DatePickerProps",
+      "demo": [
+        "DatePickerDemos",
+        "BoundsDemos"
+      ],
+      "summary": "H5 三列滚轮，PC 月历面板。区间为两段式入口。",
+      "install": "npx shadcn@latest add @bivane/date-picker",
+      "importPath": "@/components/responsive/date-picker",
+      "h5": "底部弹层 + 三列滚轮（年/月/日，5 行制居中），惯性 + scroll-snap，工具条；`columnsType` 可裁列；区间为「开始/结束」两段式入口，两端选齐才可用",
+      "pc": "锚定浮层 + 月历面板（6×7 网格），上下月 + 键盘巡航，触发器可直接输入；区间并排双月，点起点、悬停预览区间带",
+      "mode": "C",
+      "shared": "日期值计算（解析/格式化/min-max 逐字段夹紧/区间排序）、滚轮列模型",
+      "difference": "交互范式不同：一维滚轮吸附 vs 二维月历焦点巡航",
+      "propsFile": "components/responsive/date-picker.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "DatePickerValue",
+          "optional": true,
+          "description": "受控值：单值是 'YYYY-MM-DD' 字符串，区间是 [start, end] 元组",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "DatePickerValue",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: DatePickerValue) => void",
+          "optional": true,
+          "description": "值变化即回调（H5 在点「确定」时、PC 在选满时）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onConfirm",
+          "type": "(value: DatePickerValue) => void",
+          "optional": true,
+          "description": "确认回调，与 onChange 同值。两端都会触发，便于统一接埋点",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "type",
+          "type": "DatePickerType",
+          "optional": true,
+          "description": "单选 / 区间。区间时值恒为有序的两元素元组",
+          "default": "\"single\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "optional": true,
+          "description": "可选下界（含），'YYYY-MM-DD'",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "optional": true,
+          "description": "可选上界（含），'YYYY-MM-DD'",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "columnsType",
+          "type": "DateColumnKey[]",
+          "optional": true,
+          "description": "参与展示的日期列，默认 `['year','month','day']`，顺序由组件固定为「年→月→日」。 两端都生效：PC 会按列组合切换为年、年月或日历面板。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "description": "展示格式，默认由 columnsType 推出（'YYYY-MM-DD' / 'YYYY-MM' / 'MM-DD'…）。 支持 YYYY / YY / MM / M / DD / D 六个 token。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题栏文案。PC 不渲染标题栏（浮层由触发器说明自己是什么）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无选中值时展示",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除按钮（仅在有选中值、且未禁用时出现）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "TimePicker",
+      "slug": "time-picker",
+      "title": "TimePicker 时间选择",
+      "category": "select",
+      "propsType": "TimePickerProps",
+      "demo": "TimePickerDemos",
+      "summary": "两端同一套滚轮，只换外壳（底部弹层 vs 锚定浮层 + 底部确认条）。",
+      "install": "npx shadcn@latest add @bivane/time-picker",
+      "importPath": "@/components/responsive/time-picker",
+      "h5": "底部弹层 + N 列滚轮（时/分/秒，5 行制居中），惯性 + scroll-snap，顶部工具条；`columnsType` 可裁列；区间两段式",
+      "pc": "Radix Popover 锚定浮层 + **与 H5 同源的 N 列滚轮**（仅换外壳），面板级键盘驾驶滚轮（↑↓ 改值 / ←→ 换列 / Home·End / PgUp·PgDn / Enter 确定 / Esc 取消），底部「取消/确定」条",
+      "mode": "B",
+      "shared": "时间值计算（同日期族）、滚轮列模型",
+      "difference": "同滚轮范式、仅外壳不同：底部弹层+顶部工具条 vs 锚定浮层+底部确认条（滚轮行 `TimeWheelRow` 两端同源；曾按 C 实现，2026-09-23 改判 B）",
+      "propsFile": "components/responsive/time-picker.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "TimePickerValue",
+          "optional": true,
+          "description": "受控值：单值是 'HH:mm:ss' 字符串，区间是 [start, end] 元组",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "TimePickerValue",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: TimePickerValue) => void",
+          "optional": true,
+          "description": "值变化即回调（两端都在点「确定」那一瞬）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onConfirm",
+          "type": "(value: TimePickerValue) => void",
+          "optional": true,
+          "description": "确认回调，与 onChange 同值。两端都会触发，便于统一接埋点",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "type",
+          "type": "TimePickerType",
+          "optional": true,
+          "description": "单选 / 区间。区间时值恒为有序的两元素元组",
+          "default": "\"single\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "optional": true,
+          "description": "可选下界（含），'HH:mm:ss'（或按实际列裁剪的 'HH:mm' 等）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "optional": true,
+          "description": "可选上界（含），'HH:mm:ss'（或按实际列裁剪的 'HH:mm' 等）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "columnsType",
+          "type": "TimeColumnKey[]",
+          "optional": true,
+          "description": "参与展示的时间列，默认 `['hour','minute','second']`，顺序由组件固定为「时→分→秒」。 裁剪到 ['hour','minute'] 即「时分」选择器，['hour'] 即「小时」选择器。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "description": "展示格式，默认由 columnsType 推出（'HH:mm:ss' / 'HH:mm' / 'HH'）。 支持 HH / H / mm / m / ss / s 六个 token。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题栏文案。PC 不渲染标题栏（浮层由触发器说明自己是什么）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无选中值时展示",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除按钮（仅在有选中值、且未禁用时出现）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "DateTimePicker",
+      "slug": "datetime-picker",
+      "title": "DateTimePicker 日期时间选择",
+      "category": "select",
+      "propsType": "DateTimePickerProps",
+      "demo": "DateTimePickerDemos",
+      "summary": "H5 滚轮，PC 月历 + 时分秒滚轮列。单值恒走暂存 → 确定。",
+      "install": "npx shadcn@latest add @bivane/datetime-picker",
+      "importPath": "@/components/responsive/datetime-picker",
+      "h5": "底部弹层 + N 列滚轮（年/月/日 + 时·分·秒三档精度，4/5/6 列），顶部工具条；单值，恒走暂存→确定",
+      "pc": "左月历网格（« < 年月 > » + 星期头 + 6×7 定高网格）选日期 + 右侧时/分/秒 1~3 条居中双横线滚轮列（▲▼ 按住连发），顶部回显草稿时间，底部「此刻 / 确定」；键盘分区驾驶",
+      "mode": "C",
+      "shared": "6 字段值模型、跨日期时刻的逐字段夹紧、月历网格、时间滚轮列",
+      "difference": "日期段范式不同（H5 三列滚轮 vs PC 月历网格，同 DatePicker 判据）；时间段共用同一居中双横线滚轮列（PC 多挂 ▲▼ 微调钮与列间竖线，`DateTimeWheelRow`）；单值字符串",
+      "propsFile": "components/responsive/datetime-picker.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "DateTimePickerValue",
+          "optional": true,
+          "description": "受控值：'YYYY-MM-DD HH[:mm[:ss]]' 字符串（格式跟精度走）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "DateTimePickerValue",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: DateTimePickerValue) => void",
+          "optional": true,
+          "description": "点「确定」那一瞬回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onConfirm",
+          "type": "(value: DateTimePickerValue) => void",
+          "optional": true,
+          "description": "确认回调，与 onChange 同值，便于统一接埋点",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "columnsType",
+          "type": "DateTimeColumnKey[]",
+          "optional": true,
+          "description": "参与展示的列。日期三列（年/月/日）必在，时间列取「时」起的连续前缀，共三档： ['year','month','day','hour'] 年月日时 ['year','month','day','hour','minute'] 年月日时分 ['year','month','day','hour','minute','second'] 年月日时分秒（默认） 拼错（缺日期列、时间列不连续）回落全 6 列。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "optional": true,
+          "description": "可选下界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 00:00:00",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "optional": true,
+          "description": "可选上界（含），'YYYY-MM-DD HH:mm:ss'；缺时间位按当天 23:59:59",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "description": "展示格式，默认由 columnsType 推出 （'YYYY-MM-DD HH:mm:ss' / 'YYYY-MM-DD HH:mm' / 'YYYY-MM-DD HH'）。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题栏文案。PC 不渲染标题栏",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无选中值时展示",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除按钮（仅在有选中值、且未禁用时出现）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（架构契约 9 唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Picker",
+      "slug": "picker",
+      "title": "Picker 通用多列选择",
+      "category": "select",
+      "propsType": "PickerProps",
+      "demo": "PickerDemos",
+      "summary": "H5 N 列吸附滚轮，PC N 列纵向面板。列间互不影响。",
+      "install": "npx shadcn@latest add @bivane/picker",
+      "importPath": "@/components/responsive/picker",
+      "h5": "底部弹层 + 多列滚轮联动，列宽随内容",
+      "pc": "锚定浮层 + 多列面板（可滚动/搜索），或降级为多个 Select",
+      "mode": "C",
+      "shared": "列联动、级联数据",
+      "difference": "多列独立选择的容器范式不同：H5 N 列吸附滚轮（底部弹层）vs PC N 列纵向面板（锚定浮层，各列独立滚动/键盘巡航）；列间互不影响，两端都暂存→确定；滚轮件两端同款但 PC 不用（`PickerWheelRow` 仅 H5 + Cascader H5 复用）",
+      "propsFile": "components/responsive/picker.tsx",
+      "props": [
+        {
+          "name": "columns",
+          "type": "PickerColumnsInput",
+          "optional": false,
+          "description": "各列选项。每列支持 `{label,value,disabled?}[]`，也允许直接传 字符串/数字数组（此时 value 与文案相同，对齐 Vant Picker 惯例）。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "PickerValue[]",
+          "optional": true,
+          "description": "受控值：每列一个值的数组",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "PickerValue[]",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(values: PickerValue[], options: ({ label: ReactNode; value: PickerValue; } | undefined)[]) => void",
+          "optional": true,
+          "description": "点「确定」时触发，回传各列值与对应选项（空列位为 undefined）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题；PC 不渲染标题栏",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "无选中值时触发器展示",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "展示清除按钮（仅有选中值且未禁用时出现）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": "\"确定\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "cancelText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": "\"取消\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "无障碍名称；没有可见 label 时应当传入",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Cascader",
+      "slug": "cascader",
+      "title": "Cascader 级联选择",
+      "category": "select",
+      "propsType": "CascaderProps",
+      "demo": "CascaderDemos",
+      "summary": "H5 联动滚轮，PC 面包屑 + 逐级右展多列面板。值恒为根 → 叶完整路径。",
+      "install": "npx shadcn@latest add @bivane/cascader",
+      "importPath": "@/components/responsive/cascader",
+      "h5": "底部弹层 + 滚轮级联（选一级推入二级）",
+      "pc": "锚定浮层 + 多列面板 + 面包屑路径，支持搜索定位",
+      "mode": "C",
+      "shared": "级联索引、路径回显",
+      "difference": "树的走法不同：H5 联动滚轮（省市区三列，换父列子列重算）vs PC 面包屑 + 逐级右展多列面板（点叶子即生效）+ 路径全文搜索；值恒为根→叶子完整路径",
+      "propsFile": "components/responsive/cascader.tsx",
+      "props": [
+        {
+          "name": "options",
+          "type": "readonly CascaderDataItem[]",
+          "optional": false,
+          "description": "树形选项；默认字段 label/value/children，可用 fieldNames 改映射",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "fieldNames",
+          "type": "CascaderFieldNames",
+          "optional": true,
+          "description": "字段名映射，可直接喂 Vant 风格 {text,value,children} 数据",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "CascaderValue[]",
+          "optional": true,
+          "description": "受控值：根 → 叶子的完整路径值数组",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "CascaderValue[]",
+          "optional": true,
+          "description": "非受控初始值",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(values: CascaderValue[], options: CascaderOption[]) => void",
+          "optional": true,
+          "description": "叶子选定后触发，回传完整值链与选项链",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "searchable",
+          "type": "boolean",
+          "optional": true,
+          "description": "搜索定位。仅 PC 呈现：H5 滚轮列没有搜索的落点（触屏主路径是滚）， 同一 prop 两端呈现差异由模式决定，不经额外 props 泄露。",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 面板标题；PC 不渲染标题栏",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": "\"搜索\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "emptyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": "\"暂无数据\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rootText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "面包屑根层文案",
+          "default": "\"请选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Calendar",
+      "slug": "calendar",
+      "title": "Calendar 日历",
+      "category": "select",
+      "propsType": "CalendarProps",
+      "demo": "CalendarDemos",
+      "summary": "H5 全屏弹层拖选，PC 内嵌常驻月历。值恒为 YYYY-MM-DD。",
+      "install": "npx shadcn@latest add @bivane/calendar",
+      "importPath": "@/components/responsive/calendar",
+      "h5": "全屏弹层，月份列表纵向滚动加载，range 拖选",
+      "pc": "内嵌面板（非弹层）可常驻，range 拖选 + 键盘移动",
+      "mode": "C",
+      "shared": "月网格计算、区间逻辑",
+      "difference": "日历范式不同：H5 全屏弹层 + 月份纵向滚动懒挂载 + 触摸拖选（range/multiple 确定条暂存）vs PC 内嵌常驻月历（range 双月）+ 鼠标拖选 + 键盘巡航（点选即生效）；single/range/multiple，值恒为 'YYYY-MM-DD'",
+      "propsFile": "components/responsive/calendar.tsx",
+      "props": [
+        {
+          "name": "type",
+          "type": "CalendarType",
+          "optional": true,
+          "description": "选择类型：单值 / 多选 / 区间，默认 single",
+          "default": "\"single\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "CalendarValue",
+          "optional": true,
+          "description": "受控值（'YYYY-MM-DD'）： single 为字符串；range 为有序 [start, end]；multiple 为升序字符串数组。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "CalendarValue",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: CalendarValue) => void",
+          "optional": true,
+          "description": "值变化回调：H5 在确定/点选关闭时、PC 在每次选定时",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onConfirm",
+          "type": "(value: CalendarValue) => void",
+          "optional": true,
+          "description": "与 onChange 同值，两端最终选定都会触发（便于统一接埋点）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "min",
+          "type": "string",
+          "optional": true,
+          "description": "可选下界（含），默认今天",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "max",
+          "type": "string",
+          "optional": true,
+          "description": "可选上界（含），默认 6 个月后的月末",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "firstDayOfWeek",
+          "type": "0 | 2 | 1 | 3 | 4 | 5 | 6",
+          "optional": true,
+          "description": "星期表头起始：0=周日 … 6=周六，默认 0（对齐 Vant）",
+          "default": "DEFAULT_FIRST_DAY_OF_WEEK",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "formatter",
+          "type": "CalendarFormatter",
+          "optional": true,
+          "description": "单日装饰/禁用（节日、周末禁选等）；两端结果一致",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "maxRange",
+          "type": "number",
+          "optional": true,
+          "description": "区间最多跨多少天（含端点）；不传不限制",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "allowSameDay",
+          "type": "boolean",
+          "optional": true,
+          "description": "区间是否允许起止同日，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showMark",
+          "type": "boolean",
+          "optional": true,
+          "description": "今天是否标「今天」，默认 true（formatter 可覆盖）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "H5 弹层标题；PC 不渲染组件标题",
+          "default": "\"日期选择\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showTitle",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否渲染标题区（H5），默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "确定按钮文案，默认「确定」",
+          "default": "\"确定\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "confirmDisabledText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "区间未选满时确定按钮的禁用文案",
+          "default": "\"请选择结束时间\"",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义底部区（H5 渲染在确定条上方）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "description": "只读：不可选、H5 不显示确定条",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "poppable",
+          "type": "boolean",
+          "optional": true,
+          "description": "H5 是否以全屏弹层呈现，默认 true；false 时 H5 也内嵌常驻。 PC 恒为内嵌，此 prop 不影响 PC。",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "description": "弹层开合（受控，仅 H5 poppable 形态消费）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "optional": true,
+          "description": "",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onOverRange",
+          "type": "(payload: CalendarOverRangePayload) => void",
+          "optional": true,
+          "description": "轻点（非拖选）超出 maxRange 时触发",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Tabs",
+      "slug": "tabs",
+      "title": "Tabs 标签页",
+      "category": "nav",
+      "propsType": "TabsProps",
+      "demo": "TabsDemos",
+      "summary": "H5 标签条可横滑 + 手势，PC 不滑动 + 键盘 + 下划线指示器。",
+      "install": "npx shadcn@latest add @bivane/tabs",
+      "importPath": "@/components/responsive/tabs",
+      "h5": "横向可滑动标签，激活项滚入视野，手势切换内容",
+      "pc": "横向标签 + 下划线，键盘左右切换，不滑动",
+      "mode": "B",
+      "shared": "激活态与切换动画",
+      "difference": "同一激活值模型（**下标**，0 起）两端换壳：H5 标签条可横滑 + 激活项滚入视野 + 内容区手势横滑 / PC 标签条不滑动 + ←/→ 键盘切换 + 下划线指示器（组合式 API，`<Tabs><Tab title>`）",
+      "propsFile": "components/responsive/tabs.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "optional": true,
+          "description": "受控激活下标（0 起），对齐 Vant 的 v-model:active",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "number",
+          "optional": true,
+          "description": "非受控初始激活下标，默认 0",
+          "default": "0",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(index: number) => void",
+          "optional": true,
+          "description": "激活项变化",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "type",
+          "type": "TabsType",
+          "optional": true,
+          "description": "标签样式：line 下划线（默认）/ card 卡片",
+          "default": "'line'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "animated",
+          "type": "boolean",
+          "optional": true,
+          "description": "内容区切换动画，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "swipeable",
+          "type": "boolean",
+          "optional": true,
+          "description": "H5：内容区随手势左右滑动切换，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "sticky",
+          "type": "boolean",
+          "optional": true,
+          "description": "标签条吸顶，默认 false",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": true,
+          "description": "切换动画时长（毫秒），默认 300",
+          "default": "300",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "lineWidth",
+          "type": "number | \"auto\"",
+          "optional": true,
+          "description": "下划线宽度（px）；'auto' 表示与标题同宽；默认 40（对齐 Vant）",
+          "default": "40",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "description": "激活色（覆盖主题主色）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "标签条的无障碍名称",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "NavBar",
+      "slug": "nav-bar",
+      "title": "NavBar 导航栏",
+      "category": "nav",
+      "propsType": "NavBarProps",
+      "demo": "NavBarDemos",
+      "summary": "H5 返回箭头 + 标题居中，PC 标题左对齐 + 操作区右对齐。",
+      "install": "npx shadcn@latest add @bivane/nav-bar",
+      "importPath": "@/components/responsive/nav-bar",
+      "h5": "返回箭头 + 标题居中 + 右侧动作",
+      "pc": "面包屑或标题栏（左对齐 + 操作区右对齐）",
+      "mode": "B",
+      "shared": "层级与返回逻辑",
+      "difference": "同一条「左·中·右」标题栏换壳：H5 返回箭头 + 标题**居中**（三等分，中间格居中）/ PC 标题**左对齐** + 操作区右对齐；层级回调两端同一份",
+      "propsFile": "components/responsive/nav-bar.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "标题文案",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "leftText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "左侧文字（点击触发 onClickLeft）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rightText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "右侧文字（点击触发 onClickRight）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "leftArrow",
+          "type": "boolean",
+          "optional": true,
+          "description": "显示返回箭头，默认 false（对齐 Vant van-nav-bar）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onClickLeft",
+          "type": "() => void",
+          "optional": true,
+          "description": "点击左侧（箭头或文字）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onClickRight",
+          "type": "() => void",
+          "optional": true,
+          "description": "点击右侧文字",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "left",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义左侧内容（给了就顶替 leftText / leftArrow）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "right",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "自定义右侧内容（给了就顶替 rightText）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "fixed",
+          "type": "boolean",
+          "optional": true,
+          "description": "吸顶固定，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "boolean",
+          "optional": true,
+          "description": "固定时留一个等高占位块，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "border",
+          "type": "boolean",
+          "optional": true,
+          "description": "底部分隔线，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "safeAreaInsetTop",
+          "type": "boolean",
+          "optional": true,
+          "description": "顶部安全区，默认 true（贴顶时生效）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "backLabel",
+          "type": "string",
+          "optional": true,
+          "description": "返回箭头的无障碍名称",
+          "default": "'返回'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "optional": true,
+          "description": "标题的无障碍名称；没有可见标题时应当传入（作为导航地标的名字）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Tabbar",
+      "slug": "tabbar",
+      "title": "Tabbar 标签栏",
+      "category": "nav",
+      "propsType": "TabbarProps",
+      "demo": "TabbarDemos",
+      "summary": "H5 底部固定条，PC 侧边导航或顶部导航。",
+      "install": "npx shadcn@latest add @bivane/tabbar",
+      "importPath": "@/components/responsive/tabbar",
+      "h5": "底部固定 + 安全区，图标 + 文字",
+      "pc": "侧边导航或顶部导航（依布局配置）",
+      "mode": "C",
+      "shared": "路由映射",
+      "difference": "位置与信息模型都不同：H5 底部固定条（图标在上文字在下 + 安全区）/ PC 侧边导航（默认）或顶部导航（`pcVariant`），图标在左文字在右",
+      "propsFile": "components/responsive/tabbar.tsx",
+      "props": [
+        {
+          "name": "items",
+          "type": "TabbarItem[]",
+          "optional": false,
+          "description": "标签项",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "optional": true,
+          "description": "受控激活项",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "optional": true,
+          "description": "非受控初始激活项；给不上就落到第一个未禁用项",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string) => void",
+          "optional": true,
+          "description": "激活项变化",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "pcVariant",
+          "type": "PcTabbarVariant",
+          "optional": true,
+          "description": "PC 端导航形态：侧边（默认）/ 顶部；H5 恒为底部",
+          "default": "'sidebar'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "fixed",
+          "type": "boolean",
+          "optional": true,
+          "description": "固定（底栏固定在底部、侧边固定在左侧、顶部固定在顶部），默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "placeholder",
+          "type": "boolean",
+          "optional": true,
+          "description": "固定时留等高占位块，默认 true（PC 侧边形态不适用）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "safeAreaInsetBottom",
+          "type": "boolean",
+          "optional": true,
+          "description": "底部安全区，默认 true（仅 H5 底栏生效）",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "border",
+          "type": "boolean",
+          "optional": true,
+          "description": "分隔线，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "List",
+      "slug": "list",
+      "title": "List 列表",
+      "category": "nav",
+      "propsType": "ListProps",
+      "demo": "ListDemos",
+      "summary": "H5 无限滚动 + 触底加载 + 下拉刷新，PC 滚动加载 + 刷新按钮 + 虚拟滚动。",
+      "install": "npx shadcn@latest add @bivane/list",
+      "importPath": "@/components/responsive/list",
+      "h5": "无限滚动 + 触底加载 + 下拉刷新",
+      "pc": "分页器或虚拟滚动 + 滚动加载",
+      "mode": "C",
+      "shared": "数据获取状态机",
+      "difference": "加载范式不同：H5 触底哨兵（IO）+ 顶部下拉刷新手势 / PC 滚到底加载 + 顶部「刷新」按钮（等价交互）+ 可选虚拟滚动。三态全受控，组件不持有数据",
+      "propsFile": "components/responsive/list.tsx",
+      "props": [
+        {
+          "name": "data",
+          "type": "readonly unknown[]",
+          "optional": false,
+          "description": "列表数据",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "renderItem",
+          "type": "(item: unknown, index: number) => ReactNode",
+          "optional": false,
+          "description": "渲染单项",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rowKey",
+          "type": "(item: unknown, index: number) => string",
+          "optional": true,
+          "description": "行 key（默认用下标）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "description": "加载中（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "finished",
+          "type": "boolean",
+          "optional": true,
+          "description": "已无更多（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "error",
+          "type": "boolean",
+          "optional": true,
+          "description": "加载出错（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onLoad",
+          "type": "() => void",
+          "optional": true,
+          "description": "触底加载",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onRefresh",
+          "type": "() => void",
+          "optional": true,
+          "description": "下拉刷新（H5 手势 / PC 顶部按钮，两端等价）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onRetry",
+          "type": "() => void",
+          "optional": true,
+          "description": "出错后重试",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onItemClick",
+          "type": "(item: unknown, index: number) => void",
+          "optional": true,
+          "description": "点击某项",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "loadingText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "加载中文案，默认「加载中…」",
+          "default": "'加载中…'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "finishedText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "「没有更多」文案，默认「没有更多了」",
+          "default": "'没有更多了'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "errorText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "出错文案，默认「加载失败」",
+          "default": "'加载失败'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "threshold",
+          "type": "number",
+          "optional": true,
+          "description": "触底提前量（px），默认 80",
+          "default": "80",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "pullRefresh",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否支持下拉刷新（H5），默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "virtual",
+          "type": "boolean",
+          "optional": true,
+          "description": "PC：启用虚拟滚动（需同时给 itemHeight）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "itemHeight",
+          "type": "number",
+          "optional": true,
+          "description": "PC：虚拟滚动固定行高（px）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "height",
+          "type": "string | number",
+          "optional": true,
+          "description": "PC：滚动容器高度",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "Table",
+      "slug": "table",
+      "title": "Table 表格",
+      "category": "nav",
+      "propsType": "TableProps",
+      "demo": [
+        "TableDemos",
+        "TablePaginationDemos"
+      ],
+      "summary": "H5 卡片化列表，PC 标准表格（表头排序 / 列固定 / 列筛选 / 行选择 / 分页）。",
+      "install": "npx shadcn@latest add @bivane/table",
+      "importPath": "@/components/responsive/table",
+      "h5": "卡片化列表（关键字段 + 展开详情）",
+      "pc": "标准表格，排序/列固定/列筛选/行选择",
+      "mode": "C",
+      "shared": "列定义、排序规则",
+      "difference": "呈现范式不同：H5 卡片化（一行 = 一卡，字段分 title/meta/detail，详情行内展开）/ PC 标准 `<table>`（表头排序 + sticky 列固定 + 表头下拉列筛选 + 行选择 + 分页条）。两端消费同一份 `columns`，排序规则共享；分页是 PC 端能力（H5 走 List 的无限滚动）",
+      "propsFile": "components/responsive/table.tsx",
+      "props": [
+        {
+          "name": "columns",
+          "type": "readonly TableColumn[]",
+          "optional": false,
+          "description": "列定义",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "data",
+          "type": "readonly unknown[]",
+          "optional": false,
+          "description": "数据",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "sort",
+          "type": "SortState | null",
+          "optional": true,
+          "description": "受控排序。 `null` = 受控且当前无排序（第三态）；`undefined` = 非受控。 两者必须区分 —— 否则受控方无法「取消排序」。",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultSort",
+          "type": "SortState",
+          "optional": true,
+          "description": "非受控初始排序",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onSortChange",
+          "type": "(sort: SortState | null) => void",
+          "optional": true,
+          "description": "排序变化（取消排序时传 null）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "filters",
+          "type": "Readonly<Record<string, readonly string[]>>",
+          "optional": true,
+          "description": "受控列筛选",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultFilters",
+          "type": "Readonly<Record<string, readonly string[]>>",
+          "optional": true,
+          "description": "非受控初始列筛选",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onFilterChange",
+          "type": "(filters: Record<string, readonly string[]>) => void",
+          "optional": true,
+          "description": "列筛选变化",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "selectedKeys",
+          "type": "readonly string[]",
+          "optional": true,
+          "description": "受控选中行 key",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultSelectedKeys",
+          "type": "readonly string[]",
+          "optional": true,
+          "description": "非受控初始选中行 key",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onSelectionChange",
+          "type": "(keys: string[]) => void",
+          "optional": true,
+          "description": "选中行变化",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onRowClick",
+          "type": "(row: unknown, index: number) => void",
+          "optional": true,
+          "description": "点击某行",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "pagination",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否启用分页（PC 端渲染分页条；H5 忽略）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "current",
+          "type": "number",
+          "optional": true,
+          "description": "受控当前页",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultCurrent",
+          "type": "number",
+          "optional": true,
+          "description": "非受控初始页码，默认起始页",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "pageSize",
+          "type": "number",
+          "optional": true,
+          "description": "每页条数，默认 10",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "total",
+          "type": "number",
+          "optional": true,
+          "description": "总条数；local 模式不给则用筛选后行数",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "startPage",
+          "type": "number",
+          "optional": true,
+          "description": "页码起始值，默认 1（后端从 0 开始时传 0）",
+          "default": "1",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "paginationMode",
+          "type": "PaginationMode",
+          "optional": true,
+          "description": "分页模式，默认 `remote`： - `remote`：data 是当页数据，组件不切片（数据来自接口时的常态） - `local`：data 是全量，组件按页切片",
+          "default": "'remote'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "showTotal",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否显示总条数，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "totalText",
+          "type": "ReactNode | ((total: number) => ReactNode)",
+          "optional": true,
+          "description": "总条数文案；传函数可自定义",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onPageChange",
+          "type": "(page: number, pageSize: number) => void",
+          "optional": true,
+          "description": "切页回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onPageSizeChange",
+          "type": "(pageSize: number) => void",
+          "optional": true,
+          "description": "换每页条数回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "pageSizeOptions",
+          "type": "number[]",
+          "optional": true,
+          "description": "每页条数选项；给了就渲染下拉选择器",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "emptyText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "空数据文案，默认「暂无数据」",
+          "default": "'暂无数据'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    },
+    {
+      "name": "DataContainer",
+      "slug": "data-container",
+      "title": "DataContainer 加载层",
+      "category": "nav",
+      "propsType": "DataContainerProps",
+      "demo": "DataContainerDemos",
+      "summary": "只回答「数据怎么来」，对内容层透明。加载策略与模式正交。",
+      "install": "npx shadcn@latest add @bivane/data-container",
+      "importPath": "@/components/responsive/data-container",
+      "h5": "",
+      "pc": "",
+      "mode": "",
+      "shared": "",
+      "difference": "",
+      "propsFile": "components/responsive/data-container.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "DataContainerChildren",
+          "optional": true,
+          "description": "内容层：任意渲染器（节点或按页渲染的函数）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loadStrategy",
+          "type": "LoadStrategy",
+          "optional": true,
+          "description": "加载策略（只管触发器），默认 `auto`： - `auto`：PC 分页 / H5 无限滚动 - `pagination`：两端都分页 - `infinite`：两端都无限滚动 **数据切分是另一件事**：children 传函数 → 组件调用它并传 `(page, pageSize)` 由你自己切；传节点 → 原样渲染（数据已经切好了）。",
+          "default": "'auto'",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "pagination",
+          "type": "boolean",
+          "optional": true,
+          "description": "覆盖 loadStrategy 推导出的触发器（留作逃生口，一般不用传）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "current",
+          "type": "number",
+          "optional": true,
+          "description": "受控当前页",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "defaultCurrent",
+          "type": "number",
+          "optional": true,
+          "description": "非受控初始页",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "pageSize",
+          "type": "number",
+          "optional": true,
+          "description": "每页条数，默认 10",
+          "default": "DEFAULT_PAGE_SIZE",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "total",
+          "type": "number",
+          "optional": true,
+          "description": "总条数（remote 模式必给；local 模式不给则用 children 行数）",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "startPage",
+          "type": "number",
+          "optional": true,
+          "description": "页码起始值，默认 1",
+          "default": "1",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onPageChange",
+          "type": "(page: number, pageSize: number) => void",
+          "optional": true,
+          "description": "切页回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "showTotal",
+          "type": "boolean",
+          "optional": true,
+          "description": "是否显示总条数，默认 true",
+          "default": "true",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "totalText",
+          "type": "ReactNode | ((total: number) => ReactNode)",
+          "optional": true,
+          "description": "总条数文案",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "pageSizeOptions",
+          "type": "number[]",
+          "optional": true,
+          "description": "每页条数选项",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onPageSizeChange",
+          "type": "(pageSize: number) => void",
+          "optional": true,
+          "description": "换每页条数回调",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "description": "无限滚动：加载中（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "finished",
+          "type": "boolean",
+          "optional": true,
+          "description": "无限滚动：已无更多（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "error",
+          "type": "boolean",
+          "optional": true,
+          "description": "无限滚动：出错（受控）",
+          "default": "false",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "onLoad",
+          "type": "() => void",
+          "optional": true,
+          "description": "触底加载",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onRefresh",
+          "type": "() => void",
+          "optional": true,
+          "description": "下拉刷新（H5）",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "onRetry",
+          "type": "() => void",
+          "optional": true,
+          "description": "出错重试",
+          "default": null,
+          "inherited": false,
+          "kind": "event"
+        },
+        {
+          "name": "threshold",
+          "type": "number",
+          "optional": true,
+          "description": "提前触发距离（px），默认 80",
+          "default": "80",
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "loadingText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "文案",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "finishedText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "errorText",
+          "type": "ReactNode",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "description": "",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "forceMode",
+          "type": "DeviceMode",
+          "optional": true,
+          "description": "逃生舱：强制某个模式",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        }
+      ]
+    }
+  ]
+}

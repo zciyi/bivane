@@ -15,7 +15,15 @@
     "consumer:check": "node scripts/consumer-check.mjs",
     "measure": "node scripts/measure.mjs",
     "demo:single": "vite build && node scripts/build-single-demo.mjs",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "tweakcn:export": "node scripts/tweakcn-bridge.mjs export --out packages/tokens/tweakcn/bivane-tweakcn.css",
+    "tweakcn:import": "node scripts/tweakcn-bridge.mjs import",
+    "docs:dev": "vite --config apps/docs/vite.config.ts",
+    "docs:build": "vite build --config apps/docs/vite.config.ts",
+    "docs:props": "node scripts/extract-props.mjs",
+    "docs:registry": "node scripts/build-docs-registry.mjs",
+    "docs:examples": "node scripts/extract-examples.mjs",
+    "bench:snapshot": "node scripts/bench-snapshot.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

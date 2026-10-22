@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+@import '../../../packages/tokens/styles/vant.css';
+@import '../../../packages/tokens/styles/vant-dark.css';
+@import '../../../packages/tokens/styles/vant-ocean.css';
+@import '../../../packages/tokens/styles/vant-grape.css';
+@import '../../../packages/tokens/styles/modes.css';
+@import '../../../packages/tokens/styles/utilities.css';
+@import '../../../packages/tokens/styles/theme.css';
+
+/**
+ * Tailwind 扫描范围。
+ *
+ * 文档站的组件源码在**仓库根**（components/ hooks/ lib/ demos/），
+ * 不在本应用目录下，所以必须显式 @source 指过去 ——
+ * 否则 Tailwind 找不到类名，文档站里的组件会「渲染出来但没样式」。
+ *
+ * ⚠ 反过来，**非源码目录必须排除**（与根 index.css 同理）：
+ *   里面的字符串字面量会被当成类名候选，编出没人用的死规则。
+ */
+@source '../../../components';
+@source '../../../hooks';
+@source '../../../lib';
+@source '../../../demos';
+@source './';
+
+/**
+ * 文档站的 chrome 刻意**复用 Bivane 自己的 token**（bg-bv-surface / text-bv-text /
+ * border-bv-border …）—— 文档站本身就是这套设计系统的第一个消费者。
+ * 好处：
+ *  1. 不用维护第二套配色，两处永远不会打架；
+ *  2. 深浅色切换只要在 <html> 上加 bv-theme-dark，全站（含演示区）一起变，
+ *     顺带把「深色主题」这个能力展示出来了。
+ */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+    }
+}
+
+/**
+ * 深链定位高亮。
+ *
+ * 搜索面板选中一条属性/示例后跳转过来，目标行/卡会闪一下 ——
+ * 否则读者拿到 URL 打开时，「链到哪儿了」完全看不出来。
+ *
+ * 颜色走 `--bv-primary`（不写死色值）：深浅主题切换时一起变，
+ * 也和文档站 chrome 复用同一套 token 的约定一致。
+ *
+ * 挂在 `<tr>` 上时 outline 不渲染（表格行的既定行为），
+ * 只剩背景闪烁 —— 属降级，不是缺陷。
+ */
+.bv-deeplink-hit {
+    outline: 3px solid transparent;
+    outline-offset: 4px;
+    animation: bv-deeplink-flash 2.4s ease-out 1;
+}
+
+@keyframes bv-deeplink-flash {
+    from {
+        background-color: color-mix(
+            in srgb,
+            var(--bv-primary) 20%,
+            transparent
+        );
+        outline-color: color-mix(in srgb, var(--bv-primary) 55%, transparent);
+    }
+    to {
+        background-color: transparent;
+        outline-color: transparent;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bv-deeplink-hit {
+        /* 旋转/闪烁这类「功能性动效」可去，但「我在这儿」不能去 */
+        animation: none;
+        background-color: color-mix(
+            in srgb,
+            var(--bv-primary) 20%,
+            transparent
+        );
+    }
+}

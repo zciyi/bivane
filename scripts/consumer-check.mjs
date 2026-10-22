@@ -39,9 +39,18 @@ const SHADCN_VERSION = '3.6.3';
 const EXPECTED = [
   'src/styles/bivane/vant.css',
   'src/styles/bivane/vant-dark.css',
+  'src/styles/bivane/vant-ocean.css',
+  'src/styles/bivane/vant-grape.css',
   'src/styles/bivane/modes.css',
   'src/styles/bivane/utilities.css',
   'src/styles/bivane/theme.css',
+  // tweakcn 桥接（独立 item，不在 tokens item 里）
+  'src/styles/bivane/tweakcn.css',
+  'src/scripts/tweakcn-bridge.mjs',
+  'src/scripts/tweakcn/mapping.mjs',
+  'src/scripts/tweakcn/css-vars.mjs',
+  'src/scripts/tweakcn/color.mjs',
+  'src/scripts/tweakcn/tweakcn-parser.mjs',
   'src/lib/utils.ts',
   'src/lib/portal.tsx',
   'src/lib/imperative-host.tsx',
@@ -207,10 +216,12 @@ export default defineConfig({
 </html>
 `,
 
-  // 与 USAGE.md 里写的五行 import 逐字一致
+  // 与 USAGE.md 里写的八行 import 逐字一致
   'src/index.css': `@import 'tailwindcss';
 @import './styles/bivane/vant.css';
 @import './styles/bivane/vant-dark.css';
+@import './styles/bivane/vant-ocean.css';
+@import './styles/bivane/vant-grape.css';
 @import './styles/bivane/modes.css';
 @import './styles/bivane/utilities.css';
 @import './styles/bivane/theme.css';
@@ -643,6 +654,9 @@ function run(cmd, args, cwd) {
 
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+// 跑 tweakcn 桥接脚本要用 node 本身（不是 npm/npx）——
+// 脚本零依赖，不需要 npx 去解析任何包。
+const node = process.platform === 'win32' ? 'node.exe' : 'node';
 
 /** 起一个只服务 packages/registry/r/ 的静态服务，并记录每一次请求 */
 function startRegistryServer() {
@@ -745,6 +759,8 @@ async function main() {
       '@bivane/cell',
       '@bivane/tag',
       '@bivane/badge',
+      // tweakcn 桥接：独立 item，消费者显式安装才拿得到
+      '@bivane/tweakcn',
     ];
     const add = await run(npx, ['--yes', `shadcn@${SHADCN_VERSION}`, 'add', ...componentItems, '--yes'], opts.dir);
     const addOut = `${add.stdout}\n${add.stderr}`;
@@ -752,13 +768,54 @@ async function main() {
       failures.push(`shadcn add 失败（exit ${add.code}）\n${addOut.slice(-2500)}`);
     }
 
-    console.log('[consumer] 5/6 断言落盘文件');
+    console.log('[consumer] 5/7 断言落盘文件');
     const missing = EXPECTED.filter((rel) => !existsSync(join(opts.dir, rel)));
     if (missing.length) {
       failures.push(`缺少 ${missing.length} 个文件：\n  ${missing.join('\n  ')}`);
     }
 
-    console.log('[consumer] 6/6 消费者侧 typecheck + build');
+    // 5b. tweakcn 桥接脚本**真跑一次**。
+    // 「文件落盘了」不等于「能用」—— 脚本的相对导入路径在消费者项目里
+    // （落到 src/scripts/）与仓库里（scripts/）不同，跑一次才知道对不对。
+    // 同时验证「零依赖」：这个脚本不许 require/import 任何 npm 包。
+    console.log('[consumer] 5b/7 在消费者项目里跑 tweakcn 桥接脚本');
+    const bridgeDir = join(opts.dir, 'src/scripts');
+    const themeIn = join(bridgeDir, 'sample-tweakcn-theme.css');
+    await writeFile(
+        themeIn,
+        `:root {\n  --primary: #3b82f6;\n  --destructive: #ef4444;\n  --chart-2: #10b981;\n  --chart-3: #f59e0b;\n}\n`,
+        'utf8',
+    );
+    const bridgeRun = await run(
+        node,
+        ['tweakcn-bridge.mjs', 'import', 'sample-tweakcn-theme.css', '--name', 'checked'],
+        bridgeDir,
+    );
+    if (bridgeRun.code !== 0) {
+      failures.push(
+        `消费者项目里跑 tweakcn-bridge import 失败（exit ${bridgeRun.code}）\n${`${bridgeRun.stdout}\n${bridgeRun.stderr}`.slice(-1500)}`,
+      );
+    } else {
+      const out = `${bridgeRun.stdout}\n${bridgeRun.stderr}`;
+      for (const expect of ['.bv-theme-checked', '--bv-blue: #3b82f6;', '--bv-red: #ef4444;']) {
+        if (!out.includes(expect)) {
+          failures.push(`tweakcn-bridge import 输出缺少「${expect}」\n${out.slice(-800)}`);
+        }
+      }
+    }
+    // 零依赖检查：脚本里不允许出现裸模块导入
+    const bridgeSrc = await readFile(join(bridgeDir, 'tweakcn-bridge.mjs'), 'utf8');
+    const bareImports = [...bridgeSrc.matchAll(/from\s+["']([^"'./][^"']*)["']/g)]
+      .map((m) => m[1])
+      .filter((spec) => !spec.startsWith('node:') && !spec.startsWith('./'));
+    if (bareImports.length) {
+      failures.push(
+        `tweakcn-bridge.mjs 引用了 npm 包（${bareImports.join(', ')}）—— ` +
+          `它必须零依赖，消费者不必为它装任何东西`,
+      );
+    }
+
+    console.log('[consumer] 6/7 消费者侧 typecheck + build');
     const tc = await run(npm, ['run', 'typecheck'], opts.dir);
     if (tc.code !== 0) failures.push(`消费者 tsc --noEmit 失败\n${`${tc.stdout}\n${tc.stderr}`.slice(-3000)}`);
 
@@ -832,6 +889,14 @@ async function main() {
           '--bv-load-status-min-height',
           '--bv-load-status-line-height',
           'bv-fade-in',
+          // 主题/风格激活 class：三套（深色 + 两套品牌风格）都必须进消费者 CSS 产物。
+          // 漏分发时的症状是「切了 class 没反应」——不报错、类型全绿、组件照常渲染。
+          'bv-theme-dark',
+          'bv-theme-ocean',
+          'bv-theme-grape',
+          // ⚠ 不要探 tweakcn.css 的槽名：那个文件**故意不被 import**
+          // （保持消费者产物零体积增量），所以它不会进构建产物 ——
+          // 探它 = 必然假 MISS。它的正确验证方式是「在消费者项目里真跑一次脚本」。
         ];
         for (const probe of probes) {
           if (!css.includes(probe)) {

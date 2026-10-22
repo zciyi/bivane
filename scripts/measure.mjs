@@ -306,6 +306,50 @@ const PROBE = `(() => {
     'table-card-gap': root.getPropertyValue('--bv-table-card-gap').trim(),
     'table-pc-cell-padding-x': root.getPropertyValue('--bv-table-pc-cell-padding-x').trim(),
   };
+
+  // 风格 / 深色（P4-1）：真浏览器里逐个激活 class，读**实际渲染出来的颜色**。
+  // 只读 CSS 变量不够 —— 变量在但没被组件消费的话探针会误判为「生效」。
+  // 判据取 primary 按钮的计算 background-color：它是 --bv-primary 的直接消费者，
+  // 而 --bv-primary 在 vant.css 里是 var(--bv-blue) 式间接引用，
+  // 所以这条同时验证了「色板 → 语义色 → 组件」整条链没断。
+  //
+  // ⚠ class 必须加在 documentElement：portal 容器挂在 body 下，
+  // 只挂页面根 div 的话弹层不换色（这条探针在页面内取按钮，正好能验证作用域是通的）。
+  const themeProbes = {};
+  const primaryBtn = document.querySelector('[data-slot="button"][data-type="primary"]')
+    || document.querySelector('[data-slot="button"]');
+  const rootEl = document.documentElement;
+  const saved = [...rootEl.classList];
+  const readColor = () => {
+    const btn = document.querySelector('[data-slot="button"][data-type="primary"]')
+      || document.querySelector('[data-slot="button"]');
+    if (!btn) return null;
+    const cs = getComputedStyle(btn);
+    return {
+      background: cs.backgroundColor,
+      color: cs.color,
+      primaryVar: getComputedStyle(rootEl).getPropertyValue('--bv-primary').trim(),
+      blueVar: getComputedStyle(rootEl).getPropertyValue('--bv-blue').trim(),
+    };
+  };
+  for (const combo of [
+    { key: 'vant', classes: [] },
+    { key: 'ocean', classes: ['bv-theme-ocean'] },
+    { key: 'grape', classes: ['bv-theme-grape'] },
+    { key: 'dark', classes: ['bv-theme-dark'] },
+    { key: 'ocean+dark', classes: ['bv-theme-ocean', 'bv-theme-dark'] },
+  ]) {
+    // 用 className 整体赋值而不是逐个 classList.remove：后者传空串会抛
+    // DOMTokenList 异常，probe 直接崩、整轮 measure 拿不到数据。
+    rootEl.className = '';
+    for (const c of combo.classes) {
+      if (c) rootEl.classList.add(c);
+    }
+    themeProbes[combo.key] = readColor();
+  }
+  rootEl.className = saved.join(' ');
+  out.themeSwitch = { hasPrimaryButton: Boolean(primaryBtn), probes: themeProbes };
+
   return JSON.stringify(out);
 })()`;
 
