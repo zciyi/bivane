@@ -45,7 +45,7 @@ export function UploaderExample1() {
                                     afterRead={afterRead}
                                     ariaLabel="基础上传"
                                 />
-                                <span className="text-bv-xs text-bv-text-3">
+                                <span className="text-bv-xs text-bv-text-2">
                                     共 {list.length} 项
                                 </span>
                             </div>

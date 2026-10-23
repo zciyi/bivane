@@ -85,7 +85,9 @@ export interface FieldProps extends Omit<
     rows?: number;
     /** textarea 自适应高度 */
     autosize?: boolean | FieldAutosizeConfig;
+    /** 禁用：不可聚焦、不可键入 */
     disabled?: boolean;
+    /** 只读：不可键入，仍可聚焦/复制；常配合 arrowDirection 做选择器入口 */
     readOnly?: boolean;
     /** 垂直居中（默认 true，对齐 Vant） */
     center?: boolean;
@@ -142,14 +144,21 @@ export interface FieldProps extends Omit<
     onClickRightIcon?: React.MouseEventHandler<HTMLElement>;
     /** 点清除图标 */
     onClear?: React.MouseEventHandler<HTMLButtonElement>;
+    /** 原生 focus 事件（透传给内部控件） */
     onFocus?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+    /** 原生 blur 事件（透传给内部控件） */
     onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     /** 透传给原生控件的常用属性 */
     autoComplete?: string;
+    /** 初始渲染后自动聚焦 */
     autoFocus?: boolean;
+    /** 移动端输入法确认键样式（透传原生 enterkeyhint） */
     enterKeyHint?: React.InputHTMLAttributes<HTMLInputElement>["enterKeyHint"];
+    /** 拼写检查（透传原生 spellcheck） */
     spellCheck?: boolean;
+    /** 自动大写（透传原生 autocapitalize） */
     autoCapitalize?: string;
+    /** 自动纠正（透传原生 autocorrect） */
     autoCorrect?: string;
 }
 

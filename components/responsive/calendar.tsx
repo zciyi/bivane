@@ -39,6 +39,7 @@ export interface CalendarProps {
      * single 为字符串；range 为有序 [start, end]；multiple 为升序字符串数组。
      */
     value?: CalendarValue;
+    /** 非受控初始值 */
     defaultValue?: CalendarValue;
     /** 值变化回调：H5 在确定/点选关闭时、PC 在每次选定时 */
     onChange?: (value: CalendarValue) => void;
@@ -77,13 +78,19 @@ export interface CalendarProps {
     poppable?: boolean;
     /** 弹层开合（受控，仅 H5 poppable 形态消费） */
     open?: boolean;
+    /** 非受控初始开合（仅 H5 poppable 形态） */
     defaultOpen?: boolean;
+    /** 开合变化（仅 H5 poppable 形态） */
     onOpenChange?: (open: boolean) => void;
     /** 轻点（非拖选）超出 maxRange 时触发 */
     onOverRange?: (payload: CalendarOverRangePayload) => void;
+    /** 无障碍名称；没有可见标题时应当传入 */
     ariaLabel?: string;
+    /** 根元素 id */
     id?: string;
+    /** 自定义类名（透传到根元素） */
     className?: string;
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

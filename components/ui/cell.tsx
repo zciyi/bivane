@@ -36,6 +36,7 @@ export interface CellProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 't
   large?: boolean;
   /** 点击回调；传入即视为可点击 */
   onClick?: React.MouseEventHandler<HTMLDivElement>;
+  /** 值之后的自定义补充内容（渲染在内容区） */
   children?: React.ReactNode;
 }
 

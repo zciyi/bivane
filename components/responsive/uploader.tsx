@@ -32,6 +32,7 @@ export interface UploaderProps {
     accept?: string;
     /** H5 直接唤起相机（透传给 input），PC 忽略 */
     capture?: boolean | "user" | "environment";
+    /** 禁用：不可选择 / 删除 / 重试 */
     disabled?: boolean;
     /** 只读：不可增删/重试 */
     readonly?: boolean;
@@ -39,7 +40,9 @@ export interface UploaderProps {
     compress?: boolean | { maxWidth?: number; quality?: number };
     /** 上传地址（内置 XHR）。传了 action 且无 afterRead 时走它 */
     action?: string;
+    /** 内置 XHR 上传方法，默认 POST */
     method?: string;
+    /** 内置 XHR 上传请求头 */
     headers?: Record<string, string>;
     /** 上传表单字段名，默认 'file' */
     name?: string;
@@ -47,6 +50,7 @@ export interface UploaderProps {
     data?:
         | Record<string, string>
         | ((item: UploaderFileItem) => Record<string, string>);
+    /** 内置 XHR 是否携带跨域凭证（cookies） */
     withCredentials?: boolean;
     /** 业务自理上传：resolve→完成 / reject→失败。优先于 action。
      *  第二个参数 onProgress 用于上报真实进度，不调用则上传中只转圈不显示百分比。 */
@@ -62,11 +66,15 @@ export interface UploaderProps {
     /** 自定义选文件触发：传了它，点「+」/拖拽区不再打开系统弹窗，改为回调 consumer。
      *  典型是 App WebView 对接 JSBridge：回调里拿到文件后 handle.addFiles(file) 回填。 */
     onPickRequest?: (handle: UploaderHandle) => void;
+    /** 自定义类名（透传到根元素） */
     className?: string;
+    /** 自定义内联样式（透传到根元素） */
     style?: React.CSSProperties;
+    /** 根元素 id */
     id?: string;
     /** 无障碍标签，与全库一致用 ariaLabel */
     ariaLabel?: string;
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

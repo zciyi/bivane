@@ -68,13 +68,19 @@ export interface InputNumberProps extends Omit<
     decimalLength?: number;
     /** 圆角风格：default 连体方块 / round 圆形独立按钮（仅 H5 壳生效） */
     theme?: InputNumberTheme;
+    /** 禁用整个控件（加减与输入都不可用） */
     disabled?: boolean;
     /** 禁止键入（输入框只读，仍可点加减；焦点会被弹回，对齐 Vant） */
     disableInput?: boolean;
+    /** 禁用加按钮（键入仍可） */
     disablePlus?: boolean;
+    /** 禁用减按钮（键入仍可） */
     disableMinus?: boolean;
+    /** 是否展示加按钮，默认 true */
     showPlus?: boolean;
+    /** 是否展示减按钮，默认 true */
     showMinus?: boolean;
+    /** 是否展示输入框，默认 true */
     showInput?: boolean;
     /** 只允许非负整数，默认 false（唤起不带小数点的数字键盘） */
     integer?: boolean;
@@ -91,10 +97,15 @@ export interface InputNumberProps extends Omit<
     beforeChange?: (value: InputNumberValue) => boolean | Promise<boolean>;
     /** 已在边界仍点同方向时触发（可用于抖动提示） */
     onOverlimit?: (direction: InputNumberDirection) => void;
+    /** 点加按钮（值已变化后触发） */
     onPlus?: () => void;
+    /** 点减按钮（值已变化后触发） */
     onMinus?: () => void;
+    /** 输入框聚焦 */
     onFocus?: React.FocusEventHandler<HTMLInputElement>;
+    /** 输入框失焦（此时做越界收口） */
     onBlur?: React.FocusEventHandler<HTMLInputElement>;
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

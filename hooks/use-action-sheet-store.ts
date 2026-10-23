@@ -23,21 +23,31 @@ export interface ActionSheetAction {
 }
 
 export interface ActionSheetOptions {
+  /** 顶部标题 */
   title?: React.ReactNode;
+  /** 标题下方副文案 */
   description?: React.ReactNode;
+  /** 选项列表 */
   actions?: ActionSheetAction[];
   /** 取消按钮文案；传 null / false 隐藏取消 */
   cancelText?: React.ReactNode;
   /** 点击选项后是否自动关闭，默认 true */
   closeOnClickAction?: boolean;
+  /** 点击遮罩是否关闭；不传时 H5 默认 true、PC 默认 false */
   closeOnClickOverlay?: boolean;
+  /** 是否按 ESC 关闭，默认 true */
   closeOnPressEscape?: boolean;
+  /** 层级，默认用 --bv-overlay-z-index */
   zIndex?: number;
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
+  /** 自定义类名（透传弹层面板） */
   className?: string;
   /** 选中某项（在关闭之前触发） */
   onSelect?: (action: ActionSheetAction, index: number) => void | Promise<void>;
+  /** 点取消按钮（在关闭之前触发） */
   onCancel?: () => void;
+  /** 退场动画结束、节点卸载后回调 */
   onClosed?: () => void;
 }
 

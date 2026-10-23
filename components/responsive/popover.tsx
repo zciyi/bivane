@@ -33,6 +33,7 @@ export interface PopoverProps {
   open?: boolean;
   /** 非受控初始开合 */
   defaultOpen?: boolean;
+  /** 开合变化（受控与非受控都会触发） */
   onOpenChange?: (open: boolean) => void;
   /** 点动作行后是否关闭面板，默认 true（两端一致） */
   closeOnClickAction?: boolean;
@@ -52,7 +53,7 @@ export interface PopoverProps {
    * 缺省读 token --bv-popover-h5-bubble-max-rows（默认 3）。仅 H5 生效
    */
   maxRows?: number;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

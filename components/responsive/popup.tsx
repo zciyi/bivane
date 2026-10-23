@@ -52,6 +52,7 @@ export interface PopupProps extends Omit<
     open?: boolean;
     /** 非受控初始开合 */
     defaultOpen?: boolean;
+    /** 开合变化（受控与非受控都会触发） */
     onOpenChange?: (open: boolean) => void;
     /** 关闭后回调（与 onOpenChange 的区别：仅关闭时触发） */
     onClose?: () => void;
@@ -87,9 +88,11 @@ export interface PopupProps extends Omit<
     scrollable?: boolean;
     /** 进出场时长（ms），同时覆盖 CSS 变量；传 0 表示不做动画（测试与低性能场景） */
     duration?: number;
+    /** 层级，默认用 --bv-overlay-z-index */
     zIndex?: number;
-    /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
+    /** 弹层内容 */
     children?: React.ReactNode;
 }
 

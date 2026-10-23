@@ -35,7 +35,9 @@ export function Section({
     );
 }
 
-/** 内容块：纵向内边距随模式放宽（H5 16 / PC 24），横向恒为 16 以对齐标题 */
+/** 内容块：纵向内边距随模式放宽（H5 16 / PC 24），横向恒为 16 以对齐标题；
+ *  块内是纵向 flex（gap 16px）—— 相邻 Row / 说明段之间不再靠运气留白，
+ *  没有它，连续两个 <Row> 会 0 间距贴死（Tabs 页「内容一」怼着下一行说明）。 */
 export function Block({
     children,
     className,
@@ -44,7 +46,12 @@ export function Block({
     className?: string;
 }) {
     return (
-        <div className={cn("bg-bv-surface px-bv-md py-bv-block", className)}>
+        <div
+            className={cn(
+                "flex flex-col items-stretch gap-bv-md bg-bv-surface px-bv-md py-bv-block",
+                className,
+            )}
+        >
             {children}
         </div>
     );

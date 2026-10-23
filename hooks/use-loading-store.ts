@@ -21,9 +21,11 @@ export interface LoadingOptions {
    * true 时遮罩吃事件，false 时底层仍可点（但遮罩依旧盖在上面）。
    */
   forbidClick?: boolean;
+  /** 层级，默认用 --bv-toast-z-index */
   zIndex?: number;
   /** 自动关闭毫秒数；不传则常驻 */
   duration?: number;
+  /** 自定义类名（透传到遮罩层） */
   className?: string;
 }
 

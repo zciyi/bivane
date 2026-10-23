@@ -68,14 +68,17 @@ export interface DropdownMenuProps {
   placement?: "bottom-start" | "bottom-end";
   /** 叶子项选中后是否关闭菜单，默认 true（暂存模式恒不关闭，由「确定」关） */
   closeOnSelect?: boolean;
+  /** 禁用：触发器不可点（展开中会被强制收起） */
   disabled?: boolean;
   /** 某一层没有可交互条目时的文案 */
   emptyText?: React.ReactNode;
   /** 无障碍名称；没有可见 label 时应当传入 */
   ariaLabel?: string;
+  /** 触发器 id */
   id?: string;
+  /** 自定义类名（透传弹层面板） */
   className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

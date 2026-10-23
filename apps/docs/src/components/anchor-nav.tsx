@@ -52,7 +52,7 @@ export function AnchorNav({ anchors }: { anchors: Anchor[] }) {
     return (
         <nav className="hidden w-[180px] shrink-0 xl:block">
             <div className="sticky top-[72px] max-h-[calc(100vh-88px)] overflow-y-auto">
-                <div className="mb-bv-xs text-bv-sm font-bv-bold text-bv-text-2">
+                <div className="mb-bv-xs text-[11px] font-bv-bold uppercase tracking-wider text-bv-text-2">
                     本页目录
                 </div>
                 <ul className="border-l border-bv-border">
@@ -69,12 +69,12 @@ export function AnchorNav({ anchors }: { anchors: Anchor[] }) {
                                             block: 'start',
                                         });
                                 }}
-                                className={`-ml-px block border-l-2 py-[3px] text-bv-sm transition-colors ${
+                                className={`-ml-px block border-l-2 py-[4px] text-[13px] transition-colors ${
                                     a.level === 2 ? 'pl-bv-md pr-bv-xs' : 'px-bv-xs'
                                 } ${
                                     active === a.id
                                         ? 'border-bv-primary font-medium text-bv-primary'
-                                        : 'border-transparent text-bv-text-3 hover:text-bv-text'
+                                        : 'border-transparent text-bv-text-2 hover:text-bv-text'
                                 }`}
                             >
                                 {a.title}

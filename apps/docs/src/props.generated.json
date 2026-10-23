@@ -1161,7 +1161,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "顶部标题",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1170,7 +1170,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "标题下方副文案",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1179,7 +1179,7 @@
         "name": "actions",
         "type": "ActionSheetAction[] | undefined",
         "optional": true,
-        "description": "",
+        "description": "选项列表",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1206,7 +1206,7 @@
         "name": "closeOnClickOverlay",
         "type": "boolean | undefined",
         "optional": true,
-        "description": "",
+        "description": "点击遮罩是否关闭；不传时 H5 默认 true、PC 默认 false",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1215,7 +1215,7 @@
         "name": "closeOnPressEscape",
         "type": "boolean | undefined",
         "optional": true,
-        "description": "",
+        "description": "是否按 ESC 关闭，默认 true",
         "default": "true",
         "inherited": true,
         "kind": "prop"
@@ -1224,7 +1224,7 @@
         "name": "zIndex",
         "type": "number | undefined",
         "optional": true,
-        "description": "",
+        "description": "层级，默认用 --bv-overlay-z-index",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1233,7 +1233,7 @@
         "name": "forceMode",
         "type": "DeviceMode | undefined",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1242,7 +1242,7 @@
         "name": "className",
         "type": "string | undefined",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -1260,7 +1260,7 @@
         "name": "onCancel",
         "type": "(() => void) | undefined",
         "optional": true,
-        "description": "",
+        "description": "点取消按钮（在关闭之前触发）",
         "default": null,
         "inherited": true,
         "kind": "event"
@@ -1269,7 +1269,7 @@
         "name": "onClosed",
         "type": "(() => void) | undefined",
         "optional": true,
-        "description": "",
+        "description": "退场动画结束、节点卸载后回调",
         "default": null,
         "inherited": true,
         "kind": "event"
@@ -1278,7 +1278,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "受控开合",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1287,7 +1287,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "非受控初始开合，默认 false",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -1296,7 +1296,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -1328,7 +1328,7 @@
         "name": "defaultValue",
         "type": "CalendarValue",
         "optional": true,
-        "description": "",
+        "description": "非受控初始值",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1490,7 +1490,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "非受控初始开合（仅 H5 poppable 形态）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -1499,7 +1499,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（仅 H5 poppable 形态）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -1517,7 +1517,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "无障碍名称；没有可见标题时应当传入",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1526,7 +1526,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "根元素 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1535,7 +1535,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1544,7 +1544,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1621,7 +1621,7 @@
         "name": "placeholder",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "无选中值时展示",
         "default": "\"请选择\"",
         "inherited": false,
         "kind": "prop"
@@ -1630,7 +1630,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -1639,7 +1639,7 @@
         "name": "clearable",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "展示清除按钮（仅在有选中值、且未禁用时出现）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -1648,7 +1648,7 @@
         "name": "searchPlaceholder",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "PC 搜索框占位文案，默认「搜索」",
         "default": "\"搜索\"",
         "inherited": false,
         "kind": "prop"
@@ -1657,7 +1657,7 @@
         "name": "emptyText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "无匹配项时的文案",
         "default": "\"暂无数据\"",
         "inherited": false,
         "kind": "prop"
@@ -1675,7 +1675,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "无障碍名称；没有可见 label 时应当传入",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1684,7 +1684,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1693,7 +1693,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1702,7 +1702,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1905,7 +1905,7 @@
         "name": "finishedText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "「没有更多」文案",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1914,7 +1914,7 @@
         "name": "errorText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "加载出错文案",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1923,7 +1923,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -1932,7 +1932,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2045,7 +2045,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -2072,7 +2072,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2081,7 +2081,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2090,7 +2090,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2194,7 +2194,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -2221,7 +2221,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2230,7 +2230,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2239,7 +2239,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（架构契约 9 唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2253,7 +2253,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "受控开合",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2262,7 +2262,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "非受控初始开合，默认 false",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -2271,7 +2271,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2280,7 +2280,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "标题",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2316,7 +2316,7 @@
         "name": "showConfirmButton",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示确认按钮，默认 true",
         "default": "true",
         "inherited": false,
         "kind": "prop"
@@ -2325,7 +2325,7 @@
         "name": "confirmText",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "确认按钮文案，默认「确认」",
         "default": "'确认'",
         "inherited": false,
         "kind": "prop"
@@ -2334,7 +2334,7 @@
         "name": "showCancelButton",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示取消按钮，默认 false",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -2343,7 +2343,7 @@
         "name": "cancelText",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "取消按钮文案，默认「取消」",
         "default": "'取消'",
         "inherited": false,
         "kind": "prop"
@@ -2361,7 +2361,7 @@
         "name": "onConfirm",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "点确认按钮（beforeClose 放行后触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2370,7 +2370,7 @@
         "name": "onCancel",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "点取消按钮",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2406,7 +2406,7 @@
         "name": "overlay",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否渲染遮罩，默认 true",
         "default": "true",
         "inherited": false,
         "kind": "prop"
@@ -2415,7 +2415,7 @@
         "name": "lockScroll",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否锁定背景滚动，默认 true",
         "default": "true",
         "inherited": false,
         "kind": "prop"
@@ -2433,7 +2433,7 @@
         "name": "zIndex",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "层级，默认用 --bv-overlay-z-index",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2442,7 +2442,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2451,7 +2451,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "主体内容（优先于 message / description）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2619,7 +2619,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点（展开中会被强制收起）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -2646,7 +2646,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2655,7 +2655,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2664,7 +2664,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2768,7 +2768,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用整个控件（加减与输入都不可用）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2786,7 +2786,7 @@
         "name": "disablePlus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用加按钮（键入仍可）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2795,7 +2795,7 @@
         "name": "disableMinus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用减按钮（键入仍可）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2804,7 +2804,7 @@
         "name": "showPlus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示加按钮，默认 true",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2813,7 +2813,7 @@
         "name": "showMinus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示减按钮，默认 true",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2822,7 +2822,7 @@
         "name": "showInput",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示输入框，默认 true",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -2885,7 +2885,7 @@
         "name": "onPlus",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "点加按钮（值已变化后触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2894,7 +2894,7 @@
         "name": "onMinus",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "点减按钮（值已变化后触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2903,7 +2903,7 @@
         "name": "onFocus",
         "type": "FocusEventHandler<HTMLInputElement>",
         "optional": true,
-        "description": "",
+        "description": "输入框聚焦",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2912,7 +2912,7 @@
         "name": "onBlur",
         "type": "FocusEventHandler<HTMLInputElement>",
         "optional": true,
-        "description": "",
+        "description": "输入框失焦（此时做越界收口）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -2921,7 +2921,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3097,7 +3097,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3106,7 +3106,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3147,7 +3147,7 @@
         "name": "zIndex",
         "type": "number | undefined",
         "optional": true,
-        "description": "",
+        "description": "层级，默认用 --bv-toast-z-index",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -3165,7 +3165,7 @@
         "name": "className",
         "type": "string | undefined",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到遮罩层）",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -3174,7 +3174,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "是否展示（受控）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -3314,7 +3314,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3328,7 +3328,7 @@
         "name": "message",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "通知文案",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -3373,7 +3373,7 @@
         "name": "onClick",
         "type": "((event: MouseEvent<HTMLDivElement, MouseEvent>) => void) | undefined",
         "optional": true,
-        "description": "",
+        "description": "点击通知条",
         "default": null,
         "inherited": true,
         "kind": "event"
@@ -3382,7 +3382,7 @@
         "name": "onClose",
         "type": "(() => void) | undefined",
         "optional": true,
-        "description": "",
+        "description": "展示时长结束后回调",
         "default": null,
         "inherited": true,
         "kind": "event"
@@ -3391,7 +3391,7 @@
         "name": "zIndex",
         "type": "number | undefined",
         "optional": true,
-        "description": "",
+        "description": "层级，默认用 --bv-toast-z-index",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -3400,7 +3400,7 @@
         "name": "className",
         "type": "string | undefined",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到通知条）",
         "default": null,
         "inherited": true,
         "kind": "prop"
@@ -3409,7 +3409,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "受控开合",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3418,7 +3418,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "非受控初始开合，默认 false",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -3427,7 +3427,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -3495,7 +3495,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -3513,7 +3513,7 @@
         "name": "confirmText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "确定按钮文案，默认「确定」",
         "default": "\"确定\"",
         "inherited": false,
         "kind": "prop"
@@ -3522,7 +3522,7 @@
         "name": "cancelText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "取消按钮文案，默认「取消」",
         "default": "\"取消\"",
         "inherited": false,
         "kind": "prop"
@@ -3540,7 +3540,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3549,7 +3549,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3558,7 +3558,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3626,7 +3626,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -3689,7 +3689,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3721,7 +3721,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -3865,7 +3865,7 @@
         "name": "zIndex",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "层级，默认用 --bv-overlay-z-index",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3874,7 +3874,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3883,7 +3883,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "弹层内容",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -3942,7 +3942,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：不可评分（星用 disabledColor）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4041,7 +4041,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4050,7 +4050,7 @@
         "name": "style",
         "type": "CSSProperties",
         "optional": true,
-        "description": "",
+        "description": "自定义内联样式（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4059,7 +4059,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "根元素 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4077,7 +4077,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4136,7 +4136,7 @@
         "name": "placeholder",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "搜索框占位文案，默认「搜索」",
         "default": "'搜索'",
         "inherited": false,
         "kind": "prop"
@@ -4145,7 +4145,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用搜索框",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4154,7 +4154,7 @@
         "name": "readonly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "只读：不可键入（仍可聚焦/复制）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4226,7 +4226,7 @@
         "name": "onHistoryChange",
         "type": "(history: string[]) => void",
         "optional": true,
-        "description": "",
+        "description": "历史记录变化（新增 / 清空时触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -4298,7 +4298,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "搜索框 id（挂在内层输入外壳上）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4307,7 +4307,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4316,7 +4316,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4357,7 +4357,7 @@
         "name": "onChange",
         "type": "(value: SelectValueInput) => void",
         "optional": true,
-        "description": "",
+        "description": "选中值变化（H5 暂存模式下点「确定」才触发；PC 点选即触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -4393,7 +4393,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4474,7 +4474,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4483,7 +4483,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4492,7 +4492,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4524,7 +4524,7 @@
         "name": "min",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "最小值，默认 0",
         "default": "0",
         "inherited": false,
         "kind": "prop"
@@ -4533,7 +4533,7 @@
         "name": "max",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "最大值，默认 100",
         "default": "100",
         "inherited": false,
         "kind": "prop"
@@ -4542,7 +4542,7 @@
         "name": "step",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "步长，默认 1",
         "default": "1",
         "inherited": false,
         "kind": "prop"
@@ -4614,7 +4614,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：不可拖动",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4623,7 +4623,7 @@
         "name": "readonly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "只读：不可拖动（不置灰，区别于 disabled）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -4668,7 +4668,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4677,7 +4677,7 @@
         "name": "style",
         "type": "CSSProperties",
         "optional": true,
-        "description": "",
+        "description": "自定义内联样式（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4686,7 +4686,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "根元素 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4695,7 +4695,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4790,7 +4790,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -4799,7 +4799,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5038,7 +5038,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5047,7 +5047,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5160,7 +5160,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5273,7 +5273,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：触发器不可点、不清除",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -5300,7 +5300,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "触发器 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5309,7 +5309,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传弹层面板）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5318,7 +5318,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5332,7 +5332,7 @@
         "name": "message",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "提示文案",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5341,7 +5341,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "受控开合",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5350,7 +5350,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "非受控初始开合，默认 false",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -5359,7 +5359,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -5409,7 +5409,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "开合变化（仅 PC 浮层；H5 说明常驻不触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -5436,7 +5436,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "逃生舱：强制某个模式的交互（契约第 9 条唯一例外）",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5522,7 +5522,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：不可选择 / 删除 / 重试",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -5558,7 +5558,7 @@
         "name": "method",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "内置 XHR 上传方法，默认 POST",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5567,7 +5567,7 @@
         "name": "headers",
         "type": "Record<string, string>",
         "optional": true,
-        "description": "",
+        "description": "内置 XHR 上传请求头",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5594,7 +5594,7 @@
         "name": "withCredentials",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "内置 XHR 是否携带跨域凭证（cookies）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5657,7 +5657,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5666,7 +5666,7 @@
         "name": "style",
         "type": "CSSProperties",
         "optional": true,
-        "description": "",
+        "description": "自定义内联样式（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5675,7 +5675,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "根元素 id",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5693,7 +5693,7 @@
         "name": "forceMode",
         "type": "DeviceMode",
         "optional": true,
-        "description": "",
+        "description": "强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5829,7 +5829,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "被角标包裹的元素（角标挂在它的角点上）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -5951,7 +5951,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "按钮文案",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -6567,7 +6567,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "值之后的自定义补充内容（渲染在内容区）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -6744,7 +6744,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用该项：不可选（组禁用或达 max 上限时也会禁用）",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -6816,7 +6816,7 @@
         "name": "onChange",
         "type": "(checked: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "选中态变化回调（组内外都触发；组内时同步改组的选中集合）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -6825,7 +6825,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8005,7 +8005,7 @@
         "name": "onExpandedChange",
         "type": "(expanded: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "展开态变化（受控与非受控都会触发）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -8014,7 +8014,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8199,7 +8199,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用：不可聚焦、不可键入",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -8208,7 +8208,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "只读：不可键入，仍可聚焦/复制；常配合 arrowDirection 做选择器入口",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -8451,7 +8451,7 @@
         "name": "onFocus",
         "type": "FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>",
         "optional": true,
-        "description": "",
+        "description": "原生 focus 事件（透传给内部控件）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -8460,7 +8460,7 @@
         "name": "onBlur",
         "type": "FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>",
         "optional": true,
-        "description": "",
+        "description": "原生 blur 事件（透传给内部控件）",
         "default": null,
         "inherited": false,
         "kind": "event"
@@ -8478,7 +8478,7 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "初始渲染后自动聚焦",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8487,7 +8487,7 @@
         "name": "enterKeyHint",
         "type": "\"search\" | \"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"send\" | undefined",
         "optional": true,
-        "description": "",
+        "description": "移动端输入法确认键样式（透传原生 enterkeyhint）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8496,7 +8496,7 @@
         "name": "spellCheck",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "拼写检查（透传原生 spellcheck）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8505,7 +8505,7 @@
         "name": "autoCapitalize",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自动大写（透传原生 autocapitalize）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8514,7 +8514,7 @@
         "name": "autoCorrect",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自动纠正（透传原生 autocorrect）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -8526,7 +8526,7 @@
     "props": [
       {
         "name": "name",
-        "type": "\"loading\" | \"plus\" | \"minus\" | \"success\" | \"warning\" | \"message\" | \"user\" | \"search\" | \"arrow\" | \"arrow-left\" | \"arrow-down\" | \"arrow-up\" | \"check\" | \"clock\" | \"cross\" | \"fail\" | ... 8 more ... | \"setting\"",
+        "type": "\"loading\" | \"plus\" | \"minus\" | \"success\" | \"warning\" | \"user\" | \"search\" | \"arrow\" | \"arrow-left\" | \"arrow-down\" | \"arrow-up\" | \"check\" | \"clock\" | \"cross\" | \"fail\" | \"info\" | \"star\" | ... 7 more ... | \"message\"",
         "optional": false,
         "description": "图标名，取值见 iconNames",
         "default": null,
@@ -10142,7 +10142,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "禁用该单选项：不可点，键盘切换时跳过",
         "default": "false",
         "inherited": false,
         "kind": "prop"
@@ -10205,7 +10205,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "自定义类名（透传到根元素）",
         "default": null,
         "inherited": false,
         "kind": "prop"
@@ -12457,7 +12457,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "标签文案",
         "default": null,
         "inherited": false,
         "kind": "prop"

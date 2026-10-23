@@ -239,6 +239,7 @@ export interface CheckboxProps {
     name?: CheckboxName;
     /** 外形：圆（默认）/ 方 */
     shape?: CheckboxShape;
+    /** 禁用该项：不可选（组禁用或达 max 上限时也会禁用） */
     disabled?: boolean;
     /** 文字不可点，只有图标可点（Vant label-disabled） */
     labelDisabled?: boolean;
@@ -254,7 +255,9 @@ export interface CheckboxProps {
     bindGroup?: boolean;
     /** 无文字（如嵌在 Cell 行内）时给原生 input 的无障碍名 */
     ariaLabel?: string;
+    /** 选中态变化回调（组内外都触发；组内时同步改组的选中集合） */
     onChange?: (checked: boolean) => void;
+    /** 自定义类名（透传到根元素） */
     className?: string;
     /** 文案；为空时只渲染图标 */
     children?: React.ReactNode;

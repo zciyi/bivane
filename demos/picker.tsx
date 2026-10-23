@@ -30,7 +30,7 @@ export function PickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             两列独立 · 含禁用项 · 可清除
                                         </span>
                                     </div>
@@ -43,7 +43,7 @@ export function PickerExample1() {
                                                 placeholder="选择称呼"
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             单列 · 字面量数组
                                         </span>
                                     </div>
@@ -56,7 +56,7 @@ export function PickerExample1() {
                                                 disabled
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -67,7 +67,7 @@ export function PickerExample1() {
                                         ? "点开是底部弹层，N 列滚轮横排（5 行制、各自惯性吸附），顶部「取消 · 标题 · 确定」；滚某列只改这一列的草稿，互不影响，点「确定」才提交"
                                         : "点开是锚定浮层，N 列纵向面板并排（每列定宽、各自滚动，36px 桌面行高），底部固定「取消 / 确定」条；点行只改草稿，确定才生效（多列要全部调好才算选完）；键盘 ←→ 换列、↑↓ 列内巡航（跳过禁用、不回绕）、Home/End 首尾、Enter 先选中再按一次提交、Esc 取消"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：Picker 只表达「列与列互不影响」的多维度单选 （值
                                     = 每列一个值的数组）。列之间有父子联动（省市区）
                                     请用下一个 Cascader —— Vant 把两者塞进同一个

@@ -62,7 +62,7 @@ function CalendarDemo({
             />
 
             {mode === "desktop" ? (
-                <p className="mt-bv-xs text-bv-sm text-bv-text-3">
+                <p className="mt-bv-xs text-bv-sm text-bv-text-2">
                     {summary || "尚未选择"}
                 </p>
             ) : null}
@@ -112,7 +112,7 @@ export function CalendarExample1() {
                                         ? "点行打开全屏日历：min→max 的月份纵向连续排列、进入视口附近才挂载；区间可按住后跨日拖动（窗口超出 7 天上限会向前滑动），也可两次点选；半截区间时底部确定条禁用，single 点一天即完成"
                                         : "月历常驻内嵌（区间为并排双月）：鼠标按住跨日拖选或两次点选即生效，悬停有区间预览；键盘 ←→ 换日、↑↓ 换周、PgUp/PgDn 换月、Home/End 到周首尾、Enter 选定，自动跳过禁用日；轻点超出 7 天上限会 Toast 提示"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：值恒为 'YYYY-MM-DD'（single 字符串 / range
                                     有序二元组 / multiple 升序数组）；min/max 默认今天 ~
                                     6 个月后月末；formatter

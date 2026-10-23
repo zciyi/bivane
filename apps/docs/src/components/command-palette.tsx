@@ -109,7 +109,7 @@ export function CommandPalette({
 
     return (
         <div
-            className="fixed inset-0 z-40 flex items-start justify-center bg-bv-overlay px-bv-md pt-[12vh]"
+            className="fixed inset-0 z-40 flex items-start justify-center bg-bv-overlay px-bv-md pt-[12vh] backdrop-blur-sm"
             onMouseDown={(e) => {
                 // 只在点到遮罩本身时关（点在面板里不算）
                 if (e.target === e.currentTarget) onClose();
@@ -120,9 +120,15 @@ export function CommandPalette({
                 aria-modal="true"
                 aria-label="全站搜索"
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-full max-w-[560px] overflow-hidden rounded-bv-md border border-bv-border bg-bv-surface shadow-lg"
+                className="w-full max-w-[600px] overflow-hidden rounded-docs-xl border border-bv-border bg-bv-surface shadow-docs-float"
             >
-                <div className="border-b border-bv-border px-bv-md py-bv-sm">
+                <div className="flex items-center gap-bv-xs border-b border-bv-border px-bv-md py-bv-sm">
+                    <span
+                        aria-hidden="true"
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-bv-muted text-bv-text-2"
+                    >
+                        ⌕
+                    </span>
                     <input
                         ref={inputRef}
                         type="text"
@@ -131,13 +137,13 @@ export function CommandPalette({
                         onKeyDown={onKeyDown}
                         placeholder="搜组件、示例或属性…"
                         aria-label="搜组件、示例或属性"
-                        className="w-full bg-transparent text-bv-md outline-none placeholder:text-bv-text-3"
+                        className="w-full bg-transparent text-[15px] outline-none placeholder:text-bv-text-3"
                     />
                 </div>
 
                 <div className="max-h-[52vh] overflow-y-auto py-bv-xs">
                     {flat.length === 0 && (
-                        <p className="px-bv-md py-bv-md text-bv-sm text-bv-text-3">
+                        <p className="px-bv-md py-bv-md text-bv-sm text-bv-text-2">
                             {query.trim()
                                 ? `没有匹配「${query.trim()}」的组件、示例或属性。`
                                 : '输入组件名、示例标题或属性名，如「区间」「onConfirm」「rowKey」。'}
@@ -164,7 +170,7 @@ export function CommandPalette({
                                         {showHeader && (
                                             <li
                                                 role="presentation"
-                                                className="px-bv-md py-bv-xs text-[11px] uppercase tracking-wide text-bv-text-3"
+                                                className="px-bv-md pb-[2px] pt-bv-xs text-[11px] uppercase tracking-wide text-bv-text-2"
                                             >
                                                 {KIND_LABEL[doc.kind]}
                                             </li>
@@ -174,9 +180,9 @@ export function CommandPalette({
                                             aria-selected={isActive}
                                             onMouseEnter={() => setActive(i)}
                                             onClick={() => commit(doc)}
-                                            className={`flex cursor-pointer items-center gap-bv-sm px-bv-md py-[6px] ${
+                                            className={`mx-bv-xs flex cursor-pointer items-center gap-bv-sm rounded-md px-bv-sm py-[7px] ${
                                                 isActive
-                                                    ? 'bg-bv-primary text-bv-white'
+                                                    ? 'bg-bv-primary text-bv-white shadow-[0_2px_8px_color-mix(in_srgb,var(--bv-primary)_35%,transparent)]'
                                                     : 'text-bv-text hover:bg-bv-muted'
                                             }`}
                                         >
@@ -187,7 +193,7 @@ export function CommandPalette({
                                                 className={`shrink-0 text-[11px] ${
                                                     isActive
                                                         ? 'text-bv-white/80'
-                                                        : 'text-bv-text-3'
+                                                        : 'text-bv-text-2'
                                                 }`}
                                             >
                                                 {sub}
@@ -200,10 +206,20 @@ export function CommandPalette({
                     )}
                 </div>
 
-                <div className="flex items-center gap-bv-md border-t border-bv-border px-bv-md py-bv-xs text-[11px] text-bv-text-3">
-                    <span>↑↓ 选择</span>
-                    <span>Enter 打开</span>
-                    <span>Esc 关闭</span>
+                <div className="flex items-center gap-bv-md border-t border-bv-border px-bv-md py-bv-xs text-[11px] text-bv-text-2">
+                    <span className="flex items-center gap-1">
+                        <kbd className="docs-kbd">↑</kbd>
+                        <kbd className="docs-kbd">↓</kbd>
+                        选择
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <kbd className="docs-kbd">Enter</kbd>
+                        打开
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <kbd className="docs-kbd">Esc</kbd>
+                        关闭
+                    </span>
                     <span className="ml-auto">命中 {flat.length} 条</span>
                 </div>
             </div>

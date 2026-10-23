@@ -86,10 +86,10 @@ export function SidebarList({
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="过滤组件或属性…"
                     aria-label="过滤组件或属性"
-                    className="w-full rounded-bv-sm border border-bv-border bg-bv-surface px-bv-xs py-bv-xs text-bv-sm text-bv-text outline-none placeholder:text-bv-text-3 focus:border-bv-primary"
+                    className="w-full rounded-lg border border-bv-border bg-bv-surface px-bv-xs py-bv-xs text-[13px] text-bv-text shadow-docs-card outline-none transition-colors placeholder:text-bv-text-3 focus:border-bv-primary focus:ring-[3px] focus:ring-bv-primary/15"
                 />
                 {query.trim() && (
-                    <p className="mt-bv-xs text-bv-sm text-bv-text-3">
+                    <p className="mt-bv-xs text-[12px] text-bv-text-2">
                         命中 {total} 个
                     </p>
                 )}
@@ -100,7 +100,7 @@ export function SidebarList({
                 if (items.length === 0) return null;
                 return (
                     <div key={cat.id} className="mb-bv-lg">
-                        <div className="mb-bv-xs px-bv-xs text-bv-sm font-bv-bold text-bv-text-2">
+                        <div className="mb-bv-xs px-bv-xs text-[11px] font-bv-bold uppercase tracking-wider text-bv-text-2">
                             {cat.title}
                         </div>
                         <ul>
@@ -119,9 +119,9 @@ export function SidebarList({
                                             type="button"
                                             onClick={() => onNavigate(e.slug)}
                                             title={e.summary}
-                                            className={`flex w-full cursor-pointer items-center gap-bv-xs rounded-bv-sm px-bv-xs py-[3px] text-left text-bv-sm ${
+                                            className={`flex w-full cursor-pointer items-center gap-bv-xs rounded-md px-bv-xs py-[5px] text-left text-[13px] transition-all duration-200 ${
                                                 active
-                                                    ? 'bg-bv-primary text-bv-white'
+                                                    ? 'bg-bv-primary text-bv-white shadow-[0_2px_8px_color-mix(in_srgb,var(--bv-primary)_35%,transparent)]'
                                                     : 'text-bv-text hover:bg-bv-muted'
                                             }`}
                                         >
@@ -134,7 +134,7 @@ export function SidebarList({
                                                 className={`shrink-0 font-mono text-[11px] ${
                                                     active
                                                         ? 'text-bv-white/80'
-                                                        : 'text-bv-text-3'
+                                                        : 'text-bv-text-2'
                                                 }`}
                                             >
                                                 {e.name}
@@ -160,7 +160,7 @@ export function SidebarList({
             })}
 
             {total === 0 && (
-                <p className="px-bv-xs text-bv-sm text-bv-text-3">
+                <p className="px-bv-xs text-bv-sm text-bv-text-2">
                     没有匹配的组件。
                 </p>
             )}
@@ -181,7 +181,7 @@ export function Sidebar({
     onNavigate: (slug: string) => void;
 }) {
     return (
-        <nav className="hidden w-[240px] shrink-0 md:block">
+        <nav className="hidden w-[240px] shrink-0 border-r border-bv-border pr-bv-md md:block">
             <div className="sticky top-[72px] max-h-[calc(100vh-88px)] overflow-y-auto pb-bv-lg">
                 <SidebarList
                     categories={categories}

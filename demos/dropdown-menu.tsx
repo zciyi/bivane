@@ -62,7 +62,7 @@ export function DropdownMenuExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             操作菜单 · 点选即执行
                                         </span>
                                     </div>
@@ -80,7 +80,7 @@ export function DropdownMenuExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             右对齐 · 连选不关闭
                                         </span>
                                     </div>
@@ -93,7 +93,7 @@ export function DropdownMenuExample1() {
                                                 disabled
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -110,7 +110,7 @@ export function DropdownMenuExample1() {
                                             confirmable
                                         />
                                     </div>
-                                    <span className="text-bv-sm text-bv-text-3">
+                                    <span className="text-bv-sm text-bv-text-2">
                                         可选值：选好后触发器回填层级路径而不是裸
                                         label（当前：{String(menuValue)}）； H5 传
                                         confirmable 走「暂存 → 确定」，PC 点选即生效
@@ -122,7 +122,7 @@ export function DropdownMenuExample1() {
                                         ? "点开是底部抽屉（可按住指示条下拉关闭）；每一层头部都铺层级行（第一层是面板名「选择位置」，下钻后是「移动到 / 项目文档」整条链）——链上每一项都点得，点到哪一层就落回哪一层，点链首即回最上层；行高 48px，不显示快捷键提示；暂存模式下点叶子只打勾，「取消 · 确定」在头部"
                                         : "点开是锚定在触发器下方的浮层；悬停或按 → 展开子菜单（父层留在原地、保持高亮），↑↓ 巡航、Enter 执行、Esc 逐层收回；行高 36px，行尾显示 ⌘E / ⌘D；点选即生效，没有确定按钮"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：两端共享的是同一棵菜单树（use-menu-state
                                     的纯函数），不共享「怎么走这棵树」——
                                     移动端屏幕窄，子菜单只能替换当前视野（下钻 +

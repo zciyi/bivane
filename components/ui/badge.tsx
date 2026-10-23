@@ -21,6 +21,7 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 
   color?: string;
   /** 位置（仅在有 children 包裹时生效） */
   position?: BadgePosition;
+  /** 被角标包裹的元素（角标挂在它的角点上） */
   children?: React.ReactNode;
 }
 

@@ -26,12 +26,13 @@ export interface TooltipProps {
   open?: boolean;
   /** 非受控初始开合（仅 PC） */
   defaultOpen?: boolean;
+  /** 开合变化（仅 PC 浮层；H5 说明常驻不触发） */
   onOpenChange?: (open: boolean) => void;
   /** PC 禁用时不响应 hover/focus（不影响 children 自身禁用态）；H5 恒展示说明条 */
   disabled?: boolean;
   /** 透传给 PC 气泡 / H5 信息提示条的 className */
   className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

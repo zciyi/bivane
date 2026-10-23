@@ -12,6 +12,7 @@ import type * as React from 'react';
 export type NotifyType = 'primary' | 'success' | 'danger' | 'warning';
 
 export interface NotifyOptions {
+  /** 通知文案 */
   message: React.ReactNode;
   /** 语义类型，默认 danger（对齐 Vant notify 默认值） */
   type?: NotifyType;
@@ -21,9 +22,13 @@ export interface NotifyOptions {
   color?: string;
   /** 自定义背景色，覆盖 type 配色 */
   background?: string;
+  /** 点击通知条 */
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** 展示时长结束后回调 */
   onClose?: () => void;
+  /** 层级，默认用 --bv-toast-z-index */
   zIndex?: number;
+  /** 自定义类名（透传到通知条） */
   className?: string;
 }
 

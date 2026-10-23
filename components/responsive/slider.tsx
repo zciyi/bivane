@@ -21,8 +21,11 @@ export interface SliderProps {
     value?: SliderValue;
     /** 初始值，默认 0（range 默认 [min, max]） */
     defaultValue?: SliderValue;
+    /** 最小值，默认 0 */
     min?: number;
+    /** 最大值，默认 100 */
     max?: number;
+    /** 步长，默认 1 */
     step?: number;
     /** 轨道/填充条厚度，数字按 px，默认 2 */
     barHeight?: number | string;
@@ -38,7 +41,9 @@ export interface SliderProps {
     reverse?: boolean;
     /** 竖直滑块，默认 false */
     vertical?: boolean;
+    /** 禁用：不可拖动 */
     disabled?: boolean;
+    /** 只读：不可拖动（不置灰，区别于 disabled） */
     readonly?: boolean;
     /** 值变化回调 */
     onChange?: (value: SliderValue) => void;
@@ -48,9 +53,13 @@ export interface SliderProps {
     onDragEnd?: (value: SliderValue) => void;
     /** 无障碍标签（渲染到每个滑块钮上），与全库其余组件一致用 ariaLabel */
     ariaLabel?: string;
+    /** 自定义类名（透传到根元素） */
     className?: string;
+    /** 自定义内联样式（透传到根元素） */
     style?: React.CSSProperties;
+    /** 根元素 id */
     id?: string;
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

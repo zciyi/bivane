@@ -129,6 +129,7 @@ export interface RadioProps {
     checked?: boolean;
     /** 独立使用时的初始选中态（非受控） */
     defaultChecked?: boolean;
+    /** 禁用该单选项：不可点，键盘切换时跳过 */
     disabled?: boolean;
     /** 文字不可点，只有图标可点（Vant label-disabled） */
     labelDisabled?: boolean;
@@ -142,6 +143,7 @@ export interface RadioProps {
     ariaLabel?: string;
     /** 独立使用（无 Group）时的变更回调 */
     onChange?: (checked: boolean) => void;
+    /** 自定义类名（透传到根元素） */
     className?: string;
     /** 文案；为空时只渲染图标 */
     children?: React.ReactNode;

@@ -122,21 +122,26 @@ export function ComponentPage({
                 <header className="mb-bv-lg">
                     <div className="mb-bv-xs flex items-center gap-bv-xs">
                         <ModeBadge mode={entry.mode} />
+                        <span className="rounded-md bg-bv-muted px-bv-xs py-[1px] font-mono text-[11px] text-bv-text-2">
+                            {entry.name}
+                        </span>
                     </div>
-                    <h1 className="mb-bv-xs text-bv-lg font-bv-bold">
+                    <h1 className="text-docs-h1 font-bv-bold tracking-tight">
                         {entry.title}
                     </h1>
-                    <p className="text-bv-text-2">{entry.summary}</p>
+                    <p className="mt-bv-xs text-docs-lead text-bv-text-2">
+                        {entry.summary}
+                    </p>
                 </header>
 
                 {examples.length > 0 && (
                     <DocSection id="examples" title="示例">
-                        <p className="mb-bv-md text-bv-sm text-bv-text-3">
+                        <p className="mb-bv-md text-[13px] text-bv-text-2">
                             每张卡片左右并排展示同一个示例在 H5（390px）与 PC
                             下的表现，由 ResponsiveProvider
                             强制模式 —— 两边各自独立持有状态，互不影响。
                         </p>
-                        <div className="flex flex-col gap-bv-xl">
+                        <div className="flex flex-col gap-bv-lg">
                             {examples.map((ex) => (
                                 <ExampleCard
                                     key={ex.id}
@@ -153,86 +158,122 @@ export function ComponentPage({
                 )}
 
                 <DocSection id="behavior" title="两端行为">
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                    <div className="overflow-hidden rounded-docs-lg border border-bv-border bg-bv-surface shadow-docs-card">
+                        <table className="w-full border-collapse text-left text-[13px]">
                             <thead>
-                                <tr className="border-b border-bv-border text-left text-xs uppercase tracking-wide text-bv-text-3">
-                                    <th className="w-[80px] py-2 pr-4 font-medium">
+                                <tr className="border-b border-bv-border bg-bv-muted/40 text-[11px] uppercase tracking-wide text-bv-text-2">
+                                    <th className="w-[80px] px-bv-md py-bv-xs font-medium">
                                         端
                                     </th>
-                                    <th className="py-2 pr-4 font-medium">行为</th>
+                                    <th className="px-bv-md py-bv-xs font-medium">
+                                        行为
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr className="border-b border-bv-border align-top">
-                                    <td className="py-2 pr-4 text-bv-sm text-bv-text-3">
-                                        H5
+                                    <td className="px-bv-md py-bv-xs">
+                                        <span className="rounded bg-bv-primary/10 px-bv-xs py-[1px] font-mono text-[11px] text-bv-primary">
+                                            H5
+                                        </span>
                                     </td>
-                                    <td className="py-2 pr-4 text-bv-text-2">
+                                    <td className="px-bv-md py-bv-xs text-bv-text-2">
                                         {entry.h5 || '—'}
                                     </td>
                                 </tr>
-                                <tr className="border-b border-bv-border align-top">
-                                    <td className="py-2 pr-4 text-bv-sm text-bv-text-3">
-                                        PC
+                                <tr className="align-top">
+                                    <td className="px-bv-md py-bv-xs">
+                                        <span className="rounded bg-bv-muted px-bv-xs py-[1px] font-mono text-[11px] text-bv-text-2">
+                                            PC
+                                        </span>
                                     </td>
-                                    <td className="py-2 pr-4 text-bv-text-2">
+                                    <td className="px-bv-md py-bv-xs text-bv-text-2">
                                         {entry.pc || '—'}
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    {entry.shared && (
-                        <p className="mt-bv-sm text-bv-sm text-bv-text-3">
-                            <span className="font-medium">共享逻辑：</span>
-                            {entry.shared}
-                        </p>
-                    )}
-                    {entry.difference && (
-                        <p className="mt-bv-xs text-bv-sm text-bv-text-3">
-                            <span className="font-medium">本质差异：</span>
-                            {entry.difference}
-                        </p>
+                    {(entry.shared || entry.difference) && (
+                        <div className="mt-bv-sm flex flex-col gap-bv-xs">
+                            {[
+                                ['共享逻辑', entry.shared],
+                                ['本质差异', entry.difference],
+                            ]
+                                .filter((pair): pair is [string, string] =>
+                                    Boolean(pair[1]),
+                                )
+                                .map(([label, text]) => (
+                                    <div
+                                        key={label}
+                                        className="flex gap-bv-xs rounded-md border border-bv-border bg-bv-surface px-bv-md py-bv-xs text-[13px] shadow-docs-card"
+                                    >
+                                        <span className="shrink-0 font-medium text-bv-text">
+                                            {label}
+                                        </span>
+                                        <span className="text-bv-text-2">
+                                            {text}
+                                        </span>
+                                    </div>
+                                ))}
+                        </div>
                     )}
                 </DocSection>
 
                 <DocSection id="api" title="API">
                     {entry.install && (
-                        <div className="mb-bv-md">
-                            <h3 className="mb-bv-xs text-bv-md font-bv-bold">
-                                安装
-                            </h3>
-                            <CodeBlock code={entry.install} lang="bash" />
-                            <p className="mt-bv-xs text-bv-sm text-bv-text-3">
-                                装完在自己的项目里这样引：
-                            </p>
-                            <CodeBlock
-                                code={`import { ${entry.name} } from '${entry.importPath}';`}
-                                lang="tsx"
-                            />
+                        <div className="mb-bv-lg grid gap-bv-gutter md:grid-cols-2">
+                            <div>
+                                <h3 className="mb-bv-xs text-docs-h3 font-bv-bold">
+                                    安装
+                                </h3>
+                                <CodeBlock
+                                    code={entry.install}
+                                    lang="bash"
+                                    title="bash"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="mb-bv-xs text-docs-h3 font-bv-bold">
+                                    装完在自己的项目里这样引
+                                </h3>
+                                <CodeBlock
+                                    code={`import { ${entry.name} } from '${entry.importPath}';`}
+                                    lang="tsx"
+                                    title="tsx"
+                                />
+                            </div>
                         </div>
                     )}
 
-                    <p className="mb-bv-sm text-bv-sm text-bv-text-3">
-                        表格由 <code className="font-mono">scripts/extract-props.mjs</code>{' '}
+                    <p className="mb-bv-sm text-[13px] text-bv-text-2">
+                        表格由{' '}
+                        <code className="font-mono">
+                            scripts/extract-props.mjs
+                        </code>{' '}
                         从组件源码自动提取（{entry.propsType}
                         {entry.propsFile && ` · ${entry.propsFile}`}），与实现始终同步。
                     </p>
                     <PropsTable props={entry.props} />
                 </DocSection>
 
-                <nav className="mt-bv-xl flex items-center justify-between gap-bv-md border-t border-bv-border pt-bv-md">
+                <nav className="mt-bv-xl grid gap-bv-md sm:grid-cols-2">
                     {prev ? (
                         <button
                             type="button"
                             onClick={() => onNavigate(prev.slug)}
-                            className="flex cursor-pointer items-center gap-bv-xs text-bv-sm text-bv-text-2 transition-colors hover:text-bv-primary"
+                            className="docs-focus group cursor-pointer rounded-docs-lg border border-bv-border bg-bv-surface px-bv-md py-bv-sm text-left shadow-docs-card transition-all duration-200 hover:border-bv-primary/45 hover:shadow-docs-card-hover"
                         >
-                            <span>
-                                ← {chineseName(prev.title)}
+                            <span className="text-[11px] text-bv-text-2">
+                                上一篇
                             </span>
-                            <span className="font-mono text-[11px] text-bv-text-3">
+                            <span className="mt-bv-xs flex items-center gap-bv-xs text-docs-h3 font-bv-bold transition-colors group-hover:text-bv-primary">
+                                <span className="text-bv-text-2 transition-colors group-hover:text-bv-primary">
+                                    ←
+                                </span>
+                                {chineseName(prev.title)}
+                            </span>
+                            <span className="mt-bv-base block font-mono text-[11px] text-bv-text-2">
                                 {prev.name}
                             </span>
                         </button>
@@ -243,12 +284,18 @@ export function ComponentPage({
                         <button
                             type="button"
                             onClick={() => onNavigate(next.slug)}
-                            className="flex cursor-pointer items-center gap-bv-xs text-bv-sm text-bv-text-2 transition-colors hover:text-bv-primary"
+                            className="docs-focus group cursor-pointer rounded-docs-lg border border-bv-border bg-bv-surface px-bv-md py-bv-sm text-right shadow-docs-card transition-all duration-200 hover:border-bv-primary/45 hover:shadow-docs-card-hover sm:col-start-2"
                         >
-                            <span>
-                                {chineseName(next.title)} →
+                            <span className="text-[11px] text-bv-text-2">
+                                下一篇
                             </span>
-                            <span className="font-mono text-[11px] text-bv-text-3">
+                            <span className="mt-bv-xs flex items-center justify-end gap-bv-xs text-docs-h3 font-bv-bold transition-colors group-hover:text-bv-primary">
+                                {chineseName(next.title)}
+                                <span className="text-bv-text-2 transition-colors group-hover:text-bv-primary">
+                                    →
+                                </span>
+                            </span>
+                            <span className="mt-bv-base block font-mono text-[11px] text-bv-text-2">
                                 {next.name}
                             </span>
                         </button>

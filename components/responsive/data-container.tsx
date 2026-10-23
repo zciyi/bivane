@@ -99,11 +99,14 @@ export interface DataContainerProps {
 
     /** 文案 */
     loadingText?: React.ReactNode;
+    /** 「没有更多」文案 */
     finishedText?: React.ReactNode;
+    /** 加载出错文案 */
     errorText?: React.ReactNode;
 
+    /** 自定义类名（透传到根元素） */
     className?: string;
-    /** 逃生舱：强制某个模式 */
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

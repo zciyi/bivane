@@ -66,7 +66,7 @@ export interface TabsProps
   color?: string;
   /** 标签条的无障碍名称 */
   ariaLabel?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

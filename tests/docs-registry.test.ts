@@ -267,12 +267,14 @@ describe('文档站 · 生成清单覆盖全部目录条目', () => {
 
 describe('文档站 · 不泄漏内部路线图信息', () => {
     /**
-     * 矩阵末列「状态」记的是**内部路线图阶段**（✅ P1 / P2 / P3 / P1′）——
+     * 矩阵里曾有一列「状态」，记的是**内部路线图阶段**（✅ P1 / P2 / P3 / P1′）——
      * 组件在第几阶段落地是我们自己的开发节奏，对读文档的人毫无意义：
      * 38 个组件全都已落地，阶段号只会让人以为组件分三六九等。
+     * 那一列还无图例、无消费方、值已过期（Picker/Cascader 标 ⬜ 但早已落地），
+     * 2026-10-22 整列删除，只在矩阵文档头留了一句「为什么不记阶段」。
      *
-     * 文档站曾把这个值渲染在组件页页头（`{entry.status}`），2026-10-22 全链移除
-     * （生成器不再解析该列、目录不再维护该字段、页头不再渲染）。
+     * 文档站曾把这个值渲染在组件页页头（`{entry.status}`），同一次全链移除
+     * （生成器不解析、目录不维护、页头不渲染）。
      * 这几条断言锁住「别再搬回来」——每一层都是曾经出问题的地方。
      */
     function regenerate(script: string): string {
@@ -319,4 +321,87 @@ describe('文档站 · 不泄漏内部路线图信息', () => {
             );
         },
     );
+
+    it('矩阵里没有路线图状态符号', () => {
+        // ✅/⬜ 只会从已删除的「状态」列来 —— 出现即回潮。
+        // （矩阵正文里「状态」二字是合法词汇：状态归属、状态机、刷新状态机……
+        //   所以只禁符号、不禁词。）
+        const matrix = readFileSync(
+            join(ROOT, 'docs/bivane-responsive-matrix.md'),
+            'utf8',
+        );
+        expect(
+            matrix,
+            '矩阵里又出现 ✅/⬜ 了 —— 路线图阶段不进矩阵（文档头有说明）',
+        ).not.toMatch(/[✅⬜]/);
+    });
+});
+
+describe('README · 路线图状态与现实一致', () => {
+    /**
+     * README 有一张**对外**的路线图表，漂过两次：
+     * P2 写着「进行中（6/8）」其实 10/10 全落地；P3 写着「⬜ 待开始」其实 2026-10-20 已闭环
+     * ——读文档的人收到的全是过时信息。2026-10-22 按 architecture §8 的事实更新。
+     *
+     * 这里冻结「已闭环批次必须标 ✅」：P0~P3 都是闭环批次，不会重开；
+     * P4 仍在进行（registry 发布验证未完成），不冻结——它完成时这张表本来就要改。
+     */
+    const CLOSED = ['P0', 'P1', 'P1′', 'P2', 'P3'];
+
+    it('已闭环批次都标为 ✅ 已完成', () => {
+        const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+        for (const phase of CLOSED) {
+            expect(
+                readme,
+                `README 路线图的 ${phase} 行不是 ✅ 了 —— ${phase} 是已闭环批次，` +
+                    '别把它标回「待开始 / 进行中」',
+            ).toMatch(new RegExp(`^\\| ${phase} \\|[^\\n]*✅`, 'm'));
+        }
+    });
+});
+
+describe('文档站 · 展示的属性必须带说明', () => {
+    /**
+     * props 表「说明」列的内容来自源码接口的 JSDoc。2026-10-22 之前，
+     * 38 个组件页上有 149 个展示属性（近三分之一）没写说明，渲染层刷一屏
+     * 「（源码里没写说明）」——零信息量，还把「文档缺失」印刷成噪音。
+     * 那 149 条已全部补写，渲染层也改成缺说明留空。
+     *
+     * 这两条断言锁住两边：
+     *  1. 展示面上的每个属性都有说明 —— 新组件想不带 JSDoc 上线，先过这关。
+     *     「不能描述就空着」是渲染层的兜底，不是不上说明的许可证。
+     *  2. 渲染层不回流占位文本（空单元格由兜底负责，不需要文案）。
+     */
+    const catalog = readCatalog();
+    const props = JSON.parse(readFileSync(join(DOCS, 'src/props.generated.json'), 'utf8')) as {
+        [typeName: string]: { props: { name: string; description?: string }[] };
+    };
+
+    it('每个展示属性都有 JSDoc 说明', () => {
+        const gaps: string[] = [];
+        for (const entry of catalog) {
+            const table = props[entry.propsType];
+            if (!table) continue; // propsType 缺失由「生成物与源码一致」那组把关
+            for (const p of table.props) {
+                if (!(p.description ?? '').trim()) gaps.push(`${entry.name}.${p.name}`);
+            }
+        }
+        expect(
+            gaps,
+            '这些展示属性缺说明 —— 去源码接口补 JSDoc，再跑 npm run docs:props：' +
+                gaps.join(', '),
+        ).toEqual([]);
+    });
+
+    it('props 表缺说明时留空，不渲染占位文本', () => {
+        const src = readFileSync(join(DOCS, 'src/components/props-table.tsx'), 'utf8');
+        expect(
+            src,
+            'props-table 的说明列兜底不是「留空」了 —— 缺说明就渲染空，' +
+                '别把「文档没写」印刷成占位文案',
+        ).toMatch(/\{p\.description \|\| null\}/);
+        expect(src, 'props-table 又在渲染占位文案了').not.toMatch(
+            /源码里(没写|缺)说明|暂无说明|（无说明）/,
+        );
+    });
 });

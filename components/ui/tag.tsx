@@ -72,6 +72,7 @@ export interface TagProps
   color?: string;
   /** 自定义文字色（覆盖 type） */
   textColor?: string;
+  /** 标签文案 */
   children?: React.ReactNode;
 }
 

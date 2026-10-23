@@ -42,7 +42,7 @@ export function BoundsExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             选中：{demoDate ?? "未选"}
                                         </span>
                                     </div>
@@ -66,7 +66,7 @@ export function BoundsExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             小时列从 9 起、仅 9 点时分钟从 30 起；选中：
                                             {demoTime ?? "未选"}
                                         </span>
@@ -91,7 +91,7 @@ export function BoundsExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             锁在 09-24 当天、时间窗 09:00~17:30；选中：
                                             {demoDateTime ?? "未选"}
                                         </span>
@@ -116,7 +116,7 @@ export function BoundsExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             24 号时列从 14 起、25 号时列到 09
                                             止（逐字段级联）
                                         </span>

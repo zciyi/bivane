@@ -65,8 +65,9 @@ export interface ListProps {
     itemHeight?: number;
     /** PC：滚动容器高度 */
     height?: number | string;
+    /** 自定义类名（透传到根元素） */
     className?: string;
-    /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

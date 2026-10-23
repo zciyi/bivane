@@ -27,7 +27,9 @@ export interface EllipsisProps {
   expanded?: boolean;
   /** 非受控初始展开态，默认收起 */
   defaultExpanded?: boolean;
+  /** 展开态变化（受控与非受控都会触发） */
   onExpandedChange?: (expanded: boolean) => void;
+  /** 自定义类名（透传到根元素） */
   className?: string;
 }
 

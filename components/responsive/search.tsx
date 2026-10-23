@@ -37,8 +37,11 @@ export interface SearchProps {
   onSearch?: (keyword: string) => void;
   /** 点击清除键 */
   onClear?: () => void;
+  /** 搜索框占位文案，默认「搜索」 */
   placeholder?: string;
+  /** 禁用搜索框 */
   disabled?: boolean;
+  /** 只读：不可键入（仍可聚焦/复制） */
   readonly?: boolean;
   /** 展示清除键，默认 true（对齐 Vant van-search） */
   clearable?: boolean;
@@ -54,6 +57,7 @@ export interface SearchProps {
   debounce?: number;
   /** 历史记录（受控）；不传则组件内内存维护（卸载即失） */
   history?: string[];
+  /** 历史记录变化（新增 / 清空时触发） */
   onHistoryChange?: (history: string[]) => void;
   /** H5 全屏页是否展示历史记录区，默认 true（PC 恒不展示） */
   showHistory?: boolean;
@@ -69,9 +73,11 @@ export interface SearchProps {
   clearHistoryText?: React.ReactNode;
   /** 无障碍名称；没有可见 label 时应当传入 */
   ariaLabel?: string;
+  /** 搜索框 id（挂在内层输入外壳上） */
   id?: string;
+  /** 自定义类名（透传到根元素） */
   className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

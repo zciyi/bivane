@@ -20,7 +20,7 @@ export function DatePickerExample1() {
                                                 placeholder="请选择日期"
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             单值 · 可输入（仅 PC）
                                         </span>
                                     </div>
@@ -34,7 +34,7 @@ export function DatePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             区间 · 可清除
                                         </span>
                                     </div>
@@ -47,7 +47,7 @@ export function DatePickerExample1() {
                                                 columnsType={["year", "month"]}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             年月面板 · 回填 YYYY-MM
                                         </span>
                                     </div>
@@ -60,7 +60,7 @@ export function DatePickerExample1() {
                                                 columnsType={["year"]}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             年份面板 · 回填 YYYY
                                         </span>
                                     </div>
@@ -71,7 +71,7 @@ export function DatePickerExample1() {
                                         ? "点开是底部弹层，三列滚轮（年/月/日）惯性滚动 + 吸附对齐，顶部「取消 · 标题 · 确定」；区间模式在工具条下方多一条「开始日期 / 结束日期」切换，滚轮改的是当前那一端，两端都选上「确定」才可用"
                                         : "点开是锚定触发器下方的选择浮层；年月配置显示双年月份面板，完整日期显示月历；↑↓←→ 巡航、Enter 选中、Esc 关闭；输入框与 onChange 都按 columnsType 回填 YYYY / YYYY-MM / YYYY-MM-DD 等对应格式；区间模式第一下点起点、第二下点终点"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：两端共享的是同一份日期值逻辑（use-date-value
                                     的解析/格式化/min-max
                                     逐字段夹紧/区间排序），不共享「怎么选」——

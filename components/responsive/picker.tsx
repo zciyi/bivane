@@ -46,16 +46,21 @@ export interface PickerProps {
   title?: React.ReactNode;
   /** 无选中值时触发器展示 */
   placeholder?: React.ReactNode;
+  /** 禁用：触发器不可点、不清除 */
   disabled?: boolean;
   /** 展示清除按钮（仅有选中值且未禁用时出现） */
   clearable?: boolean;
+  /** 确定按钮文案，默认「确定」 */
   confirmText?: React.ReactNode;
+  /** 取消按钮文案，默认「取消」 */
   cancelText?: React.ReactNode;
   /** 无障碍名称；没有可见 label 时应当传入 */
   ariaLabel?: string;
+  /** 触发器 id */
   id?: string;
+  /** 自定义类名（透传弹层面板） */
   className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

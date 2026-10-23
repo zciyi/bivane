@@ -30,7 +30,7 @@ export function DateTimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             年月日时 · 4 列滚轮 · 回填 YYYY-MM-DD HH
                                         </span>
                                     </div>
@@ -50,7 +50,7 @@ export function DateTimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             年月日时分 · 5 列 · YYYY-MM-DD HH:mm
                                         </span>
                                     </div>
@@ -64,7 +64,7 @@ export function DateTimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             默认 6 列 · 精确到秒 · min 约束
                                         </span>
                                     </div>
@@ -76,7 +76,7 @@ export function DateTimePickerExample1() {
                                                 disabled
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -94,7 +94,7 @@ export function DateTimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             至
                                         </span>
                                         <div className="w-[260px]">
@@ -108,7 +108,7 @@ export function DateTimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             区间 · 两个单值实例互相约束（开始
                                             max=结束，结束 min=开始，两端自动有序）
                                         </span>
@@ -120,7 +120,7 @@ export function DateTimePickerExample1() {
                                         ? "底部弹层，4/5/6 列滚轮（年/月/日/时/分/秒）惯性滚动 + 吸附对齐，顶部「取消 · 标题 · 确定」，列再多也是通栏均宽"
                                         : "锚定浮层：左侧月历（« < 年月 > » 翻年翻月 + 6×7 网格，今天描边）选日期，右侧时/分/秒 1~3 条居中滚轮列（选中行在正中、上下发丝线），列顶/列尾有 ▲▼，点一下 ±1、按住连发；顶部回显草稿时间，底部「此刻 / 确定」。键盘在月历区 ←→ 走天、↑↓ 走周、PgUp/PgDn 走月，点时间列后 ↑↓ 改值、←→ 换列，Enter 确定、Esc 关闭"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     单值组件（对齐 Vant DatetimePicker）：值恒为
                                     'YYYY-MM-DD HH[:mm[:ss]]' 字符串，避开 Date
                                     时区问题； min/max 是完整时刻边界（min 当天的时列从

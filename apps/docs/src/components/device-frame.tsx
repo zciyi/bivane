@@ -26,7 +26,7 @@ import { ResponsiveProvider } from '@/components/providers/responsive-provider';
  * 这正是查阅时要的形态 —— 左右对照才看得出两端差异。
  *
  * ── 配色 ─────────────────────────────────────────────────────
- * 演示区的 chrome 用 Bivane 自己的 token（bg-bv-surface / text-bv-text-3 /
+ * 演示区的 chrome 用 Bivane 自己的 token（bg-bv-surface / text-bv-text-2 /
  * border-bv-border），**不用** white/xx —— 文档站默认是浅色，
  * white/50 在浅底上等于隐形。
  *
@@ -48,16 +48,20 @@ export function DeviceFrame({
 }) {
     return (
         <div className="flex min-w-0 flex-col gap-bv-xs">
-            <div className="flex items-center gap-bv-xs text-bv-sm text-bv-text-3">
-                <span className="rounded bg-bv-muted px-bv-xs py-[1px] font-mono">
+            <div className="flex items-center gap-bv-xs">
+                <span className="rounded bg-bv-primary/10 px-bv-xs py-[1px] font-mono text-[10px] text-bv-primary">
                     {label}
+                </span>
+                {/* 交互方式的差异是两端行为的一部分，标出来 */}
+                <span className="text-[11px] text-bv-text-2">
+                    {mode === 'mobile' ? '触屏交互' : '鼠标 / 键盘交互'}
                 </span>
             </div>
             {/* 宽内容（如 Select 的长说明）在帧内**横向滚动**，
                 而不是把帧撑宽 —— 撑宽会把另一端的帧挤出可视区，
                 左右对照就没了。 */}
             <div
-                className={`min-w-0 overflow-x-auto overflow-y-hidden rounded-bv-md border border-bv-border bg-bv-background ${widthClass}`}
+                className={`min-w-0 overflow-x-auto overflow-y-hidden rounded-docs-lg border border-bv-border bg-bv-background shadow-[inset_0_1px_4px_rgba(0,0,0,0.06)] ${widthClass}`}
             >
                 {/* 关键：Provider 强制模式，组件拿到的是已解析的 mode */}
                 <ResponsiveProvider mode={mode}>{children}</ResponsiveProvider>

@@ -6,7 +6,7 @@
 
 - 小屏走 H5 交互（底部弹层、滚轮选择、手势）
 - 大屏走 PC 交互（锚定浮层、日历面板、键盘导航）
-- **两套交互共用同一份 props**，唯一逃生舱是 `forceMode`
+- **两套交互共用同一份 props**，需要锁死形态时才传 `forceMode`
 
 > Design language inspired by Vant (Youzan). 本项目与有赞官方无关，仅复刻其视觉规格与交互模式；不使用 "Vant" 作为包名、品牌或组件名。
 
@@ -19,9 +19,9 @@
 | P0 | token 层 / 模式判定 / Button · Cell · CellGroup · Tag · Badge · Icon | ✅ 已完成 |
 | P1 | 弹层地基（portal · imperative-host · overlay · 滚动锁 · 手势）+ **Popup · Dialog · Toast** | ✅ 已完成 |
 | P1′ | ActionSheet · Alert/Confirm · Notify · Loading | ✅ 已完成 |
-| P2 | **Select** ✅ · **DropdownMenu** ✅ · **DatePicker** ✅ · **TimePicker** ✅ · **Tooltip** ✅ · **Popover** ✅ · Picker · Calendar | 🔄 进行中（6/8） |
-| P3 | 表单类 · Uploader · Search · Tabs · List/Table | ⬜ 待开始 |
-| P4 | 多风格 · tweakcn 适配 · 文档站 · registry 发布 | ⬜ 待开始 |
+| P2 | **Select** · **DropdownMenu** · **DatePicker** · **TimePicker** · **DateTimePicker** · **Tooltip** · **Popover** · **Picker** · **Cascader** · **Calendar** | ✅ 已完成 |
+| P3 | 表单类 · Uploader · Search · Tabs · List/Table | ✅ 已完成 |
+| P4 | **多风格** · **tweakcn 适配** · **文档站** · registry 发布验证 | 🔄 进行中（3/4） |
 
 > P1′ 的组件都是已件的 preset（ActionSheet ≈ Popup + 选项列表；Alert ≈ Dialog 去掉输入区；Notify ≈ Toast 换定位与信息模型），弹层地基已就绪，属于增量而非新建。
 
@@ -69,7 +69,7 @@ bivane/
 **模式判定**（`hooks/use-device-mode.ts`，判定优先级从高到低）
 
 ```
-1. 组件 forceMode prop           ← 逃生舱
+1. 组件 forceMode prop           ← 单组件强制
 2. <ResponsiveProvider mode>     ← 文档站 / 测试
 3. 自动判定：width < 768px 或 (pointer: coarse && hover: none)
 ```

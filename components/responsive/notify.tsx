@@ -83,8 +83,11 @@ export function NotifyHost() {
 /* ---------- 声明式 ---------- */
 
 export interface NotifyProps extends NotifyOptions {
+  /** 受控开合 */
   open?: boolean;
+  /** 非受控初始开合，默认 false */
   defaultOpen?: boolean;
+  /** 开合变化（受控与非受控都会触发） */
   onOpenChange?: (open: boolean) => void;
 }
 

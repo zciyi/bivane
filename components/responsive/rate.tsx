@@ -26,6 +26,7 @@ export interface RateProps {
     allowHalf?: boolean;
     /** 只读：不可选 */
     readonly?: boolean;
+    /** 禁用：不可评分（星用 disabledColor） */
     disabled?: boolean;
     /** 星尺寸，数字按 px，默认 20 */
     size?: number | string;
@@ -47,11 +48,15 @@ export interface RateProps {
     voidIcon?: React.ReactNode;
     /** 分值变化回调 */
     onChange?: (value: number) => void;
+    /** 自定义类名（透传到根元素） */
     className?: string;
+    /** 自定义内联样式（透传到根元素） */
     style?: React.CSSProperties;
+    /** 根元素 id */
     id?: string;
     /** 无障碍标签（渲染到 role="slider" 容器上），与全库其余组件一致用 ariaLabel */
     ariaLabel?: string;
+    /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
     forceMode?: DeviceMode;
 }
 

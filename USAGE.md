@@ -808,7 +808,7 @@ import { Ellipsis } from "@/components/ui/ellipsis";
 | `open` / `defaultOpen` / `onOpenChange` | PC 浮层受控/非受控开合；**H5 无浮层，这三个 prop 在 H5 不生效**                                               |
 | `disabled`                              | PC 下禁用 hover/focus 触发（不影响 children 自身禁用态）；H5 说明条恒展示                                     |
 | `className`                             | 透传给 PC 气泡 / H5 信息提示条                                                                                |
-| `forceMode`                             | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                         |
+| `forceMode`                             | 强制按某个端渲染：`'mobile'` 移动端 / `'desktop'` 桌面端；不传则按视口宽度自动判定                                                                         |
 
 说明体 id 由分发层 `useId` 生成并与主体的 `aria-describedby` 自动配对；children 必须是**单个**会把 props/ref 落到真实 DOM 的元素。H5 下它与常驻说明条纵向排列（主体在上）。
 
@@ -892,7 +892,7 @@ const actions = [
 | `ariaLabel`                             | 面板无障碍名称，内容没有可见标题时建议传                                                                     |
 | `h5Form`                                | 仅 H5：`'auto'`（默认）按行数自动分界，`'bubble'` / `'drawer'` 强制形态（跳过测量）                          |
 | `maxRows`                               | 仅 H5 且 `h5Form='auto'`：气泡形态允许的最大行数，缺省读 `--bv-popover-h5-bubble-max-rows`（默认 3）         |
-| `forceMode`                             | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                        |
+| `forceMode`                             | 强制按某个端渲染：`'mobile'` 移动端 / `'desktop'` 桌面端；不传则按视口宽度自动判定                                                                        |
 
 > 行内 ↑↓ 巡航、快捷键提示、多级子菜单是 DropdownMenu 的语义；Popover 的内容可以是任意节点，面板内导航走 `Tab`。动作行的 `onClick` 第一个参数是 action 本身；H5 气泡形态触屏不抢焦点，避免点击后页面滚动。
 
@@ -926,7 +926,7 @@ const actions = [
 | `onChange(values, options)`                            | 点「确定」时回调；`options` 与各列对齐，值失效位为 `undefined`                                |
 | `title`                                                | H5 工具条标题；PC 不渲染标题栏                                                                |
 | `placeholder` / `clearable` / `disabled` / `ariaLabel` | 同其它选择类                                                                                  |
-| `forceMode`                                            | 逃生舱：强制 `'mobile'` / `'desktop'`                                                         |
+| `forceMode`                                            | 强制按某个端渲染：`'mobile'` 移动端 / `'desktop'` 桌面端；不传则按视口宽度自动判定                                                         |
 
 两端都**恒走「暂存 → 确定」**（多列要全部调好才算选完）：
 
@@ -977,7 +977,7 @@ const area = [
 | `searchable`                                       | **仅 PC 呈现**：顶部搜索框按路径全文过滤叶子（「杭州」能命中其下所有区），结果展示完整路径；H5 滚轮没有搜索落点，此 prop 在 H5 被忽略 |
 | `searchPlaceholder` / `emptyText`                  | 搜索占位文案（默认「搜索」）/ 无结果文案（默认「暂无数据」）                                                                          |
 | `title` / `placeholder` / `clearable` / `disabled` | 同其它选择类                                                                                                                          |
-| `forceMode`                                        | 逃生舱：强制 `'mobile'` / `'desktop'`                                                                                                 |
+| `forceMode`                                        | 强制按某个端渲染：`'mobile'` 移动端 / `'desktop'` 桌面端；不传则按视口宽度自动判定                                                                                                 |
 
 两端走树的方式不同（模式 C）：
 
@@ -1035,7 +1035,7 @@ const [open, setOpen] = useState(false);
 | `title` / `showTitle` / `confirmText` / `confirmDisabledText` / `footer` | H5 弹层文案与自定义底部区                                                          |
 | `readonly`                                                               | 只读：不可选、H5 不显示确定条                                                      |
 | `onOverRange({date, maxRange})`                                          | 轻点（非拖选）超出区间上限时触发                                                   |
-| `forceMode`                                                              | 逃生舱：强制 `'mobile'` / `'desktop'`                                              |
+| `forceMode`                                                              | 强制按某个端渲染：`'mobile'` 移动端 / `'desktop'` 桌面端；不传则按视口宽度自动判定                                              |
 
 两端是两套交互范式（模式 C）：
 
@@ -1324,7 +1324,7 @@ H5 是横排 `−` 数字 `＋`，PC 是竖排微调列 + 可输入框 + 键盘�
 | `beforeChange` | `(v) => boolean \| Promise<boolean>` | — | 返回 `false` 拦截本次变更 |
 | `onOverlimit` | `(dir) => void` | — | 已在边界仍按同方向点击时触发 |
 | `onPlus` / `onMinus` | `() => void` | — | |
-| `forceMode` | `'mobile' \| 'desktop'` | — | |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 > **触屏为什么没有 44px 热区。** Rate 的选星是**按落点坐标算分**的（与 Vant 一致），
 > 不是「每颗星各挂一块 44px 热区再`elementFromPoint` 找 DOM」。
@@ -1529,7 +1529,7 @@ H5 相机直唤 + 图片压缩（canvas，等比缩放到 `maxWidth` + `toBlob` 
 | `emptyText` / `loadingText` | `ReactNode` | `'没有找到相关结果'` / `'搜索中…'` | 建议列表空态 / 加载态 |
 | `historyText` / `clearHistoryText` | `ReactNode` | `'历史记录'` / `'清空'` | H5 历史区标题 / 清空按钮 |
 | `ariaLabel` | `string` | — | 渲染到输入框上，与全库一致用 `ariaLabel` |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱（契约唯一例外） |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 > **PC 为什么不用 `Popover.Trigger`**：搜索框是「聚焦即开」的 combobox，而 Trigger 是
 > 「点击 / 空格即切换」的按钮 —— 已聚焦时再点一下会被它误关，且用户按**空格**输入词会被
@@ -1575,7 +1575,7 @@ const [active, setActive] = React.useState(0);
 | `lineWidth` | `number \| 'auto'` | `40` | 下划线宽度（px）；`'auto'` 与标题同宽 |
 | `color` | `string` | — | 激活色（覆盖主色） |
 | `ariaLabel` | `string` | — | 标签条的无障碍名称 |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 `<Tab>` 的 prop：`title`（标签文案，必填）、`disabled`（不可点、键盘跳过）、`children`（内容）。
 
@@ -1613,7 +1613,7 @@ const [active, setActive] = React.useState(0);
 | `safeAreaInsetTop` | `boolean` | `true` | 顶部安全区 |
 | `backLabel` | `string` | `'返回'` | 返回箭头的无障碍名称 |
 | `ariaLabel` | `string` | — | 导航地标的无障碍名称 |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 > **不接收 children**：内容由页面自己排。固定态下把内容塞进 fixed 容器会把它钉在屏幕上。
 > 右侧要放搜索框请用 `right`。
@@ -1651,7 +1651,7 @@ const [value, setValue] = React.useState("home");
 | `placeholder` | `boolean` | `true` | 固定时留等高占位块（PC 侧边形态不适用） |
 | `safeAreaInsetBottom` | `boolean` | `true` | 底部安全区（仅 H5 底栏生效） |
 | `border` | `boolean` | `true` | 分隔线 |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 `TabbarItem`：`value`（项标识，必填）、`label`（文案）、`icon`（图标节点）、`badge`（`true` = 红点 / 数字或字符串 = 文字角标）、`disabled`、`href`（给了就渲染成链接）。
 
@@ -1711,7 +1711,7 @@ const [rows, setRows] = useState<Order[]>([]);
 | `virtual` | `boolean` | `false` | PC 虚拟滚动（需配 `itemHeight`） |
 | `itemHeight` | `number` | — | PC 虚拟滚动行高（px） |
 | `height` | `number \| string` | — | PC 滚动容器高度 |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 > **三态全部受控**：组件不持有数据也不发请求，只在正确时机通知业务去取数据。
 > 列表数据是业务异步取的，若组件替业务持有 `loading`，会出现「请求已发出但 loading
@@ -1755,7 +1755,7 @@ const columns: TableColumn[] = [
 | `onSelectionChange` | `(keys: string[]) => void` | — | 选中变化 |
 | `onRowClick` | `(row, index) => void` | — | 点击某行 |
 | `emptyText` | `ReactNode` | `'暂无数据'` | 空态文案 |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 `TableColumn`：`key`（必填）、`title`（表头 / 字段标签）、`render`（自定义单元格）、`sortValue`（排序取值）、`sortable`（是否可排序）、`width`（PC 列宽）、`align`（对齐）、`fixed`（PC 固定列 `'left' \| 'right'`）、`h5Role`（H5 角色 `'title' \| 'meta' \| 'detail'`）、`filterable` + `filters`（PC 列筛选）。
 
@@ -1868,7 +1868,7 @@ const columns: TableColumn[] = [
 | `loading` / `finished` / `error` | `boolean` | `false` | 无限滚动三态（全受控） |
 | `onLoad` / `onRetry` | `() => void` | — | 触底加载 / 出错重试 |
 | `threshold` | `number` | `80` | 触底提前量（px） |
-| `forceMode` | `'mobile' \| 'desktop'` | — | 逃生舱 |
+| `forceMode` | `'mobile' \| 'desktop'` | — | 强制一端渲染；不传则按视口宽度自动判定 |
 
 > **为什么单独做一个组件，而不是把分页/加载塞进 Table**：
 > Table 只回答「一行数据长什么样」，DataContainer 只回答「数据怎么来」。
@@ -1890,7 +1890,7 @@ const columns: TableColumn[] = [
 优先级从高到低：
 
 ```
-1. 组件 forceMode prop            ← 单组件逃生舱
+1. 组件 forceMode prop            ← 单组件强制
 2. <ResponsiveProvider mode>      ← 全局强制（文档站 / 测试）
 3. 自动判定：width < breakpoint(768) 或 (pointer: coarse && hover: none)
 ```

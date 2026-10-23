@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DualFrame } from './device-frame';
+import { ChromeButton } from './doc-parts';
 
 /**
  * 示例卡片（Ant Design / Element 的「示例」区块）
@@ -39,38 +40,41 @@ export function ExampleCard({
 
     return (
         <section id={id} className="scroll-mt-20">
-            <h3 className="mb-bv-xs text-bv-md font-bv-bold text-bv-text">
-                {title}
-            </h3>
-            {desc && (
-                <p className="mb-bv-sm text-bv-sm text-bv-text-2">{desc}</p>
-            )}
-
-            <div className="rounded-bv-md border border-bv-border bg-bv-surface p-bv-md">
-                <DualFrame h5={children} pc={children} />
-            </div>
-
-            {hasCode && (
-                <div className="mt-bv-xs">
-                    <div className="flex items-center gap-bv-xs">
-                        <button
-                            type="button"
-                            onClick={() => setShowCode(!showCode)}
-                            aria-expanded={showCode}
-                            className="cursor-pointer rounded-bv-sm border border-bv-border px-bv-xs py-[3px] text-bv-sm text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary"
-                        >
-                            {showCode ? '收起代码' : '查看代码'}
-                        </button>
-                        <CopyButton text={text} />
-                    </div>
-
-                    {showCode && (
-                        <div className="mt-bv-xs overflow-hidden rounded-bv-md border border-bv-border">
-                            <CodePanel code={text} />
+            <div className="overflow-hidden rounded-docs-lg border border-bv-border bg-bv-surface shadow-docs-card">
+                {/* 卡头：标题居左，操作居右 —— 按钮收进卡头比放在卡下方省一行纵向空间 */}
+                <div className="flex flex-wrap items-center gap-bv-xs border-b border-bv-border bg-bv-muted/40 px-bv-md py-bv-xs">
+                    <h3 className="text-docs-h3 font-bv-bold text-bv-text">
+                        {title}
+                    </h3>
+                    {hasCode && (
+                        <div className="ml-auto flex items-center gap-bv-xs">
+                            <ChromeButton
+                                onClick={() => setShowCode(!showCode)}
+                                aria-expanded={showCode}
+                            >
+                                {showCode ? '收起代码' : '查看代码'}
+                            </ChromeButton>
+                            <CopyButton text={text} />
                         </div>
                     )}
                 </div>
-            )}
+
+                {desc && (
+                    <p className="px-bv-md pt-bv-xs text-[13px] text-bv-text-2">
+                        {desc}
+                    </p>
+                )}
+
+                <div className="p-bv-md">
+                    <DualFrame h5={children} pc={children} />
+                </div>
+
+                {showCode && (
+                    <div className="border-t border-bv-border">
+                        <CodePanel code={text} />
+                    </div>
+                )}
+            </div>
         </section>
     );
 }
@@ -80,8 +84,7 @@ function CopyButton({ text }: { text: string }) {
     const [copied, setCopied] = useState(false);
 
     return (
-        <button
-            type="button"
+        <ChromeButton
             onClick={() => {
                 // navigator.clipboard 在非安全上下文（http://）下不可用
                 // → 退回老办法，别静默失败
@@ -107,17 +110,16 @@ function CopyButton({ text }: { text: string }) {
                     document.body.removeChild(ta);
                 }
             }}
-            className="cursor-pointer rounded-bv-sm border border-bv-border px-bv-xs py-[3px] text-bv-sm text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary"
         >
             {copied ? '已复制' : '复制代码'}
-        </button>
+        </ChromeButton>
     );
 }
 
 /** 代码面板（深底浅字 —— 代码块的通行观感） */
 function CodePanel({ code }: { code: string }) {
     return (
-        <pre className="overflow-x-auto bg-[#1c1e24] p-bv-md text-[12.5px] leading-relaxed">
+        <pre className="overflow-x-auto bg-[#17191f] p-bv-md text-[12.5px] leading-relaxed">
             <code className="font-mono text-[#e6e8ee]">{code}</code>
         </pre>
     );

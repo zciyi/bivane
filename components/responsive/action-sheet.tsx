@@ -36,8 +36,11 @@ const ACTION_SHEET_HOST_KEY = 'bivane-action-sheet';
 /* ---------- 声明式 ---------- */
 
 export interface ActionSheetProps extends ActionSheetOptions {
+  /** 受控开合 */
   open?: boolean;
+  /** 非受控初始开合，默认 false */
   defaultOpen?: boolean;
+  /** 开合变化（受控与非受控都会触发） */
   onOpenChange?: (open: boolean) => void;
 }
 

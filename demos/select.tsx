@@ -55,7 +55,7 @@ export function SelectExample1() {
                                                 }
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             单选 · 点选即生效
                                         </span>
                                     </div>
@@ -69,7 +69,7 @@ export function SelectExample1() {
                                                 options={CITY_OPTIONS}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             多选 · 可清除
                                         </span>
                                     </div>
@@ -83,7 +83,7 @@ export function SelectExample1() {
                                                 options={CITY_OPTIONS}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             输入过滤（H5 需选项 &gt; 10 才出搜索框）
                                         </span>
                                     </div>
@@ -96,7 +96,7 @@ export function SelectExample1() {
                                                 options={CITY_OPTIONS}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -110,7 +110,7 @@ export function SelectExample1() {
                                             options={GROUPED_CITY_OPTIONS}
                                         />
                                     </div>
-                                    <span className="text-bv-sm text-bv-text-3">
+                                    <span className="text-bv-sm text-bv-text-2">
                                         分组 + 过滤
                                     </span>
                                 </div>
@@ -127,7 +127,7 @@ export function SelectExample1() {
                                             }
                                         />
                                     </div>
-                                    <span className="text-bv-sm text-bv-text-3">
+                                    <span className="text-bv-sm text-bv-text-2">
                                         H5 暂存确认：面板带「取消 · 标题 ·
                                         确定」，点选项只打勾，点确定才回填
                                     </span>
@@ -138,7 +138,7 @@ export function SelectExample1() {
                                         ? "点开是底部弹层列表（项高 48px、可按住顶部指示条下拉关闭），选项 > 10 才出现搜索框；默认点选即关，传 confirmable 走「暂存 → 确定」"
                                         : "点开是锚定在触发器下方的浮层，↑↓ 巡航（自动跳过禁用项）、Enter 选中、Home/End 首尾、Esc 关闭、输入即过滤，多选保持展开；PC 恒为点选即生效，没有确定这一步"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：同一个 searchable prop，H5 在选项 ≤ 10
                                     时不渲染搜索框（触屏主路径是点选），PC 只要
                                     searchable 就给（桌面端输入过滤是主路径）；行高 48px

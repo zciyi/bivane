@@ -61,7 +61,7 @@ export function CascaderExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             三级联动 · 可搜索（PC）· 可清除
                                         </span>
                                     </div>
@@ -73,7 +73,7 @@ export function CascaderExample1() {
                                                 placeholder="请选择所在地区"
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             无默认值
                                         </span>
                                     </div>
@@ -86,7 +86,7 @@ export function CascaderExample1() {
                                                 disabled
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -97,7 +97,7 @@ export function CascaderExample1() {
                                         ? "点开是底部弹层里的联动滚轮（省 / 市 / 区，即 Vant Area 交互）：滚「省」，市/区两列整体重算并回到第一个可选项；顶部「取消 · 标题 · 确定」，改完确定才提交"
                                         : "点开是锚定浮层：顶部面包屑（请选择 / 省 / 市，可点回退），下方逐级向右展开的多列面板；点父级展开下一列，点叶子立即生效并关闭；打开即定位到已选路径。searchable 时顶部有搜索框，按「浙江 杭州 西湖」这样的完整路径匹配，点结果直接选中整条路径；键盘 ↑↓ 巡航、→/Enter 展开或选中、← 回上级、Esc 关闭"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：值恒为根 → 叶子的**完整路径值数组**（如
                                     ['zj','hz','xh']），半截/失效路径不回显；只有叶子可选。
                                     options 支持 fieldNames 改字段映射，可直接喂 Vant

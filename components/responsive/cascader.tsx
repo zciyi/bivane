@@ -50,17 +50,25 @@ export interface CascaderProps {
   searchable?: boolean;
   /** H5 面板标题；PC 不渲染标题栏 */
   title?: React.ReactNode;
+  /** 无选中值时展示 */
   placeholder?: React.ReactNode;
+  /** 禁用：触发器不可点、不清除 */
   disabled?: boolean;
+  /** 展示清除按钮（仅在有选中值、且未禁用时出现） */
   clearable?: boolean;
+  /** PC 搜索框占位文案，默认「搜索」 */
   searchPlaceholder?: string;
+  /** 无匹配项时的文案 */
   emptyText?: React.ReactNode;
   /** 面包屑根层文案 */
   rootText?: React.ReactNode;
+  /** 无障碍名称；没有可见 label 时应当传入 */
   ariaLabel?: string;
+  /** 触发器 id */
   id?: string;
+  /** 自定义类名（透传弹层面板） */
   className?: string;
-  /** 逃生舱：强制某个模式的交互（契约第 9 条唯一例外） */
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
 }
 

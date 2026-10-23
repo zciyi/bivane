@@ -55,7 +55,7 @@ export function PopupExample1() {
                                         ? "四向滑入、底部圆角 + 安全区、可按住指示条下拉关闭、点击遮罩关闭"
                                         : "所有方向一律降级为居中模态、遮罩点击不关、ESC 关闭、动画 200ms"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：PC
                                     端「bottom」不会渲染成底部面板，而是居中弹出（data-position
                                     仍记录原始值， data-position-resolved

@@ -63,6 +63,7 @@ export function LoadingHost() {
 /* ---------- 声明式 ---------- */
 
 export interface LoadingProps extends LoadingOptions {
+  /** 是否展示（受控） */
   open?: boolean;
 }
 

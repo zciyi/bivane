@@ -108,6 +108,7 @@ export interface ButtonProps
   iconPosition?: 'left' | 'right';
   /** 原生 type 属性（与组件 type 语义冲突，故改名） */
   nativeType?: 'button' | 'submit' | 'reset';
+  /** 按钮文案 */
   children?: React.ReactNode;
 }
 

@@ -20,7 +20,7 @@ export function TimePickerExample1() {
                                                 placeholder="请选择时间"
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             单值 · 预填现在
                                         </span>
                                     </div>
@@ -34,7 +34,7 @@ export function TimePickerExample1() {
                                                 clearable
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             区间 · 可清除
                                         </span>
                                     </div>
@@ -47,7 +47,7 @@ export function TimePickerExample1() {
                                                 columnsType={["hour", "minute"]}
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             时分面板 · 回填 HH:mm
                                         </span>
                                     </div>
@@ -59,7 +59,7 @@ export function TimePickerExample1() {
                                                 disabled
                                             />
                                         </div>
-                                        <span className="text-bv-sm text-bv-text-3">
+                                        <span className="text-bv-sm text-bv-text-2">
                                             禁用态
                                         </span>
                                     </div>
@@ -70,7 +70,7 @@ export function TimePickerExample1() {
                                         ? "点开是底部弹层，三列拖拽滚轮（时/分/秒）惯性滚动 + 吸附对齐，顶部「取消 · 标题 · 确定」；区间模式在工具条下方多一条「开始时间 / 结束时间」切换，滚轮改的是当前那一端，两端都选上「确定」才可用"
                                         : "点开是锚定触发器下方的浮层，壳里是同一套三列滚轮（同 5 行制、同吸附、同中央高亮带），底部「取消 / 确定」条；单值也要点「确定」才生效（滚轮要三列都调好才算选完）；键盘 ←→ 换列（点亮该列高亮带）、↑↓ 改值、Home/End 首尾、Enter 确定、Esc 关闭；区间用「开始时间 / 结束时间」两个 tab 手动切换在改哪一端，结束 ≤ 开始时「确定」禁用并提示"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     注：两端共享的是同一份时间值逻辑（use-time-value
                                     的解析/格式化/min-max
                                     逐字段夹紧/区间排序），也共享同一个滚轮行

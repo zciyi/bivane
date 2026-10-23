@@ -37,9 +37,13 @@ const DIALOG_HOST_KEY = 'bivane-dialog';
 
 export interface DialogProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'title' | 'content'> {
+  /** 受控开合 */
   open?: boolean;
+  /** 非受控初始开合，默认 false */
   defaultOpen?: boolean;
+  /** 开合变化（受控与非受控都会触发） */
   onOpenChange?: (open: boolean) => void;
+  /** 标题 */
   title?: React.ReactNode;
   /** 主体文案（Vant 命名） */
   message?: React.ReactNode;
@@ -47,13 +51,19 @@ export interface DialogProps
   description?: React.ReactNode;
   /** 自定义底部，覆盖默认按钮区 */
   footer?: React.ReactNode;
+  /** 是否展示确认按钮，默认 true */
   showConfirmButton?: boolean;
+  /** 确认按钮文案，默认「确认」 */
   confirmText?: string;
+  /** 是否展示取消按钮，默认 false */
   showCancelButton?: boolean;
+  /** 取消按钮文案，默认「取消」 */
   cancelText?: string;
   /** 返回 false 可阻止关闭，支持异步（异步期间确认按钮进入 loading） */
   beforeClose?: (action: DialogAction) => boolean | Promise<boolean>;
+  /** 点确认按钮（beforeClose 放行后触发） */
   onConfirm?: () => void;
+  /** 点取消按钮 */
   onCancel?: () => void;
   /** 退场动画结束后回调 */
   onClosed?: () => void;
@@ -61,12 +71,17 @@ export interface DialogProps
   closeOnClickOverlay?: boolean;
   /** ESC 关闭，默认 true */
   closeOnPressEscape?: boolean;
+  /** 是否渲染遮罩，默认 true */
   overlay?: boolean;
+  /** 是否锁定背景滚动，默认 true */
   lockScroll?: boolean;
   /** 进出场时长（ms），传 0 关闭动画 */
   duration?: number;
+  /** 层级，默认用 --bv-overlay-z-index */
   zIndex?: number;
+  /** 强制按某个端渲染：'mobile' 移动端 / 'desktop' 桌面端；不传则按视口宽度自动判定 */
   forceMode?: DeviceMode;
+  /** 主体内容（优先于 message / description） */
   children?: React.ReactNode;
 }
 

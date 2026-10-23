@@ -42,7 +42,7 @@ export function TooltipExample1() {
                                         ? "触屏没有 hover，说明直接常驻在主体下方（ⓘ 信息提示条，全文展示）；超长文案用 Ellipsis 截到 2 行并显示展开/收起"
                                         : "鼠标悬停 200ms 气泡弹出并跟随鼠标，移出即关；Tab 聚焦按钮立即弹出（气泡锚定元素），Esc 关闭；hover 与 focus 任一仍在都不会误关"}
                                 </p>
-                                <p className="text-bv-sm text-bv-text-3">
+                                <p className="text-bv-sm text-bv-text-2">
                                     同一段说明两端容器不同：H5 常驻提示条 / PC
                                     纯展示气泡（pointer-events:none、role=tooltip），均与主体
                                     aria-describedby 配对。

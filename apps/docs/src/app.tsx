@@ -196,17 +196,26 @@ export function App() {
     );
 
     return (
-        <div className="min-h-screen bg-bv-background text-bv-text">
-            <header className="sticky top-0 z-20 border-b border-bv-border bg-bv-surface">
-                <div className="mx-auto flex max-w-[1600px] items-center gap-bv-sm px-bv-md py-bv-sm">
+        <div className="docs-shell min-h-screen text-bv-text">
+            <header className="sticky top-0 z-30 border-b border-bv-border bg-bv-surface/85 shadow-docs-header backdrop-blur-md">
+                <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-bv-md px-bv-md">
                     <button
                         type="button"
                         onClick={() => navigate('')}
-                        className="cursor-pointer text-bv-lg font-bv-bold"
+                        className="docs-focus flex cursor-pointer items-center gap-bv-xs rounded-lg"
                     >
-                        Bivane
+                        {/* 品牌方块：主色渐变 + 同色投影，深浅主题下都跟着 --bv-primary 变 */}
+                        <span
+                            aria-hidden="true"
+                            className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[var(--bv-primary)] to-[color-mix(in_srgb,var(--bv-primary)_55%,black)] text-[15px] font-bv-bold text-bv-white shadow-[0_2px_8px_color-mix(in_srgb,var(--bv-primary)_45%,transparent)]"
+                        >
+                            B
+                        </span>
+                        <span className="text-[17px] font-bv-bold tracking-tight">
+                            Bivane
+                        </span>
                     </button>
-                    <span className="hidden text-bv-sm text-bv-text-2 sm:block">
+                    <span className="hidden text-bv-sm text-bv-text-2 lg:block">
                         一套 API，两端各得其所
                     </span>
                     <div className="flex-1" />
@@ -216,11 +225,11 @@ export function App() {
                         type="button"
                         onClick={() => setPaletteOpen(true)}
                         aria-label="搜索组件、示例或属性"
-                        className="flex cursor-pointer items-center gap-bv-xs rounded-bv-sm border border-bv-border px-bv-xs py-[3px] text-bv-sm text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary"
+                        className="docs-focus flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-bv-border text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary sm:w-auto sm:justify-start sm:gap-bv-xs sm:px-bv-sm"
                     >
                         <span aria-hidden="true">⌕</span>
                         <span className="hidden sm:inline">搜索</span>
-                        <span className="hidden rounded border border-bv-border px-1 text-[10px] text-bv-text-3 md:inline">
+                        <span className="docs-kbd ml-auto hidden md:inline">
                             ⌘K
                         </span>
                     </button>
@@ -229,9 +238,13 @@ export function App() {
                         type="button"
                         aria-pressed={dark}
                         onClick={() => setDark(!dark)}
-                        className="cursor-pointer rounded-bv-sm border border-bv-border px-bv-xs py-[3px] text-bv-sm"
+                        aria-label={dark ? '切换到浅色主题' : '切换到深色主题'}
+                        className="docs-focus flex h-9 cursor-pointer items-center gap-bv-xs rounded-full border border-bv-border px-bv-sm text-[13px] text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary"
                     >
-                        {dark ? '浅色' : '深色'}
+                        <span aria-hidden="true">{dark ? '☀' : '☾'}</span>
+                        <span className="hidden sm:inline">
+                            {dark ? '浅色' : '深色'}
+                        </span>
                     </button>
 
                     {/* 汉堡：手机上打开导航抽屉 */}
@@ -240,7 +253,7 @@ export function App() {
                         onClick={() => setDrawerOpen(true)}
                         aria-label="打开组件导航"
                         aria-expanded={drawerOpen}
-                        className="cursor-pointer rounded-bv-sm border border-bv-border px-bv-xs py-[3px] text-bv-sm md:hidden"
+                        className="docs-focus grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-bv-border text-bv-text-2 transition-colors hover:border-bv-primary hover:text-bv-primary md:hidden"
                     >
                         ☰
                     </button>
@@ -258,22 +271,22 @@ export function App() {
                 {/* 手机导航抽屉：与桌面侧栏同一份内容 */}
                 {drawerOpen && (
                     <div
-                        className="fixed inset-0 z-30 md:hidden"
+                        className="fixed inset-0 z-40 md:hidden"
                         onMouseDown={(e) => {
                             if (e.target === e.currentTarget) setDrawerOpen(false);
                         }}
                     >
-                        <div className="absolute inset-0 bg-bv-overlay" />
-                        <div className="absolute inset-y-0 left-0 flex w-[280px] max-w-[85vw] flex-col bg-bv-surface">
+                        <div className="absolute inset-0 bg-bv-overlay backdrop-blur-sm" />
+                        <div className="absolute inset-y-0 left-0 flex w-[280px] max-w-[85vw] flex-col rounded-r-docs-xl bg-bv-surface shadow-docs-float">
                             <div className="flex items-center justify-between border-b border-bv-border px-bv-md py-bv-sm">
-                                <span className="text-bv-sm font-bv-bold">
+                                <span className="text-[13px] font-bv-bold">
                                     组件（{REG.entries.length}）
                                 </span>
                                 <button
                                     type="button"
                                     onClick={() => setDrawerOpen(false)}
                                     aria-label="关闭导航"
-                                    className="cursor-pointer px-bv-xs text-bv-text-2"
+                                    className="docs-focus grid h-8 w-8 cursor-pointer place-items-center rounded-full text-bv-text-2 transition-colors hover:bg-bv-muted hover:text-bv-primary"
                                 >
                                     ✕
                                 </button>
