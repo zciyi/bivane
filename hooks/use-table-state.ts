@@ -98,16 +98,18 @@ export function compareSortValues(a: string | number, b: string | number): numbe
  * 用「复制后排序」而不是原地 sort：不改传入的 data 引用
  * （受控模式下业务可能同时持有同一份数组，原地排序会让 React 的比较失效）。
  */
-export function sortData(
-    data: readonly unknown[],
+export function sortData<T>(
+    data: readonly T[],
     columns: readonly TableColumn[],
     sort: SortState | undefined,
-): readonly unknown[] {
+    getRow: (entry: T) => unknown = (entry) => entry,
+): readonly T[] {
     if (!sort) return data;
     const column = columns.find((entry) => entry.key === sort.key);
     if (!column?.sortable) return data;
 
-    const read = (row: unknown): string | number => {
+    const read = (entry: T): string | number => {
+        const row = getRow(entry);
         const value = (row as Record<string, unknown> | null)?.[column.key];
         return column.sortValue ? column.sortValue(value, row) : (value as string | number);
     };
@@ -122,11 +124,12 @@ export function sortData(
 }
 
 /** 列筛选：按「该列的值落在筛选项集合内」过滤（未筛的列不参与） */
-export function filterData(
-    data: readonly unknown[],
+export function filterData<T>(
+    data: readonly T[],
     columns: readonly TableColumn[],
     filters: Readonly<Record<string, readonly string[]>>,
-): readonly unknown[] {
+    getRow: (entry: T) => unknown = (entry) => entry,
+): readonly T[] {
     const active = columns.filter(
         (column) =>
             column.filterable === true &&
@@ -135,9 +138,9 @@ export function filterData(
     );
     if (active.length === 0) return data;
 
-    return data.filter((row) =>
+    return data.filter((entry) =>
         active.every((column) => {
-            const value = (row as Record<string, unknown> | null)?.[column.key];
+            const value = (getRow(entry) as Record<string, unknown> | null)?.[column.key];
             return filters[column.key].includes(String(value));
         }),
     );
@@ -162,6 +165,8 @@ export interface UseTableStateOptions {
     columns: readonly TableColumn[];
     /** 数据 */
     data: readonly unknown[];
+    /** 业务行标识；默认取 id/key 或原始下标，远程分页及数据重排时应提供稳定业务标识 */
+    rowKey?: (row: unknown, index: number) => string | number;
     /**
      * 受控排序。
      *
@@ -215,6 +220,8 @@ export interface UseTableStateOptions {
 export interface TableState {
     /** 排序后的数据（已套用列筛选与排序） */
     rows: readonly unknown[];
+    /** 与当前页 rows 一一对应、在派生处理前确定的行标识 */
+    rowKeys: readonly string[];
     /** 当前排序 */
     sort: SortState | undefined;
     /** 点击列头/字段标签：切换排序方向 */
@@ -276,6 +283,7 @@ export interface TableState {
 export function useTableState({
     columns,
     data,
+    rowKey,
     sort: controlledSort,
     defaultSort,
     onSortChange,
@@ -314,10 +322,22 @@ export function useTableState({
     );
     const selectedKeys = isSelectionControlled ? controlledSelected : internalSelected;
 
-    // 筛选 + 排序后的全量行（分页的输入）
+    // 行标识随原始记录一起派生，避免排序或切页后把展示下标当成业务身份。
+    const keyedData = React.useMemo(
+        () => data.map((row, index) => ({
+            row,
+            key: String(rowKey ? rowKey(row, index) : resolveRowKey(row, index)),
+        })),
+        [data, rowKey],
+    );
     const fullRows = React.useMemo(
-        () => sortData(filterData(data, columns, filters), columns, sort),
-        [data, columns, filters, sort],
+        () => sortData(
+            filterData(keyedData, columns, filters, (entry) => entry.row),
+            columns,
+            sort,
+            (entry) => entry.row,
+        ),
+        [keyedData, columns, filters, sort],
     );
 
     /**
@@ -380,11 +400,13 @@ export function useTableState({
      * - local 模式：组件按页切片全量
      * - remote 模式：业务给的就是当页数据，原样渲染（再切就错了）
      */
-    const rows = React.useMemo(() => {
+    const visibleRows = React.useMemo(() => {
         if (!pagination || paginationMode !== 'local') return fullRows;
         const start = sliceStartIndex(currentPage, startPage, pageSize);
         return fullRows.slice(start, start + Math.max(1, pageSize));
     }, [fullRows, pagination, paginationMode, currentPage, startPage, pageSize]);
+    const rows = React.useMemo(() => visibleRows.map((entry) => entry.row), [visibleRows]);
+    const rowKeys = React.useMemo(() => visibleRows.map((entry) => entry.key), [visibleRows]);
 
     const toggleSort = React.useCallback(
         (key: string) => {
@@ -429,21 +451,19 @@ export function useTableState({
         [selectedKeys, isSelectionControlled, onSelectionChange],
     );
 
-    const rowKeys = React.useMemo(
-        () => rows.map((row, index) => resolveRowKey(row, index)),
-        [rows],
-    );
-
     const allSelected = React.useMemo(
         () => rowKeys.length > 0 && rowKeys.every((key) => selectedKeys.includes(key)),
         [rowKeys, selectedKeys],
     );
 
     const toggleAll = React.useCallback(() => {
-        const next = allSelected ? [] : rowKeys;
+        const currentPageKeys = new Set(rowKeys);
+        const next = allSelected
+            ? selectedKeys.filter((key) => !currentPageKeys.has(key))
+            : [...new Set([...selectedKeys, ...rowKeys])];
         if (!isSelectionControlled) setInternalSelected(next);
         onSelectionChange?.([...next]);
-    }, [allSelected, rowKeys, isSelectionControlled, onSelectionChange]);
+    }, [allSelected, rowKeys, selectedKeys, isSelectionControlled, onSelectionChange]);
 
     const isRowSelected = React.useCallback(
         (key: string) => selectedKeys.includes(key),
@@ -455,6 +475,7 @@ export function useTableState({
 
     return {
         rows,
+        rowKeys,
         sort,
         toggleSort,
         canSort,

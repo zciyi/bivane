@@ -12,7 +12,8 @@
     "@bivane/utils",
     "@bivane/time-parts",
     "@bivane/use-time-value",
-    "@bivane/tokens"
+    "@bivane/tokens",
+    "@bivane/button"
   ],
   "files": [
     {

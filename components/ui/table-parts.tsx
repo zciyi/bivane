@@ -27,6 +27,8 @@ export interface TableViewProps {
     columns: readonly TableColumn[];
     /** 已套用筛选与排序的数据 */
     rows: readonly unknown[];
+    /** 与 rows 对应的稳定行标识，由共享状态层提供 */
+    rowKeys: readonly string[];
     /** 当前排序 */
     sort: SortState | undefined;
     /** 点击列头 / 字段标签切换排序 */

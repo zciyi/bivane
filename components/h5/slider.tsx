@@ -45,6 +45,15 @@ export const H5Slider = React.forwardRef<HTMLDivElement, SliderRenderProps>(
     ) {
         const trackRef = React.useRef<HTMLDivElement>(null);
         const activeThumbRef = React.useRef<0 | 1>(0);
+        const dragValueRef = React.useRef(current);
+        React.useLayoutEffect(() => {
+            dragValueRef.current = current;
+        }, [current]);
+        // move 与 up 可能在同一次渲染前连续到达，结束值必须同步记录而非等待 state 提交。
+        const applyDragValue = React.useCallback((next: SliderRenderProps['current']) => {
+            dragValueRef.current = next;
+            onApply(next);
+        }, [onApply]);
 
         const nearestThumb = (val: number): 0 | 1 => {
             if (!range) return 0;
@@ -56,25 +65,25 @@ export const H5Slider = React.forwardRef<HTMLDivElement, SliderRenderProps>(
             (ratio: number) => {
                 const val = ratioToValue(ratio, min, max, step);
                 if (!range) {
-                    onApply(val);
+                    applyDragValue(val);
                     return;
                 }
-                const [lo, hi] = current as [number, number];
+                const [lo, hi] = dragValueRef.current as [number, number];
                 if (activeThumbRef.current === 0) {
-                    onApply([Math.min(val, hi), hi]);
+                    applyDragValue([Math.min(val, hi), hi]);
                 } else {
-                    onApply([lo, Math.max(val, lo)]);
+                    applyDragValue([lo, Math.max(val, lo)]);
                 }
             },
-            [min, max, step, range, current, onApply],
+            [min, max, step, range, applyDragValue],
         );
 
         const { beginTracking, ratioFromClient } = useSliderDrag(trackRef, {
             vertical,
             reverse,
-            disabled,
+            disabled: disabled || readonly,
             onDragStart: () => onDragStart?.(current),
-            onDragEnd: () => onDragEnd?.(current),
+            onDragEnd: () => onDragEnd?.(dragValueRef.current),
             onDrag: applyRatio,
         });
 

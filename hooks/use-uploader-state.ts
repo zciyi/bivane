@@ -84,6 +84,12 @@ export interface UploaderBinding {
     retryItem: (key: string) => Promise<void>;
     /** 是否还能再加（maxCount 满了就 false，两端用它隐藏「+」位） */
     canAdd: boolean;
+    /** 读取前校验是否异常；不包含底层错误详情 */
+    readError: boolean;
+    /** 是否正在重试失败批次 */
+    isRetryingRead: boolean;
+    /** 使用保留的原始文件重新校验，重复调用不会重复提交 */
+    retryRead: () => Promise<void>;
 }
 
 /* --------------------------- 纯函数 --------------------------- */
@@ -308,6 +314,9 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
     const [inner, setInner] = React.useState<UploaderFileItem[]>(
         () => valueProp ?? defaultValue ?? [],
     );
+    const [failedRead, setFailedRead] = React.useState<File[] | null>(null);
+    const [isRetryingRead, setIsRetryingRead] = React.useState(false);
+    const retryingReadRef = React.useRef(false);
     const itemsRef = React.useRef<UploaderFileItem[]>(inner);
     // 最后一次 emit 的列表：受控回传同一引用时不再二次 set，避免上传循环
     const emitted = React.useRef<UploaderFileItem[]>(inner);
@@ -374,9 +383,10 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
         [afterRead, action, method, headers, name, data, withCredentials, patch],
     );
 
-    const addFiles = React.useCallback(
-        async (incoming: File[]) => {
-            if (disabled || readonly || incoming.length === 0) return;
+    const prepareFiles = React.useCallback(
+        async (incoming: File[]): Promise<UploaderFileItem[]> => {
+            if (disabled || readonly || incoming.length === 0) return [];
+            setFailedRead(null);
             let files = incoming.slice();
             if (!multiple) files = files.slice(0, 1);
 
@@ -386,7 +396,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
                 const remaining = maxCount - current;
                 if (remaining <= 0) {
                     onExceed?.(files);
-                    return;
+                    return [];
                 }
                 if (files.length > remaining) {
                     onExceed?.(files.slice(remaining));
@@ -396,19 +406,34 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
 
             // beforeRead：false 拦截整批（Vant 语义）
             if (beforeRead) {
-                const ok = await beforeRead(multiple ? files : files[0]);
-                if (!ok) return;
+                try {
+                    const ok = await beforeRead(multiple ? files : files[0]);
+                    if (!ok) return [];
+                } catch {
+                    // 文件尚未入列，保留这一批供原样重试，不把业务校验异常泄漏给事件入口。
+                    setFailedRead(files);
+                    return [];
+                }
             }
 
             const cOpts = normalizeCompress(compress);
-            const created: UploaderFileItem[] = [];
+            const prepared: File[] = [];
+            const originalFiles: File[] = [];
             for (const file of files) {
                 if (!matchAccept(file, accept)) continue;
                 if (!validateFileSize(file, maxSize)) {
                     onOversize?.(file);
                     continue;
                 }
-                const f = cOpts ? await compressImage(file, cOpts) : file;
+                prepared.push(cOpts ? await compressImage(file, cOpts) : file);
+                originalFiles.push(file);
+            }
+
+            // 异步校验与压缩期间其他入口可能已入列；以提交时的实时队列重新分配名额。
+            const remaining = maxCount == null ? prepared.length : Math.max(0, maxCount - itemsRef.current.length);
+            const accepted = prepared.slice(0, remaining);
+            const exceeded = originalFiles.slice(remaining);
+            const created = accepted.map((f) => {
                 const item = createFileItem(f);
                 if (isImageFile(f) && typeof URL !== "undefined") {
                     try {
@@ -417,18 +442,37 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
                         /* 无 createObjectURL 时不预览图片，退回文件图标 */
                     }
                 }
-                created.push(item);
-            }
-            if (created.length === 0) return;
-
-            update((list) => [...list, ...created]);
-            await Promise.all(created.map((it) => uploadItem(it)));
+                return item;
+            });
+            if (created.length > 0) update((list) => [...list, ...created]);
+            if (exceeded.length > 0) onExceed?.(exceeded);
+            return created;
         },
         [
             disabled, readonly, multiple, maxCount, beforeRead, compress,
-            accept, maxSize, onOversize, onExceed, update, uploadItem,
+            accept, maxSize, onOversize, onExceed, update,
         ],
     );
+
+    const addFiles = React.useCallback(async (incoming: File[]) => {
+        const created = await prepareFiles(incoming);
+        await Promise.all(created.map((it) => uploadItem(it)));
+    }, [prepareFiles, uploadItem]);
+
+    const retryRead = React.useCallback(async () => {
+        if (!failedRead || disabled || readonly || retryingReadRef.current) return;
+        retryingReadRef.current = true;
+        setIsRetryingRead(true);
+        let created: UploaderFileItem[];
+        try {
+            created = await prepareFiles(failedRead);
+        } finally {
+            // 校验重试只锁定文件准备阶段，不能让后续批次等待当前文件上传完成。
+            retryingReadRef.current = false;
+            setIsRetryingRead(false);
+        }
+        await Promise.all(created.map((it) => uploadItem(it)));
+    }, [failedRead, disabled, readonly, prepareFiles, uploadItem]);
 
     const removeItem = React.useCallback(
         async (key: string) => {
@@ -473,5 +517,5 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
     // 选文件后毫无反应）。这里以 value 为唯一事实源，非受控才用内部态。
     const items = isControlled ? (valueProp ?? []) : inner;
 
-    return { items, addFiles, removeItem, retryItem, canAdd };
+    return { items, addFiles, removeItem, retryItem, canAdd, readError: failedRead !== null, isRetryingRead, retryRead };
 }

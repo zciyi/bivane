@@ -10,7 +10,8 @@
     "@bivane/select-parts",
     "@bivane/popup",
     "@bivane/use-select-state",
-    "@bivane/tokens"
+    "@bivane/tokens",
+    "@bivane/panel-header"
   ],
   "files": [
     {

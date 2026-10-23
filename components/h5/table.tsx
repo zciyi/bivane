@@ -8,7 +8,7 @@ import {
     tableLabelClass,
     tableValueClass,
 } from '@/components/ui/table-parts';
-import { resolveRowKey, type TableColumn } from '@/hooks/use-table-state';
+import type { TableColumn } from '@/hooks/use-table-state';
 import type { TableViewProps } from '@/components/ui/table-parts';
 
 /**
@@ -36,6 +36,7 @@ export const H5Table = React.forwardRef<HTMLDivElement, TableViewProps>(
             mode,
             columns,
             rows,
+            rowKeys,
             sort,
             onSort,
             canSort,
@@ -110,7 +111,7 @@ export const H5Table = React.forwardRef<HTMLDivElement, TableViewProps>(
                 style={style}
             >
                 {rows.map((row, index) => {
-                    const key = resolveRowKey(row, index);
+                    const key = rowKeys[index];
                     const selected = isRowSelected(key);
                     const expanded = expandedKeys.includes(key);
                     const hasDetail = effectiveDetail.length > 0;

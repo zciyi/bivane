@@ -2379,7 +2379,7 @@
           "name": "beforeRead",
           "type": "(file: File | File[]) => boolean | Promise<boolean>",
           "optional": true,
-          "description": "读取前钩子，返回 false 拦截整批（Vant 语义）",
+          "description": "读取前钩子，返回 false 拦截整批；抛错或拒绝时提示校验失败并保留文件供重试",
           "default": null,
           "inherited": false,
           "kind": "prop"
@@ -6000,6 +6000,15 @@
           "type": "readonly unknown[]",
           "optional": false,
           "description": "数据",
+          "default": null,
+          "inherited": false,
+          "kind": "prop"
+        },
+        {
+          "name": "rowKey",
+          "type": "(row: unknown, index: number) => string | number",
+          "optional": true,
+          "description": "业务行标识；默认取 id/key 或原始下标，远程分页及数据重排时应提供稳定业务标识",
           "default": null,
           "inherited": false,
           "kind": "prop"

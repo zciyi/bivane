@@ -8,7 +8,7 @@ import {
     tableValueClass,
 } from '@/components/ui/table-parts';
 import { TablePagination } from '@/components/ui/table-pagination';
-import { resolveRowKey, type TableColumn } from '@/hooks/use-table-state';
+import type { TableColumn } from '@/hooks/use-table-state';
 import type { TableViewProps } from '@/components/ui/table-parts';
 
 /**
@@ -42,6 +42,7 @@ export const PcTable = React.forwardRef<HTMLDivElement, TableViewProps>(
             mode,
             columns,
             rows,
+            rowKeys,
             sort,
             onSort,
             canSort,
@@ -328,7 +329,7 @@ export const PcTable = React.forwardRef<HTMLDivElement, TableViewProps>(
                             </tr>
                         ) : (
                             rows.map((row, index) => {
-                                const key = resolveRowKey(row, index);
+                                const key = rowKeys[index];
                                 const selected = isRowSelected(key);
 
                                 return (

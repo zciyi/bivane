@@ -6,7 +6,10 @@
   "description": "DateTimePicker 跨模式共用的『年月日时分秒』值逻辑：6 字段 parts、三档精度列归一（年月日时/时分/时分秒）、解析/格式化（日期+时间 token 并集）、跨日期的 min-max 逐字段级联夹紧、默认范围被已选值撑开、无值落「此刻」。纯函数，不含组件。",
   "dependencies": [],
   "devDependencies": [],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "@bivane/use-date-value",
+    "@bivane/use-time-value"
+  ],
   "files": [
     {
       "path": "hooks/use-datetime-value.ts",

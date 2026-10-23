@@ -242,7 +242,8 @@
             ],
             "registryDependencies": [
                 "utils",
-                "tokens"
+                "tokens",
+                "use-device-mode"
             ]
         },
         {
@@ -686,7 +687,8 @@
                 "select-parts",
                 "popup",
                 "use-select-state",
-                "tokens"
+                "tokens",
+                "panel-header"
             ]
         },
         {
@@ -1115,7 +1117,8 @@
                 "utils",
                 "time-parts",
                 "use-time-value",
-                "tokens"
+                "tokens",
+                "button"
             ],
             "dependencies": [
                 "@radix-ui/react-popover"
@@ -1154,7 +1157,11 @@
                     "target": "hooks/use-datetime-value.ts"
                 }
             ],
-            "dependencies": []
+            "dependencies": [],
+            "registryDependencies": [
+                "use-date-value",
+                "use-time-value"
+            ]
         },
         {
             "name": "datetime-parts",
@@ -1214,7 +1221,9 @@
                 "utils",
                 "datetime-parts",
                 "use-datetime-value",
-                "tokens"
+                "tokens",
+                "button",
+                "use-date-value"
             ],
             "dependencies": [
                 "@radix-ui/react-popover"
@@ -2433,7 +2442,9 @@
                     "target": "hooks/use-table-state.ts"
                 }
             ],
-            "registryDependencies": []
+            "registryDependencies": [
+                "table-pagination"
+            ]
         },
         {
             "name": "table-parts",

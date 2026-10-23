@@ -9,8 +9,11 @@ import * as React from "react";
  */
 
 export interface SliderDragParams {
+    /** 是否竖向拖拽 */
     vertical: boolean;
+    /** 是否反转坐标方向 */
     reverse: boolean;
+    /** 是否禁用拖拽 */
     disabled: boolean;
     /** 拖拽开始（点击/按下瞬间），组件可在此触发 onDragStart */
     onDragStart: () => void;
@@ -36,6 +39,20 @@ export function useSliderDrag(
     // 监听器只活在本函数作用域内（move/up 都是闭包），抬手时直接按同一引用移除，
     // 无需再存一份 ref。React 19 的 useRef 必须带初值，这里也就没有存 undefined 的必要。
     const cleanupRef = React.useRef<(() => void) | null>(null);
+    const callbacksRef = React.useRef({ onDrag, onDragEnd });
+    const endTracking = React.useCallback(() => {
+        if (!draggingRef.current) return;
+        draggingRef.current = false;
+        cleanupRef.current?.();
+        cleanupRef.current = null;
+        callbacksRef.current.onDragEnd();
+    }, []);
+
+    // 先同步回调再中断手势，确保禁用时结束通知拿到本次渲染的最终值。
+    React.useLayoutEffect(() => {
+        callbacksRef.current = { onDrag, onDragEnd };
+        if (disabled) endTracking();
+    }, [disabled, onDrag, onDragEnd, endTracking]);
 
     const ratioFromClient = React.useCallback(
         (clientX: number, clientY: number): number | null => {
@@ -56,22 +73,16 @@ export function useSliderDrag(
     const beginTracking = React.useCallback(
         () => {
             if (disabled) return;
+            cleanupRef.current?.();
             draggingRef.current = true;
             onDragStart();
 
             const move = (event: PointerEvent) => {
                 if (!draggingRef.current) return;
                 const r = ratioFromClient(event.clientX, event.clientY);
-                if (r !== null) onDrag(r);
+                if (r !== null) callbacksRef.current.onDrag(r);
             };
-            const up = () => {
-                draggingRef.current = false;
-                onDragEnd();
-                window.removeEventListener("pointermove", move);
-                window.removeEventListener("pointerup", up);
-                window.removeEventListener("pointercancel", up);
-                cleanupRef.current = null;
-            };
+            const up = endTracking;
             cleanupRef.current = () => {
                 window.removeEventListener("pointermove", move);
                 window.removeEventListener("pointerup", up);
@@ -81,13 +92,15 @@ export function useSliderDrag(
             window.addEventListener("pointerup", up);
             window.addEventListener("pointercancel", up);
         },
-        [disabled, onDragStart, onDragEnd, ratioFromClient, onDrag],
+        [disabled, onDragStart, ratioFromClient, endTracking],
     );
 
     // 卸载时若仍在拖拽，清理全局监听，避免泄漏
     React.useEffect(
         () => () => {
+            draggingRef.current = false;
             cleanupRef.current?.();
+            cleanupRef.current = null;
         },
         [],
     );

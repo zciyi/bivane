@@ -8,7 +8,8 @@
   "devDependencies": [],
   "registryDependencies": [
     "@bivane/utils",
-    "@bivane/tokens"
+    "@bivane/tokens",
+    "@bivane/use-device-mode"
   ],
   "files": [
     {

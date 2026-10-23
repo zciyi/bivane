@@ -41,8 +41,12 @@ export interface DialogOptions {
 }
 
 export interface DialogEntry {
+  /** 弹窗实例标识 */
   id: number;
+  /** 弹窗配置 */
   options: DialogOptions;
+  /** 是否处于打开状态；关闭后由宿主完成清理 */
+  open: boolean;
 }
 
 export interface DialogHandle {
@@ -87,7 +91,7 @@ export function showDialog(options: DialogOptions): DialogHandle {
   const id = nextId;
   nextId += 1;
 
-  entries = [...entries, { id, options }];
+  entries = [...entries, { id, options, open: true }];
   emit();
 
   return {
@@ -106,10 +110,24 @@ export function showConfirmDialog(
 
 /** 关闭指定弹窗；不传 id 时关闭全部（Vant closeDialog 语义） */
 export function closeDialog(id?: number): void {
-  const next = id === undefined ? EMPTY : entries.filter((entry) => entry.id !== id);
-  if (next === entries) return;
+  let changed = false;
+  const next = entries.map((entry) => {
+    if (!entry.open || (id !== undefined && entry.id !== id)) return entry;
+    changed = true;
+    return { ...entry, open: false };
+  });
+  if (!changed) return;
   entries = next;
   emit();
+}
+
+/** 宿主已提交关闭状态后清理，先删除条目以防回调重入导致重复通知。 */
+export function finishDialogClose(id: number): void {
+  const entry = entries.find((item) => item.id === id);
+  if (!entry || entry.open) return;
+  entries = entries.filter((item) => item.id !== id);
+  emit();
+  entry.options.onClosed?.();
 }
 
 export function updateDialog(id: number, next: Partial<DialogOptions>): void {

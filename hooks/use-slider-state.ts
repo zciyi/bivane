@@ -133,13 +133,14 @@ export function useSliderValue(
 
     const apply = React.useCallback(
         (next: SliderValue) => {
+            if (disabled || readonly) return;
             const quantized = range
                 ? normalizeRange(next as [number, number], min, max, step)
                 : quantizeValue(next as number, min, max, step);
             if (!isControlled) setInner(quantized);
             onChange?.(quantized);
         },
-        [isControlled, min, max, step, range, onChange],
+        [isControlled, min, max, step, range, disabled, readonly, onChange],
     );
 
     // 非受控下边界变化要重夹（Vant 有同名 watch）
@@ -152,7 +153,5 @@ export function useSliderValue(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [min, max, step, range]);
 
-    void disabled;
-    void readonly;
     return { current, apply };
 }

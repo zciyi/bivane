@@ -55,7 +55,7 @@ export interface UploaderProps {
     /** 业务自理上传：resolve→完成 / reject→失败。优先于 action。
      *  第二个参数 onProgress 用于上报真实进度，不调用则上传中只转圈不显示百分比。 */
     afterRead?: UploaderAfterRead;
-    /** 读取前钩子，返回 false 拦截整批（Vant 语义） */
+    /** 读取前钩子，返回 false 拦截整批；抛错或拒绝时提示校验失败并保留文件供重试 */
     beforeRead?: (file: File | File[]) => boolean | Promise<boolean>;
     /** 删除前钩子，返回 false 拦截 */
     beforeDelete?: (item: UploaderFileItem) => boolean | Promise<boolean>;
@@ -113,7 +113,7 @@ export const Uploader = React.forwardRef<UploaderHandle, UploaderProps>(
         ref,
     ) {
         const mode = useDeviceMode(forceMode);
-        const { items, addFiles, removeItem, retryItem, canAdd } = useUploader({
+        const { items, addFiles, removeItem, retryItem, canAdd, readError, isRetryingRead, retryRead } = useUploader({
             value,
             defaultValue,
             onChange,
@@ -157,6 +157,9 @@ export const Uploader = React.forwardRef<UploaderHandle, UploaderProps>(
             addFiles,
             removeItem,
             retryItem,
+            readError,
+            isRetryingRead,
+            retryRead,
             accept,
             multiple,
             disabled,

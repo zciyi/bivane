@@ -40,6 +40,8 @@ export interface TableProps {
     columns: readonly TableColumn[];
     /** 数据 */
     data: readonly unknown[];
+    /** 业务行标识；默认取 id/key 或原始下标，远程分页及数据重排时应提供稳定业务标识 */
+    rowKey?: (row: unknown, index: number) => string | number;
     /**
      * 受控排序。
      *
@@ -105,6 +107,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(function Table
     {
         columns,
         data,
+        rowKey,
         sort,
         defaultSort,
         onSortChange,
@@ -137,6 +140,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(function Table
     const state = useTableState({
         columns,
         data,
+        rowKey,
         sort,
         defaultSort,
         onSortChange,
@@ -161,6 +165,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(function Table
         mode,
         columns,
         rows: state.rows,
+        rowKeys: state.rowKeys,
         sort: state.sort,
         onSort: state.toggleSort,
         canSort: state.canSort,

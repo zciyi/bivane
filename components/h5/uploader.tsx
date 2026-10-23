@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
+    UploaderReadFeedback,
     UploaderAddTile,
     UploaderGridItem,
     type UploaderRenderProps,
@@ -89,6 +90,7 @@ export function H5Uploader(props: UploaderRenderProps) {
                 />
             ))}
             {canAdd && <UploaderAddTile onClick={handleTrigger} ariaLabel={ariaLabel} />}
+            <UploaderReadFeedback {...props} />
             <input
                 ref={inputRef}
                 type="file"

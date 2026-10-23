@@ -39,11 +39,11 @@ async function dropFiles(container: HTMLElement, files: File[]) {
     });
 }
 
-async function pasteFiles(files: File[]) {
+async function pasteFiles(target: HTMLElement, files: File[]) {
     const evt = new Event("paste", { bubbles: true, cancelable: true });
     Object.defineProperty(evt, "clipboardData", { value: { files } });
     await act(async () => {
-        window.dispatchEvent(evt);
+        target.dispatchEvent(evt);
     });
 }
 
@@ -231,7 +231,9 @@ describe("Uploader · PC（拖拽区 + 列表 + 粘贴）", () => {
     it("粘贴上传（PC 独有能力）", async () => {
         setViewport({ width: 1280 });
         const { container } = render(<Uploader afterRead={resolveOk} />);
-        await pasteFiles([makeFile("p.png", "image/png")]);
+        const zone = container.querySelector<HTMLElement>('[data-slot="uploader-dropzone"]')!;
+        zone.focus();
+        await pasteFiles(zone, [makeFile("p.png", "image/png")]);
         await waitFor(() =>
             expect(container.querySelector('[data-slot="uploader-list-item"]')).toBeTruthy(),
         );

@@ -42,6 +42,12 @@ export interface UploaderRenderProps {
     addFiles: (files: File[]) => Promise<void>;
     removeItem: (key: string) => Promise<void>;
     retryItem: (key: string) => Promise<void>;
+    /** 读取前校验是否异常；两端展示统一的友好提示 */
+    readError: boolean;
+    /** 是否正在重试读取前校验 */
+    isRetryingRead: boolean;
+    /** 用保留的原始文件重试校验 */
+    retryRead: () => Promise<void>;
     accept?: string;
     multiple: boolean;
     disabled: boolean;
@@ -57,6 +63,36 @@ export interface UploaderRenderProps {
     style?: React.CSSProperties;
     id?: string;
     ariaLabel?: string;
+}
+
+/* ---------------------------- 读取失败反馈 ---------------------------- */
+
+export function UploaderReadFeedback({
+    readError,
+    isRetryingRead,
+    retryRead,
+    canAdd,
+}: Pick<UploaderRenderProps, "readError" | "isRetryingRead" | "retryRead" | "canAdd">) {
+    if (!readError && !isRetryingRead) return null;
+    return (
+        <div
+            data-slot="uploader-read-feedback"
+            role={isRetryingRead ? "status" : "alert"}
+            className="flex w-full items-center gap-bv-sm text-bv-sm text-bv-text-3"
+        >
+            <span>{isRetryingRead ? "正在重新校验文件…" : "文件校验失败，请重试或重新选择文件"}</span>
+            {!isRetryingRead && (
+                <button
+                    type="button"
+                    onClick={() => void retryRead()}
+                    disabled={!canAdd}
+                    className="text-bv-primary disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    重试校验
+                </button>
+            )}
+        </div>
+    );
 }
 
 /* ------------------------------- 缩略图 ------------------------------- */

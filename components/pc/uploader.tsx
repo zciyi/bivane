@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
+    UploaderReadFeedback,
     UploaderDropZone,
     UploaderListItem,
     type UploaderRenderProps,
@@ -12,7 +13,7 @@ import {
  *
  * 列表视图 + 顶部拖拽区。PC 独有能力在此落地（能力等价原则）：
  *  ① 拖拽：dragenter/leave 用深度计数防抖（子元素反复进出不会让高亮闪烁）；
- *  ② 粘贴：window 级 paste 监听，直接取剪贴板里的图片文件。
+ *  ② 粘贴：只处理本上传区域内的 paste，避免多实例重复上传。
  * 入口仍是隐藏的 `<input type=file>`（点击拖拽区或按 Enter/Space 触发）。
  *
  * 自定义触发（onPickRequest）：点拖拽区不再打开系统弹窗，改为把命令句柄交给
@@ -64,19 +65,14 @@ export function PcUploader(props: UploaderRenderProps) {
         [addFiles],
     );
 
-    // 粘贴上传（PC 独有能力）
-    React.useEffect(() => {
-        if (disabled) return undefined;
-        const onPaste = (event: ClipboardEvent) => {
-            const files = Array.from(event.clipboardData?.files ?? []);
-            if (files.length > 0) {
-                event.preventDefault();
-                void addFiles(files);
-            }
-        };
-        window.addEventListener("paste", onPaste);
-        return () => window.removeEventListener("paste", onPaste);
-    }, [disabled, addFiles]);
+    // 仅消费所属上传区域的事件，且不抢占子组件已处理的粘贴。
+    const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+        if (disabled || !canAdd || event.defaultPrevented) return;
+        const files = Array.from(event.clipboardData.files);
+        if (files.length === 0) return;
+        event.preventDefault();
+        void addFiles(files);
+    };
 
     const onDragEnter = (event: React.DragEvent) => {
         event.preventDefault();
@@ -107,6 +103,7 @@ export function PcUploader(props: UploaderRenderProps) {
             id={id}
             data-mode="pc"
             data-slot="uploader"
+            onPaste={handlePaste}
             role="group"
             aria-label={ariaLabel ?? "文件上传"}
             aria-disabled={disabled || undefined}
@@ -139,6 +136,7 @@ export function PcUploader(props: UploaderRenderProps) {
                     ))}
                 </div>
             )}
+            <UploaderReadFeedback {...props} />
             <input
                 ref={inputRef}
                 type="file"

@@ -12,7 +12,9 @@
     "@bivane/utils",
     "@bivane/datetime-parts",
     "@bivane/use-datetime-value",
-    "@bivane/tokens"
+    "@bivane/tokens",
+    "@bivane/button",
+    "@bivane/use-date-value"
   ],
   "files": [
     {

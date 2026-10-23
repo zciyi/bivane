@@ -75,8 +75,11 @@ export function computeVirtualWindow({
 }
 
 export interface UseVirtualWindowOptions {
+  /** 单项固定高度 */
   itemHeight: number;
+  /** 总项数 */
   count: number;
+  /** 视口上下额外渲染的项数 */
   overscan?: number;
   /** 传 false 时不做窗口化（分组列表等不定高场景），窗口恒为全量 */
   enabled?: boolean;
@@ -95,6 +98,7 @@ export interface UseVirtualWindowOptions {
 export interface UseVirtualWindowResult {
   /** 挂到滚动容器上的 ref */
   containerRef: React.RefObject<HTMLDivElement | null>;
+  /** 当前渲染窗口及占位高度 */
   window: VirtualWindow;
   /** 供容器同步测量视口高度（jsdom 里 clientHeight 恒为 0，因此需要可覆盖） */
   viewportHeight: number;
@@ -116,12 +120,10 @@ export function useVirtualWindow({
   React.useEffect(() => {
     const node = containerRef.current;
     if (!node || !enabled) return undefined;
-    // 显式给了视口高度就不必再测（也测不准 —— jsdom 里恒为 0）
-    if (fixedViewportHeight !== undefined) return undefined;
-
     const sync = () => {
       setScrollTop(node.scrollTop);
-      setMeasuredHeight(node.clientHeight);
+      // 固定高度只免去测量，滚动位置仍必须持续同步。
+      if (fixedViewportHeight === undefined) setMeasuredHeight(node.clientHeight);
     };
     sync();
 

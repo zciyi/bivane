@@ -8,6 +8,7 @@ import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import { ensureImperativeHost, useManualImperativeHost } from '@/lib/imperative-host';
 import {
   closeDialog as closeDialogEntry,
+  finishDialogClose,
   getDialogEntries,
   getDialogServerEntries,
   showConfirmDialog as showConfirmDialogEntry,
@@ -440,6 +441,13 @@ export function DialogHost({ auto = false }: DialogHostProps = {}) {
     getDialogServerEntries,
   );
 
+  React.useEffect(() => {
+    // 同批次打开后立即关闭时可能没有打开态渲染，也必须完成关闭通知与清理。
+    for (const entry of entries) {
+      if (!entry.open) finishDialogClose(entry.id);
+    }
+  }, [entries]);
+
   if (entries.length === 0) return null;
 
   return (
@@ -448,7 +456,8 @@ export function DialogHost({ auto = false }: DialogHostProps = {}) {
         <Dialog
           key={entry.id}
           {...entry.options}
-          open
+          open={entry.open}
+          onClosed={undefined}
           onOpenChange={(next) => {
             if (!next) closeDialogEntry(entry.id);
           }}
