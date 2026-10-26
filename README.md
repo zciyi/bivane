@@ -21,7 +21,7 @@
 | P1′ | ActionSheet · Alert/Confirm · Notify · Loading | ✅ 已完成 |
 | P2 | **Select** · **DropdownMenu** · **DatePicker** · **TimePicker** · **DateTimePicker** · **Tooltip** · **Popover** · **Picker** · **Cascader** · **Calendar** | ✅ 已完成 |
 | P3 | 表单类 · Uploader · Search · Tabs · List/Table | ✅ 已完成 |
-| P4 | **多风格** · **tweakcn 适配** · **文档站** · registry 发布验证 | 🔄 进行中（3/4） |
+| P4 | **多风格** · **tweakcn 适配** · **文档站** · **registry 发布验证** | ✅ 已完成（4/4） |
 
 > P1′ 的组件都是已件的 preset（ActionSheet ≈ Popup + 选项列表；Alert ≈ Dialog 去掉输入区；Notify ≈ Toast 换定位与信息模型），弹层地基已就绪，属于增量而非新建。
 
@@ -114,7 +114,7 @@ Bivane 不是官方源，**必须先声明命名空间**，否则 `shadcn add @b
 // components.json
 {
   "registries": {
-    "@bivane": "https://bivane.dev/r/{name}.json"
+    "@bivane": "https://zciyi.github.io/bivane/r/{name}.json"
   }
 }
 ```

@@ -317,6 +317,25 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
     const [failedRead, setFailedRead] = React.useState<File[] | null>(null);
     const [isRetryingRead, setIsRetryingRead] = React.useState(false);
     const retryingReadRef = React.useRef(false);
+    const mountedRef = React.useRef(true);
+    const previewUrlsRef = React.useRef(new Set<string>());
+
+    React.useEffect(() => {
+        mountedRef.current = true;
+        const previewUrls = previewUrlsRef.current;
+        return () => {
+            mountedRef.current = false;
+            // 只回收本实例创建的预览，避免释放由调用方管理的地址。
+            for (const url of previewUrls) {
+                try {
+                    URL.revokeObjectURL(url);
+                } catch {
+                    /* 清理失败不阻断其余预览的释放 */
+                }
+            }
+            previewUrls.clear();
+        };
+    }, []);
     const itemsRef = React.useRef<UploaderFileItem[]>(inner);
     // 最后一次 emit 的列表：受控回传同一引用时不再二次 set，避免上传循环
     const emitted = React.useRef<UploaderFileItem[]>(inner);
@@ -331,6 +350,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
 
     const commit = React.useCallback(
         (next: UploaderFileItem[]) => {
+            if (!mountedRef.current) return;
             itemsRef.current = next;
             emitted.current = next;
             if (!isControlled) setInner(next);
@@ -358,8 +378,10 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
     /** 上传单个已入列项：afterRead 优先，其次 action XHR，都没有则本地完成 */
     const uploadItem = React.useCallback(
         async (item: UploaderFileItem) => {
+            if (!mountedRef.current) return;
             const key = item.key;
             patch(key, { status: "uploading", percent: 0, message: undefined });
+            if (!mountedRef.current) return;
             try {
                 if (afterRead) {
                     // 业务自理上传：把进度回调交给它，用了才有真进度
@@ -385,7 +407,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
 
     const prepareFiles = React.useCallback(
         async (incoming: File[]): Promise<UploaderFileItem[]> => {
-            if (disabled || readonly || incoming.length === 0) return [];
+            if (!mountedRef.current || disabled || readonly || incoming.length === 0) return [];
             setFailedRead(null);
             let files = incoming.slice();
             if (!multiple) files = files.slice(0, 1);
@@ -404,14 +426,16 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
                 }
             }
 
+            if (!mountedRef.current) return [];
+
             // beforeRead：false 拦截整批（Vant 语义）
             if (beforeRead) {
                 try {
                     const ok = await beforeRead(multiple ? files : files[0]);
-                    if (!ok) return [];
+                    if (!mountedRef.current || !ok) return [];
                 } catch {
                     // 文件尚未入列，保留这一批供原样重试，不把业务校验异常泄漏给事件入口。
-                    setFailedRead(files);
+                    if (mountedRef.current) setFailedRead(files);
                     return [];
                 }
             }
@@ -420,14 +444,20 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
             const prepared: File[] = [];
             const originalFiles: File[] = [];
             for (const file of files) {
+                if (!mountedRef.current) return [];
                 if (!matchAccept(file, accept)) continue;
                 if (!validateFileSize(file, maxSize)) {
                     onOversize?.(file);
                     continue;
                 }
-                prepared.push(cOpts ? await compressImage(file, cOpts) : file);
+                const preparedFile = cOpts ? await compressImage(file, cOpts) : file;
+                // 校验和压缩都可能跨越卸载，恢复执行时不再产生新的预览或上传副作用。
+                if (!mountedRef.current) return [];
+                prepared.push(preparedFile);
                 originalFiles.push(file);
             }
+
+            if (!mountedRef.current) return [];
 
             // 异步校验与压缩期间其他入口可能已入列；以提交时的实时队列重新分配名额。
             const remaining = maxCount == null ? prepared.length : Math.max(0, maxCount - itemsRef.current.length);
@@ -438,6 +468,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
                 if (isImageFile(f) && typeof URL !== "undefined") {
                     try {
                         item.url = URL.createObjectURL(f);
+                        previewUrlsRef.current.add(item.url);
                     } catch {
                         /* 无 createObjectURL 时不预览图片，退回文件图标 */
                     }
@@ -445,7 +476,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
                 return item;
             });
             if (created.length > 0) update((list) => [...list, ...created]);
-            if (exceeded.length > 0) onExceed?.(exceeded);
+            if (mountedRef.current && exceeded.length > 0) onExceed?.(exceeded);
             return created;
         },
         [
@@ -460,7 +491,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
     }, [prepareFiles, uploadItem]);
 
     const retryRead = React.useCallback(async () => {
-        if (!failedRead || disabled || readonly || retryingReadRef.current) return;
+        if (!mountedRef.current || !failedRead || disabled || readonly || retryingReadRef.current) return;
         retryingReadRef.current = true;
         setIsRetryingRead(true);
         let created: UploaderFileItem[];
@@ -469,7 +500,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
         } finally {
             // 校验重试只锁定文件准备阶段，不能让后续批次等待当前文件上传完成。
             retryingReadRef.current = false;
-            setIsRetryingRead(false);
+            if (mountedRef.current) setIsRetryingRead(false);
         }
         await Promise.all(created.map((it) => uploadItem(it)));
     }, [failedRead, disabled, readonly, prepareFiles, uploadItem]);
@@ -486,6 +517,7 @@ export function useUploader(options: UseUploaderOptions): UploaderBinding {
             if (target.url && typeof URL !== "undefined") {
                 try {
                     URL.revokeObjectURL(target.url);
+                    previewUrlsRef.current.delete(target.url);
                 } catch {
                     /* 忽略 */
                 }

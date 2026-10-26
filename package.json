@@ -12,6 +12,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "registry:build": "node scripts/build-registry.mjs",
+    "registry:serve": "node scripts/registry-serve.mjs",
+    "registry:publish": "node scripts/publish-registry.mjs",
     "consumer:check": "node scripts/consumer-check.mjs",
     "measure": "node scripts/measure.mjs",
     "demo:single": "vite build && node scripts/build-single-demo.mjs",

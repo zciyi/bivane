@@ -40,12 +40,14 @@ Bivane 不是官方源。**不声明命名空间，`shadcn add @bivane/select` �
 ```json
 {
     "registries": {
-        "@bivane": "https://bivane.dev/r/{name}.json"
+        "@bivane": "https://zciyi.github.io/bivane/r/{name}.json"
     }
 }
 ```
 
 `{name}` 是占位符，原样保留；换自建镜像或本地调试时只改这一段。
+
+> 💡 **本地预览 registry（调试用）**：仓库内置 `npm run registry:serve`，静态托管 `packages/registry/r/`（默认 4173 端口），可当作 `bivane.dev` 的本地替身。把上面 `registries` 的 URL 换成 `http://127.0.0.1:4173/r/{name}.json`，即可在真实消费者项目里跑 `npx shadcn add @bivane/select`，完整复现安装链路（依赖树拉取 → 落盘 → 构建）。正式发布时换成 `https://zciyi.github.io/bivane/r/{name}.json`（GitHub Pages 实际地址）。
 
 ### 2) 先装 token，再装组件
 

@@ -447,7 +447,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 消费者必须声明：
 
 ```json
-{ "registries": { "@bivane": "https://bivane.dev/r/{name}.json" } }
+{ "registries": { "@bivane": "https://zciyi.github.io/bivane/r/{name}.json" } }
 ```
 
 本地文件路径安装（`add ./x.json`）对本库不成立；只能走 registry URL。
@@ -474,7 +474,7 @@ PC 用户不下载滚轮/手势代码：`h5/` 与 `pc/` 实现用 `React.lazy` +
 - **P1′ 弹层补全** ✅：ActionSheet（Popup+列表）→ Alert/Confirm（Dialog preset）→ Notify（Toast 换信息模型）→ Loading
 - **P2 选择类（最高价值）**：Select ✅ → DropdownMenu ✅ → DatePicker ✅ → TimePicker ✅ → DateTimePicker ✅ → Tooltip/Popover ✅ → Picker ✅ / Cascader ✅ → Calendar ✅
 - **P3 表单与列表** ✅：Field/Input/Textarea ✅ → Switch/Checkbox/Radio ✅ → Rate/Slider ✅ → InputNumber ✅ → Uploader ✅ → **Search ✅（2026-10-20，模式 C）** → **Tabs/NavBar ✅（2026-10-20，模式 B）→ Tabbar ✅（2026-10-20，模式 C）** → **List ✅ / Table ✅（2026-10-20，模式 C / C，闭环 P3）**
-- **P4 生态** 🔨 进行中：**第 2/3 套风格 ✅（2026-10-21，`vant-ocean.css` / `vant-grape.css`，class 激活可与深色叠加）** → **tweakcn 适配 ✅（2026-10-22，独立 item `@bivane/tweakcn`，零依赖双向桥接）** → **文档站 `apps/docs` ✅（2026-10-21，38 组件页；2026-10-22 信息架构升级 + 查阅体验 + 中文名）** → registry 发布验证 ⬜
+- **P4 生态** ✅：**第 2/3 套风格 ✅（2026-10-21，`vant-ocean.css` / `vant-grape.css`，class 激活可与深色叠加）** → **tweakcn 适配 ✅（2026-10-22，独立 item `@bivane/tweakcn`，零依赖双向桥接）** → **文档站 `apps/docs` ✅（2026-10-21，38 组件页；2026-10-22 信息架构升级 + 查阅体验 + 中文名）** → **registry 发布验证 ✅（2026-10-23，全量 38 公开组件 + tokens + tweakcn 消费者实测：空白项目安装 + tsc + vite build 全绿，176 次 registry 请求全 200）**
 
 ## 9. 验证与质量门
 

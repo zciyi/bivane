@@ -1021,7 +1021,7 @@
             ],
             "dependencies": [
                 "@radix-ui/react-popover",
-                "react-day-picker"
+                "react-day-picker@^10.0.1"
             ]
         },
         {
@@ -1526,7 +1526,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "react-day-picker"
+                "react-day-picker@^10.0.1"
             ]
         },
         {

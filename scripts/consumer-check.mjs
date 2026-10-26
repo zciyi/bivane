@@ -25,7 +25,7 @@
 
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,83 +35,58 @@ const REGISTRY_DIR = join(ROOT, 'packages/registry/r');
 const NODE_DIR = 'C:\\Users\\Administrator\\.workbuddy\\binaries\\node\\versions\\22.22.2-6';
 const SHADCN_VERSION = '3.6.3';
 
-/** 必须落盘的消费者文件（相对消费者项目根） */
-const EXPECTED = [
-  'src/styles/bivane/vant.css',
-  'src/styles/bivane/vant-dark.css',
-  'src/styles/bivane/vant-ocean.css',
-  'src/styles/bivane/vant-grape.css',
-  'src/styles/bivane/modes.css',
-  'src/styles/bivane/utilities.css',
-  'src/styles/bivane/theme.css',
-  // tweakcn 桥接（独立 item，不在 tokens item 里）
-  'src/styles/bivane/tweakcn.css',
-  'src/scripts/tweakcn-bridge.mjs',
-  'src/scripts/tweakcn/mapping.mjs',
-  'src/scripts/tweakcn/css-vars.mjs',
-  'src/scripts/tweakcn/color.mjs',
-  'src/scripts/tweakcn/tweakcn-parser.mjs',
-  'src/lib/utils.ts',
-  'src/lib/portal.tsx',
-  'src/lib/imperative-host.tsx',
-  'src/hooks/use-device-mode.ts',
-  'src/hooks/use-select-state.ts',
-  'src/hooks/use-virtual-window.ts',
-  'src/components/providers/responsive-provider.tsx',
-  'src/components/ui/icon.tsx',
-  'src/components/ui/select-parts.tsx',
-  'src/components/h5/select.tsx',
-  'src/components/pc/select.tsx',
-  'src/components/responsive/select.tsx',
-  'src/hooks/use-search-state.ts',
-  'src/components/ui/search-parts.tsx',
-  'src/components/h5/search.tsx',
-  'src/components/pc/search.tsx',
-  'src/components/responsive/search.tsx',
-  'src/hooks/use-time-value.ts',
-  'src/components/ui/time-parts.tsx',
-  'src/components/h5/time-picker.tsx',
-  'src/components/pc/time-picker.tsx',
-  'src/components/responsive/time-picker.tsx',
-  'src/hooks/use-rate-state.ts',
-  'src/components/ui/rate-parts.tsx',
-  'src/components/h5/rate.tsx',
-  'src/components/pc/rate.tsx',
-  'src/components/responsive/rate.tsx',
-  'src/hooks/use-slider-state.ts',
-  'src/hooks/use-slider-drag.ts',
-  'src/components/ui/slider-parts.tsx',
-  'src/components/h5/slider.tsx',
-  'src/components/pc/slider.tsx',
-  'src/components/responsive/slider.tsx',
-  'src/hooks/use-uploader-state.ts',
-  'src/components/ui/uploader-parts.tsx',
-  'src/components/h5/uploader.tsx',
-  'src/components/pc/uploader.tsx',
-  'src/components/responsive/uploader.tsx',
-  'src/hooks/use-tabs-state.ts',
-  'src/components/ui/tabs-parts.tsx',
-  'src/components/responsive/tabs.tsx',
-  'src/components/responsive/nav-bar.tsx',
-  'src/hooks/use-tabbar-state.ts',
-  'src/components/ui/tabbar-parts.tsx',
-  'src/components/h5/tabbar.tsx',
-  'src/components/pc/tabbar.tsx',
-  'src/components/responsive/tabbar.tsx',
-  'src/hooks/use-list-state.ts',
-  'src/components/ui/list-parts.tsx',
-  'src/components/h5/list.tsx',
-  'src/components/pc/list.tsx',
-  'src/components/responsive/list.tsx',
-  'src/hooks/use-table-state.ts',
-  'src/components/ui/table-parts.tsx',
-  'src/components/ui/table-pagination.tsx',
-  'src/components/ui/data-container-parts.tsx',
-  'src/components/responsive/data-container.tsx',
-  'src/components/h5/table.tsx',
-  'src/components/pc/table.tsx',
-  'src/components/responsive/table.tsx',
-];
+/** 读取本仓库 registry.json，推导公开组件入口（全量验证用）。 */
+const REGISTRY_MANIFEST = join(ROOT, 'packages/registry/registry.json');
+
+function loadRegistryItems() {
+  const manifest = JSON.parse(readFileSync(REGISTRY_MANIFEST, 'utf8'));
+  return manifest.items ?? [];
+}
+
+/** 公开组件 = 文档站 catalog 里列的那些（约 38 个）。registry 里 type=registry:component 既包含
+ *  公开入口，也包含 h5/pc 子实现、*-parts 共享件、以及 panel-header/overlay/table-pagination 这类
+ *  内部 ui 基件——后者不是消费者应直接安装的入口，由公开组件的 registryDependencies 递归拉取即可。
+ *  这里按「入口直接落在 components/(responsive|ui)/<name>.tsx 且 basename===name」+ 排除名单，
+ *  精确收敛到公开组件集合。 */
+const INTERNAL_UI = new Set(['panel-header', 'overlay', 'table-pagination']);
+function publicComponentEntries(items) {
+  const entries = [];
+  for (const item of items) {
+    if (item.type !== 'registry:component') continue;
+    if (INTERNAL_UI.has(item.name)) continue;
+    if (/-(h5|pc|parts)$/.test(item.name)) continue;
+    const entry = (item.files ?? []).find((f) => {
+      const base = f.target.replace(/\.tsx?$/, '').split('/').pop();
+      return /^components\/(responsive|ui)\//.test(f.target) && base === item.name;
+    });
+    if (!entry) continue;
+    entries.push({ name: item.name, importPath: '@/' + entry.target.replace(/\.tsx?$/, '') });
+  }
+  return entries;
+}
+
+/** 动态推导「必须落盘」清单：registry 服务返回 200 的每个 item，
+ *  其声明的 files.target 都应在消费者项目出现（src/ 前缀由 shadcn 的 isSrcDir 自动加）。
+ *  取代原先手写 60+ 条路径——registry 增删组件时不再需要同步维护，杜绝漂移。 */
+function deriveExpectedFromServedRequests(requests) {
+  const expected = new Set();
+  for (const r of requests) {
+    if (r.status !== 200) continue;
+    const name = (r.path ?? '').split('?')[0].split('/').pop()?.replace(/\.json$/, '');
+    if (!name) continue;
+    try {
+      const item = JSON.parse(readFileSync(join(REGISTRY_DIR, `${name}.json`), 'utf8'));
+      for (const f of item.files ?? []) {
+        const target = f.target ?? f.path;
+        if (target) expected.add(target);
+      }
+    } catch {
+      /* 非 item 请求（如 /index.json）忽略 */
+    }
+  }
+  return [...expected];
+}
+
 
 /** 消费者项目骨架：标准 src/ 布局（@/* -> ./src/*），与 shadcn 官方模板一致 */
 const FIXTURE = {
@@ -696,6 +671,10 @@ async function main() {
     throw new Error(`registry 产物不存在：${REGISTRY_DIR}（先跑 npm run registry:build）`);
   }
 
+  // 推导公开组件清单（全量验证用）：registry.json 里 type=registry:component 的全部 item（约 38 个）
+  const allItems = loadRegistryItems();
+  const publicEntries = publicComponentEntries(allItems);
+
   console.log(`[consumer] 目标目录：${opts.dir}`);
   if (!opts.keep) await rm(opts.dir, { recursive: true, force: true });
 
@@ -706,73 +685,114 @@ async function main() {
     await writeFile(file, content, 'utf8');
   }
 
-  const { server, requests, port } = await startRegistryServer();
-  const registryUrl = `http://127.0.0.1:${port}/{name}.json`;
-  console.log(`[consumer] 2/6 registry 服务已起：${registryUrl}`);
+  // 默认起本地静态服务；设了 REGISTRY_BASE_URL 则直接打公网地址（用于发布后验收）
+  const externalBase = process.env.REGISTRY_BASE_URL || '';
+  let server;
+  let requests;
+  let port;
+  let registryUrl;
+  if (externalBase) {
+    registryUrl = externalBase;
+    requests = [];
+    console.log(`[consumer] 2/6 使用外部 registry：${registryUrl}（跳过本地服务）`);
+  } else {
+    ({ server, requests, port } = await startRegistryServer());
+    registryUrl = `http://127.0.0.1:${port}/{name}.json`;
+    console.log(`[consumer] 2/6 registry 服务已起：${registryUrl}`);
+  }
 
   // 消费者必须在 components.json 里声明命名空间，否则 @bivane/* 依赖无法解析
   const componentsJson = JSON.parse(await readFile(join(opts.dir, 'components.json'), 'utf8'));
   componentsJson.registries = { '@bivane': registryUrl };
   await writeFile(join(opts.dir, 'components.json'), `${JSON.stringify(componentsJson, null, 2)}\n`, 'utf8');
 
+  // 公网验收：逐个拉取 r/ 下每个 item，记录 200/非200，喂给后面的落盘断言与请求摘要
+  if (externalBase) {
+    const names = (await readdir(REGISTRY_DIR))
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => f.replace(/\.json$/, ''));
+    for (const name of names) {
+      const url = externalBase.replace('{name}', name);
+      try {
+        const res = await fetch(url);
+        const body = res.ok ? await res.text() : '';
+        requests.push({ path: `/${name}.json`, status: res.status, bytes: body.length });
+      } catch {
+        requests.push({ path: `/${name}.json`, status: 0 });
+      }
+    }
+  }
+
   try {
     // 每次都跑：依赖齐了只要一两秒，但能保证新加的 devDependency（如 @types/node）
     // 不会因为 node_modules 已存在而被静默跳过。
     console.log('[consumer] 3/6 npm install（首次约 35s）');
-    const inst = await run(npm, ['install', '--no-audit', '--no-fund'], opts.dir);
+    // Windows 上 npm reify 偶发 ENOTEMPTY（rmdir 竞态，实测同一夹具本地连跑多次偶中一次），
+    // 留下半个 node_modules 会让后面的 tsc/build 全崩且报错方向完全误导。
+    // 清理 node_modules 后有限重试；真依赖冲突重试到底仍红。
+    let inst;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      inst = await run(npm, ['install', '--no-audit', '--no-fund'], opts.dir);
+      if (inst.code === 0) break;
+      if (attempt < 3) {
+        console.log(`[consumer]   npm install 第 ${attempt} 次失败（exit ${inst.code}），清理 node_modules 后重试…`);
+        await rm(join(opts.dir, 'node_modules'), { recursive: true, force: true }).catch(() => {});
+        await rm(join(opts.dir, 'package-lock.json'), { force: true }).catch(() => {});
+      }
+    }
     if (inst.code !== 0) {
       failures.push(`npm install 失败（exit ${inst.code}）\n${inst.stderr.slice(-1500)}`);
     }
 
-    console.log('[consumer] 4/6 npx shadcn add（两段式，与 USAGE.md 一致）');
-    // 第一段照文档先装 token；第二段装组件。
-    // 注意 @bivane/tokens 其实也是 select-h5 的传递依赖，这里显式装是为了
-    // 同时覆盖「显式声明」与「传递解析」两条路径。
-    const addTokens = await run(
-      npx,
-      ['--yes', `shadcn@${SHADCN_VERSION}`, 'add', '@bivane/tokens', '--yes'],
-      opts.dir,
-    );
-    if (addTokens.code !== 0 || /Something went wrong/i.test(`${addTokens.stdout}${addTokens.stderr}`)) {
-      failures.push(`shadcn add @bivane/tokens 失败（exit ${addTokens.code}）\n${`${addTokens.stdout}${addTokens.stderr}`.slice(-2000)}`);
-    }
-
-    // 夹具 App.tsx 用到的组件一并装上——真实用户也是按用到的组件装。
+    console.log('[consumer] 4/6 npx shadcn add（全量公开组件 + tokens + tweakcn，一次装完）');
+    // 公开组件 = registry.json 里 type=registry:component 的全部 item（约 38 个）；
+    // tokens（风格）/ tweakcn（桥接脚本）单独装；其余 lib/hook 由 registryDependencies 递归拉取。
     const componentItems = [
-      '@bivane/select',
-      '@bivane/dropdown-menu',
-      '@bivane/date-picker',
-      '@bivane/time-picker',
-      '@bivane/rate',
-      '@bivane/slider',
-      '@bivane/uploader',
-      '@bivane/search',
-      '@bivane/tabs',
-      '@bivane/nav-bar',
-      '@bivane/tabbar',
-      '@bivane/list',
-      '@bivane/table',
-      '@bivane/data-container',
-      '@bivane/dialog',
-      '@bivane/toast',
-      '@bivane/button',
-      '@bivane/cell',
-      '@bivane/tag',
-      '@bivane/badge',
-      // tweakcn 桥接：独立 item，消费者显式安装才拿得到
+      ...publicEntries.map((e) => `@bivane/${e.name}`),
+      '@bivane/tokens',
       '@bivane/tweakcn',
     ];
-    const add = await run(npx, ['--yes', `shadcn@${SHADCN_VERSION}`, 'add', ...componentItems, '--yes'], opts.dir);
-    const addOut = `${add.stdout}\n${add.stderr}`;
-    if (add.code !== 0 || /Something went wrong/i.test(addOut)) {
-      failures.push(`shadcn add 失败（exit ${add.code}）\n${addOut.slice(-2500)}`);
+    console.log(`[consumer]   将安装 ${publicEntries.length} 个公开组件 + tokens + tweakcn`);
+    // CDN 边缘在并发突发下会返瞬态 5xx（GitHub Pages 实测：同一 URL 预探针 200、
+    // shadcn 并发拉取却 502，重试即过）。只对 5xx 类瞬态故障有限重试；
+    // 真 404 / 真错误不重试，照样红——不能把门磨成永远绿。
+    const isTransient = (out) => /Failed to fetch from registry \(5\d\d\)/i.test(out);
+    let addOut = '';
+    let addCode = 1;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const add = await run(npx, ['--yes', `shadcn@${SHADCN_VERSION}`, 'add', ...componentItems, '--yes'], opts.dir);
+      addCode = add.code;
+      addOut = `${add.stdout}\n${add.stderr}`;
+      if (addCode === 0 && !/Something went wrong/i.test(addOut)) break;
+      if (attempt < 3 && isTransient(addOut)) {
+        console.log(`[consumer]   shadcn add 第 ${attempt} 次因瞬态 5xx 失败，30s 后重试…`);
+        await new Promise((r) => setTimeout(r, 30000));
+      } else {
+        break;
+      }
+    }
+    if (addCode !== 0 || /Something went wrong/i.test(addOut)) {
+      failures.push(`shadcn add 失败（exit ${addCode}）\n${addOut.slice(-2500)}`);
     }
 
-    console.log('[consumer] 5/7 断言落盘文件');
-    const missing = EXPECTED.filter((rel) => !existsSync(join(opts.dir, rel)));
+    console.log('[consumer] 5/7 断言落盘文件（动态：按 registry 服务实际返回的 item 推导）');
+    const expectedTargets = deriveExpectedFromServedRequests(requests);
+    const missing = expectedTargets.filter((rel) => !existsSync(join(opts.dir, 'src', rel)));
     if (missing.length) {
       failures.push(`缺少 ${missing.length} 个文件：\n  ${missing.join('\n  ')}`);
     }
+
+    // 全图类型编译探针：把每个公开组件入口都 import 进消费者项目（type-only），
+    // 强制 tsc 在消费者 @/* 别名 + jsx 配置下检查整张依赖图（h5/pc/parts/hooks 全拉入）。
+    // 仅凭代表性 App 只能编译 22 个，其余组件若无引用就不在 tsc 程序内、编译错误发现不了。
+    const allTsImports = publicEntries
+      .map((e) => `import type * as _${e.name.replace(/[^A-Za-z0-9_]/g, '_')} from '${e.importPath}';`)
+      .join('\n');
+    await writeFile(
+      join(opts.dir, 'src/bivane-all.ts'),
+      `// 自动生成：registry 发布验证用的全量类型编译探针，勿手改\n${allTsImports}\nexport type _BivaneAll = unknown;\n`,
+      'utf8',
+    );
 
     // 5b. tweakcn 桥接脚本**真跑一次**。
     // 「文件落盘了」不等于「能用」—— 脚本的相对导入路径在消费者项目里
@@ -780,6 +800,7 @@ async function main() {
     // 同时验证「零依赖」：这个脚本不许 require/import 任何 npm 包。
     console.log('[consumer] 5b/7 在消费者项目里跑 tweakcn 桥接脚本');
     const bridgeDir = join(opts.dir, 'src/scripts');
+    await mkdir(bridgeDir, { recursive: true }); // 防御：批量安装失败时目录可能不存在
     const themeIn = join(bridgeDir, 'sample-tweakcn-theme.css');
     await writeFile(
         themeIn,
@@ -907,8 +928,12 @@ async function main() {
         notes.push('未找到消费者 CSS 产物，跳过样式探针');
       }
     }
+  } catch (e) {
+    // 关键：脚本自身异常（如 5b 写文件崩）绝不能吞掉已收集的 failures 就退出——
+    // 那样的输出会误导排查方向。异常本身也记入 failures，走完报告段再退出。
+    failures.push(`consumer-check 脚本异常（后续步骤未执行）：\n${e?.stack ?? e}`);
   } finally {
-    server.close();
+    if (server) server.close();
   }
 
   console.log('\n========== registry 请求记录 ==========');
@@ -920,8 +945,8 @@ async function main() {
   if (requests.some((r) => r.status !== 200)) {
     failures.push('registry 服务返回过非 200 —— 依赖名形式仍然不对');
   }
-  if (fetched < 15) {
-    notes.push(`只成功拉取 ${fetched} 个 item，传递依赖可能没走全（预期 15+）`);
+  if (fetched < publicEntries.length) {
+    notes.push(`只成功拉取 ${fetched} 个 item，传递依赖可能没走全（预期 ${publicEntries.length}+）`);
   }
 
   if (notes.length) {
