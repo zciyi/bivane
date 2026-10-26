@@ -5,7 +5,7 @@
   "title": "Picker（PC 实现）",
   "description": "Radix Popover 锚定浮层 + N 列纵向面板（每列定宽独立滚动、桌面密度 36px）+ 底部「取消/确定」条。多列调好才算选完，故 PC 也走暂存确认；键盘 ↑↓ 列内巡航跳禁用、←→ 换列、Home/End 首尾、Enter 选中/提交、Esc 取消。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

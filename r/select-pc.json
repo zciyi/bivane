@@ -5,7 +5,7 @@
   "title": "Select（PC 实现）",
   "description": "Radix Popover 锚定浮层：键盘巡航、输入过滤、翻转防溢出、长列表虚拟滚动，多选保持展开。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

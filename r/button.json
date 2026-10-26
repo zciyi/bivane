@@ -5,7 +5,7 @@
   "title": "Button",
   "description": "对齐 Vant Button：type/size/plain/round/square/block/hairline/loading。",
   "dependencies": [
-    "class-variance-authority"
+    "class-variance-authority@0.7.1"
   ],
   "devDependencies": [],
   "registryDependencies": [

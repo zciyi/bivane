@@ -5,8 +5,8 @@
   "title": "DatePicker（PC 实现）",
   "description": "Radix Popover 锚定浮层 + react-day-picker 月历引擎：上下月按钮、键盘方向键巡航、直接输入日期、Esc 关闭，区间模式并排双月 + 悬停预览。",
   "dependencies": [
-    "@radix-ui/react-popover",
-    "react-day-picker"
+    "@radix-ui/react-popover@1.1.23",
+    "react-day-picker@10.0.1"
   ],
   "devDependencies": [],
   "registryDependencies": [

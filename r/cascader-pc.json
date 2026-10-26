@@ -5,7 +5,7 @@
   "title": "Cascader（PC 实现）",
   "description": "Radix Popover 锚定浮层：顶部可点面包屑 + 逐级向右展开的多列面板，点叶子即生效即关，打开即定位到已选路径（ref 回调滚入视野）。searchable 时顶部搜索框按路径全文过滤叶子（禁用子树剔除），点结果直接提交完整路径；键盘 ↑↓ 巡航、→/Enter 展开或选中、← 回上级。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

@@ -5,7 +5,7 @@
   "title": "Calendar（PC 实现）",
   "description": "内嵌常驻月历（非弹层）：react-day-picker 引擎，single/multiple 单月、range 并排双月，顶部 ‹ 年月 › 导航；点选即生效（桌面无确认条），range 支持鼠标按下拖选（超 maxRange 窗口滑动）、两次点选与悬停预览；面板级键盘巡航（方向键逐日周、PgUp/PgDn 逐月、Home/End 跳周首尾、Enter 选定），禁用日自动跳过。",
   "dependencies": [
-    "react-day-picker"
+    "react-day-picker@10.0.1"
   ],
   "devDependencies": [],
   "registryDependencies": [

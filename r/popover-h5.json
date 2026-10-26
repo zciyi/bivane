@@ -5,7 +5,7 @@
   "title": "Popover（H5 实现）",
   "description": "打开即定形态：纯 actions 数行，带自定义内容时挂不可见限宽探针实测高度；行数 ≤ 阈值走 Radix 轻量气泡（Anchor 自管 click，触屏不抢焦，点外部延迟关闭），超阈值降级 Popup 底部抽屉（遮罩/安全区/滚动锁复用现成）。阈值取 token --bv-popover-h5-bubble-max-rows（默认 3），maxRows prop 可单实例覆盖；h5Form 可强制 bubble/drawer（跳过探针）。关闭后等退场播完再收回形态。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

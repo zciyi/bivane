@@ -5,7 +5,7 @@
   "title": "Search（PC 实现）",
   "description": "内联输入框 + Radix Popover 建议浮层：Anchor 只定位、open 受控、onPointerDownOutside/FocusOutside 显式判定输入框为内部，↑↓/Enter/Esc 键盘。聚焦即开，不设快捷键。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

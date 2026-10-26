@@ -5,7 +5,7 @@
   "title": "Popover（PC 实现）",
   "description": "Radix Popover 锚定浮层：翻转/防溢出/间距交 Popper，Trigger asChild 包住外部任意触发器（click 开合由 Radix 承担，triggerRef 登记后点触发器/焦点落回触发器不算浮层外部交互，跨实例无空帧无关不掉的竞态），键盘 Enter/Space 开合后焦点落入面板、Tab 循环、Esc 关闭并显式还焦触发器。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

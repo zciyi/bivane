@@ -5,8 +5,8 @@
   "title": "cn 工具",
   "description": "clsx + tailwind-merge 的类名合并工具（已注册 --bv-* 命名空间），所有 Bivane 组件的公共依赖。",
   "dependencies": [
-    "clsx",
-    "tailwind-merge"
+    "clsx@2.1.1",
+    "tailwind-merge@3.7.0"
   ],
   "devDependencies": [],
   "registryDependencies": [],

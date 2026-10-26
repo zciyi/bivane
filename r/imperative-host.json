@@ -4,9 +4,7 @@
   "type": "registry:lib",
   "title": "命令式宿主管理",
   "description": "命令式弹层的宿主注册与自动创建（手动挂载优先，避免两份渲染）。",
-  "dependencies": [
-    "react-dom"
-  ],
+  "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [],
   "files": [
