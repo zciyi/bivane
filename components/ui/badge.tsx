@@ -68,7 +68,10 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Badg
         'inline-block box-border text-center font-bv-bold',
         // 顺序约定：text-*（font-size）在前、leading-* 在后，否则 leading 会被 tailwind-merge 删除
         'text-bv-sm leading-[1.2] rounded-bv-max',
-        '[background:var(--bv-badge-background)]',
+        // 文字色必须显式套用语义 token：badge 常被放进 Cell 的 value 槽，
+        // 该槽默认 text-bv-text-2（灰），不显式设色会让数字继承成浅灰、红底上看不清。
+        // 用 [color:...] 任意属性而非 text-[...]，避免与上面的 text-bv-sm（字号）在 tailwind-merge 冲突。
+        '[background:var(--bv-badge-background)] [color:var(--bv-badge-color)]',
         dot
           ? 'w-[var(--bv-badge-dot-size)] h-[var(--bv-badge-dot-size)] min-w-0 border-none p-0 rounded-full'
           : 'min-w-[var(--bv-badge-size)] px-[var(--bv-badge-padding-x)] py-[var(--bv-badge-padding-y)] border border-bv-surface',
