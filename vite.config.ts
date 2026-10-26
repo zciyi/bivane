@@ -39,7 +39,7 @@ export default defineConfig({
     // 顺带把环境创建从「每文件一次」降为「每 worker 一次」，全套从 128s 降到 ~12s。
     pool: 'vmThreads',
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ['./tests/setup.tsx'],
     include: ['tests/**/*.test.{ts,tsx}'],
     css: false,
   },

@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Cascader } from "@/components/h5/cascader";
-import { PcCascader } from "@/components/pc/cascader";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Cascader = lazyWithRef(() => import("@/components/h5/cascader").then((m) => ({ default: m.H5Cascader })));
+const PcCascader = lazyWithRef(() => import("@/components/pc/cascader").then((m) => ({ default: m.PcCascader })));
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
   deriveLinkedColumns,
@@ -207,35 +209,39 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
       id,
     } as const;
 
-    return mode === "mobile" ? (
-      <H5Cascader
-        ref={ref}
-        {...commonProps}
-        linked={linked}
-        confirmText="确定"
-        cancelText="取消"
-        onLinkedColumnChange={handleLinkedColumnChange}
-        onSubmit={handleLinkedSubmit}
-        onCancel={() => setOpen(false)}
-      />
-    ) : (
-      <PcCascader
-        ref={ref}
-        {...commonProps}
-        tree={tree}
-        chain={chain}
-        onChainChange={setChain}
-        selectedValues={selectedPath.map((option) => option.value)}
-        searchable={searchable}
-        keyword={keyword}
-        onKeywordChange={setKeyword}
-        searchResults={searchResults}
-        searchPlaceholder={searchPlaceholder}
-        emptyText={emptyText}
-        rootText={rootText}
-        onCommit={handleCommit}
-        onCancel={() => setOpen(false)}
-      />
+    return (
+      <React.Suspense fallback={null}>
+        {mode === "mobile" ? (
+          <H5Cascader
+            ref={ref}
+            {...commonProps}
+            linked={linked}
+            confirmText="确定"
+            cancelText="取消"
+            onLinkedColumnChange={handleLinkedColumnChange}
+            onSubmit={handleLinkedSubmit}
+            onCancel={() => setOpen(false)}
+          />
+        ) : (
+          <PcCascader
+            ref={ref}
+            {...commonProps}
+            tree={tree}
+            chain={chain}
+            onChainChange={setChain}
+            selectedValues={selectedPath.map((option) => option.value)}
+            searchable={searchable}
+            keyword={keyword}
+            onKeywordChange={setKeyword}
+            searchResults={searchResults}
+            searchPlaceholder={searchPlaceholder}
+            emptyText={emptyText}
+            rootText={rootText}
+            onCommit={handleCommit}
+            onCancel={() => setOpen(false)}
+          />
+        )}
+      </React.Suspense>
     );
   },
 );

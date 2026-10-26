@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lazy-with-ref",
+  "type": "registry:lib",
+  "title": "lazy + ref 透传",
+  "description": "让 React.lazy 加载的 forwardRef 组件支持 ref 透传。架构 §6.3 把 responsive 分发层的 H5/PC 两套实现拆成异步 chunk，本工具保留 ref 语义，是所有双端组件的公共依赖。",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/lazy-with-ref.tsx",
+      "content": "import * as React from 'react';\n\n/**\n * 让 React.lazy 加载的 forwardRef 组件支持 ref 透传。\n *\n * 原生 `React.lazy` 不转发 ref：`<Lazy ref={r} />` 里的 r 拿不到被加载组件的实例。\n * 分发层（components/responsive/*）大量使用 forwardRef 把根 DOM 透传给外部，\n * 为把这些实现拆成异步 chunk（架构 §6.3 包体策略），必须用本包装保留 ref 语义。\n *\n * 在 React 19 中 ref 作为普通 prop 传递，因此这里用 forwardRef 包一层、把 ref\n * 作为 prop 透传给内部 lazy 组件即可生效。异步 chunk 加载完成前 ref.current 为\n * null（首屏一帧内），加载完成后即指向真实根 DOM，与静态引入行为一致。\n *\n * 返回类型与被加载的 forwardRef 组件完全一致（由调用处的 import 类型推断），\n * 因此分发层 render 处无需任何改动。\n */\n\n/** 宽松组件类型：lazy 边界内只做「接收任意 props + 透传 ref」，不关心具体签名 */\ntype LazyLoadable = React.ComponentType<Record<string, unknown>>;\n\nexport function lazyWithRef<T>(factory: () => Promise<{ default: T }>): T {\n  const Lazy = React.lazy(factory as () => Promise<{ default: LazyLoadable }>);\n  const Wrapped = React.forwardRef(function LazyWithRef(\n    props: Record<string, unknown>,\n    ref: React.Ref<unknown>,\n  ) {\n    return React.createElement(Lazy, { ...props, ref });\n  });\n  return Wrapped as unknown as T;\n}\n",
+      "type": "registry:lib",
+      "target": "lib/lazy-with-ref.tsx"
+    }
+  ]
+}

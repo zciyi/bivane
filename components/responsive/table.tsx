@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { H5Table } from '@/components/h5/table';
-import { PcTable } from '@/components/pc/table';
 import type { TableViewProps } from '@/components/ui/table-parts';
+import { lazyWithRef } from '@/lib/lazy-with-ref';
+
+// H5 / PC 两套实现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Table = lazyWithRef(() => import('@/components/h5/table').then((m) => ({ default: m.H5Table })));
+const PcTable = lazyWithRef(() => import('@/components/pc/table').then((m) => ({ default: m.PcTable })));
 import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import {
     useTableState,
@@ -191,9 +194,13 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(function Table
         className,
     };
 
-    return mode === 'mobile' ? (
-        <H5Table ref={ref} {...viewProps} />
-    ) : (
-        <PcTable ref={ref} {...viewProps} />
+    return (
+        <React.Suspense fallback={null}>
+            {mode === 'mobile' ? (
+                <H5Table ref={ref} {...viewProps} />
+            ) : (
+                <PcTable ref={ref} {...viewProps} />
+            )}
+        </React.Suspense>
     );
 });

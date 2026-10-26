@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Tooltip } from "@/components/h5/tooltip";
-import { PcTooltip } from "@/components/pc/tooltip";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Tooltip = lazyWithRef(() => import("@/components/h5/tooltip").then((m) => ({ default: m.H5Tooltip })));
+const PcTooltip = lazyWithRef(() => import("@/components/pc/tooltip").then((m) => ({ default: m.PcTooltip })));
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 
 /**
@@ -71,31 +73,35 @@ export const Tooltip = React.forwardRef<HTMLElement, TooltipProps>(
     // 上面的 hooks 仍须无条件调用（不能随模式提前 return 跳过 hook）。
     if (mode === "mobile") {
       return (
-        <H5Tooltip
-          ref={ref}
-          mode={mode}
-          content={content}
-          infoId={describedById}
-          className={className}
-        >
-          {children}
-        </H5Tooltip>
+        <React.Suspense fallback={null}>
+          <H5Tooltip
+            ref={ref}
+            mode={mode}
+            content={content}
+            infoId={describedById}
+            className={className}
+          >
+            {children}
+          </H5Tooltip>
+        </React.Suspense>
       );
     }
 
     return (
-      <PcTooltip
-        ref={ref}
-        mode={mode}
-        open={opened}
-        onOpenChange={setOpen}
-        content={content}
-        bubbleId={describedById}
-        disabled={disabled}
-        className={className}
-      >
-        {children}
-      </PcTooltip>
+      <React.Suspense fallback={null}>
+        <PcTooltip
+          ref={ref}
+          mode={mode}
+          open={opened}
+          onOpenChange={setOpen}
+          content={content}
+          bubbleId={describedById}
+          disabled={disabled}
+          className={className}
+        >
+          {children}
+        </PcTooltip>
+      </React.Suspense>
     );
   },
 );

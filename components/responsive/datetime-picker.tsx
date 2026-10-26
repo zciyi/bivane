@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5DateTimePicker } from "@/components/h5/datetime-picker";
-import { PcDateTimePicker } from "@/components/pc/datetime-picker";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5DateTimePicker = lazyWithRef(() => import("@/components/h5/datetime-picker").then((m) => ({ default: m.H5DateTimePicker })));
+const PcDateTimePicker = lazyWithRef(() => import("@/components/pc/datetime-picker").then((m) => ({ default: m.PcDateTimePicker })));
 import type { DateTimePanelProps } from "@/components/ui/datetime-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
@@ -182,10 +184,14 @@ export const DateTimePicker = React.forwardRef<
     id,
   };
 
-  return mode === "mobile" ? (
-    <H5DateTimePicker ref={ref} {...panelProps} />
-  ) : (
-    <PcDateTimePicker ref={ref} {...panelProps} />
+  return (
+    <React.Suspense fallback={null}>
+      {mode === "mobile" ? (
+        <H5DateTimePicker ref={ref} {...panelProps} />
+      ) : (
+        <PcDateTimePicker ref={ref} {...panelProps} />
+      )}
+    </React.Suspense>
   );
 });
 

@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { Portal } from '@/lib/portal';
-import { H5ToastPresenter } from '@/components/h5/toast';
-import { PcToastStack } from '@/components/pc/toast';
 import { useDeviceMode } from '@/hooks/use-device-mode';
 import { ensureImperativeHost, useManualImperativeHost } from '@/lib/imperative-host';
 import {
@@ -31,6 +29,14 @@ import {
  *   命令式  showToast('已保存') / showSuccessToast / showFailToast / showLoadingToast / closeToast
  */
 
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略），presenter 不接收 ref
+const H5ToastPresenter = React.lazy(() =>
+  import('@/components/h5/toast').then((m) => ({ default: m.H5ToastPresenter })),
+);
+const PcToastStack = React.lazy(() =>
+  import('@/components/pc/toast').then((m) => ({ default: m.PcToastStack })),
+);
+
 const TOAST_HOST_KEY = 'bivane-toast';
 
 /**
@@ -53,12 +59,14 @@ export function ToastHost() {
 
   return (
     <Portal>
-      {mode === 'mobile' ? (
-        // H5 单例：只呈现最新一条（更早的条目仍由 store 计时回收）
-        <H5ToastPresenter item={items[items.length - 1] ?? null} />
-      ) : (
-        <PcToastStack items={items} onClose={closeToastEntry} />
-      )}
+      <React.Suspense fallback={null}>
+        {mode === 'mobile' ? (
+          // H5 单例：只呈现最新一条（更早的条目仍由 store 计时回收）
+          <H5ToastPresenter item={items[items.length - 1] ?? null} />
+        ) : (
+          <PcToastStack items={items} onClose={closeToastEntry} />
+        )}
+      </React.Suspense>
     </Portal>
   );
 }
@@ -116,11 +124,13 @@ export function Toast({
 
   return (
     <Portal>
-      {mode === 'mobile' ? (
-        <H5ToastPresenter item={item} />
-      ) : (
-        <PcToastStack items={[item]} onClose={() => setOpen(false)} />
-      )}
+      <React.Suspense fallback={null}>
+        {mode === 'mobile' ? (
+          <H5ToastPresenter item={item} />
+        ) : (
+          <PcToastStack items={[item]} onClose={() => setOpen(false)} />
+        )}
+      </React.Suspense>
     </Portal>
   );
 }

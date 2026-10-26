@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Picker } from "@/components/h5/picker";
-import { PcPicker } from "@/components/pc/picker";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Picker = lazyWithRef(() => import("@/components/h5/picker").then((m) => ({ default: m.H5Picker })));
+const PcPicker = lazyWithRef(() => import("@/components/pc/picker").then((m) => ({ default: m.PcPicker })));
 import type { PickerPanelProps } from "@/components/ui/picker-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
@@ -177,10 +179,14 @@ export const Picker = React.forwardRef<HTMLDivElement, PickerProps>(
       id,
     };
 
-    return mode === "mobile" ? (
-      <H5Picker ref={ref} {...panelProps} />
-    ) : (
-      <PcPicker ref={ref} {...panelProps} />
+    return (
+      <React.Suspense fallback={null}>
+        {mode === "mobile" ? (
+          <H5Picker ref={ref} {...panelProps} />
+        ) : (
+          <PcPicker ref={ref} {...panelProps} />
+        )}
+      </React.Suspense>
     );
   },
 );

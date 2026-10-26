@@ -13,6 +13,10 @@ import {
 import { ResponsiveProvider } from '@/components/providers/responsive-provider';
 import { resetToastStore } from '@/hooks/use-toast-store';
 import { resetImperativeHosts } from '@/lib/imperative-host';
+// 预热两个 React.lazy presenter chunk：动态 import 命中模块缓存后才能在
+// 单次 async act 的微任务冲刷内解析完（否则模块加载链太长，act 来不及）
+import '@/components/h5/toast';
+import '@/components/pc/toast';
 
 /**
  * Toast 双模式行为测试（矩阵 §4 要求）
@@ -27,10 +31,22 @@ function toasts(): Element[] {
   return Array.from(document.querySelectorAll('[data-slot="toast"]'));
 }
 
-function actShow(fn: () => unknown): void {
+// presenter 是 React.lazy 异步 chunk：store 更新后才触发 import，解析需数个微任务。
+// fake timers 下 waitFor 无法推进（RTL 只会调 jest.advanceTimersByTime，vitest 无此 API），
+// 故统一用 async act + 微任务自旋冲刷，不依赖计时器。
+async function flushPresenter(): Promise<void> {
+  await act(async () => {
+    for (let i = 0; i < 50; i += 1) {
+      await Promise.resolve();
+    }
+  });
+}
+
+async function actShow(fn: () => unknown): Promise<void> {
   act(() => {
     fn();
   });
+  await flushPresenter();
 }
 
 beforeEach(() => {
@@ -44,15 +60,15 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('h5 mode', () => {
-  it('渲染为顶部居中胶囊，白字深底', () => {
+describe('h5 mode', async () => {
+  it('渲染为顶部居中胶囊，白字深底', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('已保存'));
+    await actShow(() => showToast('已保存'));
 
     const [toast] = toasts();
     expect(toast).toHaveAttribute('data-mode', 'h5');
@@ -65,7 +81,7 @@ describe('h5 mode', () => {
     expect(capsule.className).toContain('text-[var(--bv-toast-text-color)]');
   });
 
-  it('2s 后自动消失', () => {
+  it('2s 后自动消失', async () => {
     vi.useFakeTimers();
     render(
       <ResponsiveProvider mode="mobile">
@@ -73,7 +89,7 @@ describe('h5 mode', () => {
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('会自动消失'));
+    await actShow(() => showToast('会自动消失'));
     expect(toasts().length).toBe(1);
 
     act(() => {
@@ -83,14 +99,14 @@ describe('h5 mode', () => {
     expect(toasts().length).toBe(0);
   });
 
-  it('单例语义：连发两条只显示最新一条', () => {
+  it('单例语义：连发两条只显示最新一条', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => {
+    await actShow(() => {
       showToast('第一条');
       showToast('第二条');
     });
@@ -100,7 +116,7 @@ describe('h5 mode', () => {
     expect(document.body.textContent).not.toContain('第一条');
   });
 
-  it('loading 类型默认常驻，不自动消失', () => {
+  it('loading 类型默认常驻，不自动消失', async () => {
     vi.useFakeTimers();
     render(
       <ResponsiveProvider mode="mobile">
@@ -108,7 +124,7 @@ describe('h5 mode', () => {
       </ResponsiveProvider>,
     );
 
-    actShow(() => showLoadingToast('加载中'));
+    await actShow(() => showLoadingToast('加载中'));
 
     act(() => {
       vi.advanceTimersByTime(10000);
@@ -118,7 +134,7 @@ describe('h5 mode', () => {
     expect(toasts()[0].querySelector('[data-slot="icon"]')).not.toBeNull();
   });
 
-  it('closeToast(id) 可提前关闭 loading', () => {
+  it('closeToast(id) 可提前关闭 loading', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <ToastHost />
@@ -126,37 +142,37 @@ describe('h5 mode', () => {
     );
 
     let handle: ToastHandle = { id: 0, close: () => undefined };
-    actShow(() => {
+    await actShow(() => {
       handle = showLoadingToast('加载中');
     });
 
     expect(toasts().length).toBe(1);
 
-    actShow(() => handle.close());
+    await actShow(() => handle.close());
 
     expect(toasts().length).toBe(0);
   });
 
-  it('无关闭按钮（H5 靠自动消失）', () => {
+  it('无关闭按钮（H5 靠自动消失）', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('纯文案'));
+    await actShow(() => showToast('纯文案'));
 
     expect(document.querySelector('[data-slot="toast-close"]')).toBeNull();
   });
 
-  it('success 类型带成功图标', () => {
+  it('success 类型带成功图标', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => showSuccessToast('操作成功'));
+    await actShow(() => showSuccessToast('操作成功'));
 
     const icon = toasts()[0].querySelector('[data-slot="icon"]');
     expect(icon).not.toBeNull();
@@ -165,15 +181,15 @@ describe('h5 mode', () => {
   });
 });
 
-describe('pc mode', () => {
-  it('渲染为右上角卡片栈', () => {
+describe('pc mode', async () => {
+  it('渲染为右上角卡片栈', async () => {
     render(
       <ResponsiveProvider mode="desktop">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('已保存'));
+    await actShow(() => showToast('已保存'));
 
     const stack = document.querySelector('[data-slot="toast-stack"]');
     expect(stack).toHaveAttribute('data-mode', 'pc');
@@ -182,14 +198,14 @@ describe('pc mode', () => {
     expect(toasts()[0]).toHaveAttribute('data-mode', 'pc');
   });
 
-  it('可多条并存（与 H5 单例形成对照）', () => {
+  it('可多条并存（与 H5 单例形成对照）', async () => {
     render(
       <ResponsiveProvider mode="desktop">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => {
+    await actShow(() => {
       showToast('第一条');
       showFailToast('第二条');
     });
@@ -206,7 +222,7 @@ describe('pc mode', () => {
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('可手动关闭'));
+    await actShow(() => showToast('可手动关闭'));
 
     const closeBtn = document.querySelector('[data-slot="toast-close"]');
     expect(closeBtn).not.toBeNull();
@@ -220,7 +236,7 @@ describe('pc mode', () => {
     });
   });
 
-  it('2s 自动消失（生命周期两端一致）', () => {
+  it('2s 自动消失（生命周期两端一致）', async () => {
     vi.useFakeTimers();
     render(
       <ResponsiveProvider mode="desktop">
@@ -228,7 +244,7 @@ describe('pc mode', () => {
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast('会自动消失'));
+    await actShow(() => showToast('会自动消失'));
     expect(toasts().length).toBe(1);
 
     act(() => {
@@ -238,14 +254,14 @@ describe('pc mode', () => {
     expect(toasts().length).toBe(0);
   });
 
-  it('成功类型使用彩色图标（白底卡片，不再是白字深底）', () => {
+  it('成功类型使用彩色图标（白底卡片，不再是白字深底）', async () => {
     render(
       <ResponsiveProvider mode="desktop">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => showSuccessToast('操作成功'));
+    await actShow(() => showSuccessToast('操作成功'));
 
     const item = toasts()[0];
     expect(item.className).toContain('bg-bv-surface');
@@ -254,21 +270,21 @@ describe('pc mode', () => {
   });
 });
 
-describe('双模式一致性', () => {
-  it('closeToast() 不传 id 时两端都关闭全部', () => {
+describe('双模式一致性', async () => {
+  it('closeToast() 不传 id 时两端都关闭全部', async () => {
     const { unmount } = render(
       <ResponsiveProvider mode="desktop">
         <ToastHost />
       </ResponsiveProvider>,
     );
 
-    actShow(() => {
+    await actShow(() => {
       showToast('A');
       showToast('B');
     });
     expect(toasts().length).toBe(2);
 
-    actShow(() => closeToast());
+    await actShow(() => closeToast());
     expect(toasts().length).toBe(0);
     unmount();
 
@@ -277,14 +293,14 @@ describe('双模式一致性', () => {
         <ToastHost />
       </ResponsiveProvider>,
     );
-    actShow(() => showToast('C'));
+    await actShow(() => showToast('C'));
     expect(toasts().length).toBe(1);
 
-    actShow(() => closeToast());
+    await actShow(() => closeToast());
     expect(toasts().length).toBe(0);
   });
 
-  it('duration 显式传 0 时两端都不自动关闭', () => {
+  it('duration 显式传 0 时两端都不自动关闭', async () => {
     vi.useFakeTimers();
     render(
       <ResponsiveProvider mode="mobile">
@@ -292,7 +308,7 @@ describe('双模式一致性', () => {
       </ResponsiveProvider>,
     );
 
-    actShow(() => showToast({ message: '常驻', duration: 0 }));
+    await actShow(() => showToast({ message: '常驻', duration: 0 }));
 
     act(() => {
       vi.advanceTimersByTime(10000);
@@ -302,8 +318,8 @@ describe('双模式一致性', () => {
   });
 });
 
-describe('声明式 Toast', () => {
-  it('open 为真时渲染，2s 后回调 onOpenChange(false)', () => {
+describe('声明式 Toast', async () => {
+  it('open 为真时渲染，2s 后回调 onOpenChange(false)', async () => {
     vi.useFakeTimers();
     const onOpenChange = vi.fn();
 
@@ -313,6 +329,9 @@ describe('声明式 Toast', () => {
       </ResponsiveProvider>,
     );
 
+    // presenter 是异步 chunk：fake timers 下 waitFor 无法推进，用微任务自旋等它渲染
+    // （2s 计时器在 dispatcher 的 useEffect 里，挂载即起跑，与 presenter 无关）
+    await flushPresenter();
     expect(document.body.textContent).toContain('声明式提示');
 
     act(() => {
@@ -322,7 +341,7 @@ describe('声明式 Toast', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('open 为假时不渲染', () => {
+  it('open 为假时不渲染', async () => {
     render(
       <ResponsiveProvider mode="mobile">
         <Toast open={false} message="不该出现" />
@@ -332,14 +351,16 @@ describe('声明式 Toast', () => {
     expect(document.body.textContent).not.toContain('不该出现');
   });
 
-  it('PC 模式下走卡片栈形态', () => {
+  it('PC 模式下走卡片栈形态', async () => {
     render(
       <ResponsiveProvider mode="desktop">
         <Toast open message="PC 提示" />
       </ResponsiveProvider>,
     );
 
-    expect(document.querySelector('[data-slot="toast-stack"]')).not.toBeNull();
+    await waitFor(() =>
+      expect(document.querySelector('[data-slot="toast-stack"]')).not.toBeNull(),
+    );
     expect(toasts()[0]).toHaveAttribute('data-mode', 'pc');
   });
 });

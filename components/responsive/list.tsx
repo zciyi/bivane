@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { H5List } from '@/components/h5/list';
-import { PcList } from '@/components/pc/list';
 import type { ListViewProps } from '@/components/ui/list-parts';
+import { lazyWithRef } from '@/lib/lazy-with-ref';
+
+// H5 / PC 两套实现拆成异步 chunk（架构 §6.3 包体策略）
+const H5List = lazyWithRef(() => import('@/components/h5/list').then((m) => ({ default: m.H5List })));
+const PcList = lazyWithRef(() => import('@/components/pc/list').then((m) => ({ default: m.PcList })));
 import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import { useListState } from '@/hooks/use-list-state';
 
@@ -126,15 +129,19 @@ export const List = React.forwardRef<HTMLDivElement, ListProps>(function List(
         className,
     };
 
-    return mode === 'mobile' ? (
-        <H5List ref={ref} {...viewProps} />
-    ) : (
-        <PcList
-            ref={ref}
-            {...viewProps}
-            virtual={virtual}
-            itemHeight={itemHeight}
-            height={height}
-        />
+    return (
+        <React.Suspense fallback={null}>
+            {mode === 'mobile' ? (
+                <H5List ref={ref} {...viewProps} />
+            ) : (
+                <PcList
+                    ref={ref}
+                    {...viewProps}
+                    virtual={virtual}
+                    itemHeight={itemHeight}
+                    height={height}
+                />
+            )}
+        </React.Suspense>
     );
 });

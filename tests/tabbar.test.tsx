@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Tabbar, type TabbarItem } from '@/components/responsive/tabbar';
 import {
     findTabIndex,
@@ -14,6 +14,16 @@ import { setViewport } from './setup';
  * PC 侧边导航（默认）或顶部导航（pcVariant），图标在左文字在右。
  * 两端共用同一份「当前选中哪一项」的语义（字符串 value）。
  */
+
+// H5Tabbar / PcTabbar 经 React.lazy 异步加载，render 后首帧为 Suspense fallback（null），
+// 故统一用 load 等待根 slot 渲染后再做同步断言。
+async function load(node: ReactElement) {
+  const utils = rtlRender(node);
+  await waitFor(async () => {
+    expect(document.querySelector('[data-slot="tabbar"]')).not.toBeNull();
+  });
+  return utils;
+}
 
 const ITEMS: TabbarItem[] = [
     { value: 'home', label: '首页' },
@@ -38,14 +48,14 @@ function badgeOfItem(label: string): HTMLElement | null {
     return null;
 }
 
-describe('use-tabbar-state 纯函数', () => {
-    it('findTabIndex：找到返回下标，找不到返回 -1', () => {
+describe('use-tabbar-state 纯函数', async () => {
+    it('findTabIndex：找到返回下标，找不到返回 -1', async () => {
         expect(findTabIndex(ITEMS, 'order')).toBe(1);
         expect(findTabIndex(ITEMS, 'nope')).toBe(-1);
         expect(findTabIndex(ITEMS, undefined)).toBe(-1);
     });
 
-    it('resolveInitialValue：defaultValue 对得上就用，对不上落到第一个未禁用项', () => {
+    it('resolveInitialValue：defaultValue 对得上就用，对不上落到第一个未禁用项', async () => {
         expect(resolveInitialValue(ITEMS, 'order')).toBe('order');
         expect(resolveInitialValue(ITEMS, 'nope')).toBe('home');
         expect(resolveInitialValue(ITEMS, undefined)).toBe('home');
@@ -53,26 +63,26 @@ describe('use-tabbar-state 纯函数', () => {
     });
 });
 
-describe('Tabbar · H5', () => {
+describe('Tabbar · H5', async () => {
     beforeEach(() => {
         act(() => setViewport({ width: 375, touch: true }));
     });
 
-    it('渲染底部形态：data-mode="h5"、data-variant="bottom"', () => {
-        render(<Tabbar items={ITEMS} />);
+    it('渲染底部形态：data-mode="h5"、data-variant="bottom"', async () => {
+        await load(<Tabbar items={ITEMS} />);
         const bar = document.querySelector('[data-slot="tabbar"]');
         expect(bar?.getAttribute('data-mode')).toBe('h5');
         expect(bar?.getAttribute('data-variant')).toBe('bottom');
     });
 
-    it('fixed 默认开启并留等高占位块', () => {
-        render(<Tabbar items={ITEMS} />);
+    it('fixed 默认开启并留等高占位块', async () => {
+        await load(<Tabbar items={ITEMS} />);
         expect(document.querySelector('[data-slot="tabbar-placeholder"]')).not.toBeNull();
     });
 
-    it('点击切换激活项并回调 onChange', () => {
+    it('点击切换激活项并回调 onChange', async () => {
         const calls: string[] = [];
-        render(
+        await load(
             <Tabbar
                 items={ITEMS}
                 onChange={(value) => {
@@ -84,9 +94,9 @@ describe('Tabbar · H5', () => {
         expect(calls).toEqual(['order']);
     });
 
-    it('禁用项不响应点击', () => {
+    it('禁用项不响应点击', async () => {
         const calls: string[] = [];
-        render(
+        await load(
             <Tabbar
                 items={ITEMS}
                 onChange={(value) => {
@@ -98,23 +108,23 @@ describe('Tabbar · H5', () => {
         expect(calls).toEqual([]);
     });
 
-    it('非受控时默认选中第一项，激活项带 aria-current="page"', () => {
-        render(<Tabbar items={ITEMS} />);
+    it('非受控时默认选中第一项，激活项带 aria-current="page"', async () => {
+        await load(<Tabbar items={ITEMS} />);
         const active = document.querySelector('[data-slot="tabbar-item"][data-active="true"]');
         expect(active?.getAttribute('aria-current')).toBe('page');
         expect(active?.textContent).toContain('首页');
     });
 });
 
-describe('Tabbar · PC', () => {
+describe('Tabbar · PC', async () => {
     beforeEach(() => {
         act(() => setViewport({ width: 1280, touch: false }));
     });
 
     /* ---------- 角标（徽标挂在图标右上角）---------- */
 
-    it('角标渲染在图标盒内，并绝对定位挂在右上角', () => {
-        render(<Tabbar items={ITEMS_WITH_BADGE} />);
+    it('角标渲染在图标盒内，并绝对定位挂在右上角', async () => {
+        await load(<Tabbar items={ITEMS_WITH_BADGE} />);
         const iconBox = badgeOfItem('订单')?.closest('[data-slot="tabbar-pc-item-icon"]');
         const badge = badgeOfItem('订单');
         expect(iconBox).not.toBeNull();
@@ -128,35 +138,35 @@ describe('Tabbar · PC', () => {
         expect(cls).toContain('top-[var(--bv-tabbar-badge-top)]');
     });
 
-    it('数字角标显示内容、红点只出圆点、badge=false 不出角标', () => {
-        render(<Tabbar items={ITEMS_WITH_BADGE} />);
+    it('数字角标显示内容、红点只出圆点、badge=false 不出角标', async () => {
+        await load(<Tabbar items={ITEMS_WITH_BADGE} />);
         expect(badgeOfItem('订单')?.textContent).toBe('3');
         expect(badgeOfItem('购物车')?.getAttribute('data-dot')).toBe('true');
         expect(badgeOfItem('首页')).toBeNull();
         expect(badgeOfItem('我的')).toBeNull();
     });
 
-    it('默认侧边导航：data-mode="pc"、data-variant="sidebar"', () => {
-        render(<Tabbar items={ITEMS} />);
+    it('默认侧边导航：data-mode="pc"、data-variant="sidebar"', async () => {
+        await load(<Tabbar items={ITEMS} />);
         const bar = document.querySelector('[data-slot="tabbar"]');
         expect(bar?.getAttribute('data-mode')).toBe('pc');
         expect(bar?.getAttribute('data-variant')).toBe('sidebar');
     });
 
-    it('pcVariant="top" 切到顶部导航', () => {
-        render(<Tabbar items={ITEMS} pcVariant="top" />);
+    it('pcVariant="top" 切到顶部导航', async () => {
+        await load(<Tabbar items={ITEMS} pcVariant="top" />);
         expect(
             document.querySelector('[data-slot="tabbar"]')?.getAttribute('data-variant'),
         ).toBe('top');
     });
 
-    it('PC 用自己的槽名（tabbar-pc-item），不复用 H5 的槽名', () => {
-        render(<Tabbar items={ITEMS} />);
+    it('PC 用自己的槽名（tabbar-pc-item），不复用 H5 的槽名', async () => {
+        await load(<Tabbar items={ITEMS} />);
         expect(document.querySelector('[data-slot="tabbar-pc-item"]')).not.toBeNull();
         expect(document.querySelector('[data-slot="tabbar-item"]')).toBeNull();
     });
 
-    it('受控 value 决定激活项（对不上任何项时谁都不选中）', () => {
+    it('受控 value 决定激活项（对不上任何项时谁都不选中）', async () => {
         function Controlled() {
             const [value, setValue] = useState<string | undefined>('order');
             return (
@@ -168,7 +178,7 @@ describe('Tabbar · PC', () => {
                 </>
             );
         }
-        render(<Controlled />);
+        await load(<Controlled />);
         expect(
             document.querySelector('[data-slot="tabbar-pc-item"][data-active="true"]')
                 ?.textContent,

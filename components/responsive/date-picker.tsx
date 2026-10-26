@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5DatePicker } from "@/components/h5/date-picker";
-import { PcDatePicker } from "@/components/pc/date-picker";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5DatePicker = lazyWithRef(() => import("@/components/h5/date-picker").then((m) => ({ default: m.H5DatePicker })));
+const PcDatePicker = lazyWithRef(() => import("@/components/pc/date-picker").then((m) => ({ default: m.PcDatePicker })));
 import type { DatePanelProps } from "@/components/ui/date-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
@@ -207,11 +209,15 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       id,
     };
 
-    return mode === "mobile" ? (
-      <H5DatePicker ref={ref} {...panelProps} />
-    ) : (
-      <PcDatePicker ref={ref} {...panelProps} />
-    );
+  return (
+    <React.Suspense fallback={null}>
+      {mode === "mobile" ? (
+        <H5DatePicker ref={ref} {...panelProps} />
+      ) : (
+        <PcDatePicker ref={ref} {...panelProps} />
+      )}
+    </React.Suspense>
+  );
   },
 );
 

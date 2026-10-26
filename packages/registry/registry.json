@@ -35,6 +35,19 @@
             "dependencies": []
         },
         {
+            "name": "lazy-with-ref",
+            "type": "registry:lib",
+            "title": "lazy + ref 透传",
+            "description": "让 React.lazy 加载的 forwardRef 组件支持 ref 透传。架构 §6.3 把 responsive 分发层的 H5/PC 两套实现拆成异步 chunk，本工具保留 ref 语义，是所有双端组件的公共依赖。",
+            "files": [
+                {
+                    "path": "lib/lazy-with-ref.tsx",
+                    "type": "registry:lib",
+                    "target": "lib/lazy-with-ref.tsx"
+                }
+            ]
+        },
+        {
             "name": "imperative-host",
             "type": "registry:lib",
             "title": "命令式宿主管理",
@@ -728,7 +741,8 @@
                 "use-select-state",
                 "select-parts",
                 "select-h5",
-                "select-pc"
+                "select-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -827,7 +841,8 @@
                 "use-search-state",
                 "search-parts",
                 "search-h5",
-                "search-pc"
+                "search-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -924,7 +939,8 @@
                 "use-menu-state",
                 "menu-parts",
                 "dropdown-menu-h5",
-                "dropdown-menu-pc"
+                "dropdown-menu-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1038,7 +1054,8 @@
                 "use-date-value",
                 "date-parts",
                 "date-picker-h5",
-                "date-picker-pc"
+                "date-picker-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1138,7 +1155,8 @@
                 "use-time-value",
                 "time-parts",
                 "time-picker-h5",
-                "time-picker-pc"
+                "time-picker-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1243,7 +1261,8 @@
                 "use-datetime-value",
                 "datetime-parts",
                 "datetime-picker-h5",
-                "datetime-picker-pc"
+                "datetime-picker-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1342,7 +1361,8 @@
                 "use-picker-state",
                 "picker-parts",
                 "picker-h5",
-                "picker-pc"
+                "picker-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1441,7 +1461,8 @@
                 "picker-parts",
                 "cascader-parts",
                 "cascader-h5",
-                "cascader-pc"
+                "cascader-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1544,7 +1565,8 @@
                 "use-calendar-state",
                 "calendar-parts",
                 "calendar-h5",
-                "calendar-pc"
+                "calendar-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1638,7 +1660,8 @@
                 "use-device-mode",
                 "responsive-provider",
                 "tooltip-h5",
-                "tooltip-pc"
+                "tooltip-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1719,7 +1742,8 @@
                 "use-device-mode",
                 "responsive-provider",
                 "popover-h5",
-                "popover-pc"
+                "popover-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -1966,7 +1990,8 @@
                 "use-rate-state",
                 "rate-parts",
                 "rate-h5",
-                "rate-pc"
+                "rate-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -2073,7 +2098,8 @@
                 "use-slider-state",
                 "slider-parts",
                 "slider-h5",
-                "slider-pc"
+                "slider-pc",
+                "lazy-with-ref"
             ]
         },
         {
@@ -2328,7 +2354,8 @@
                 "tabbar-parts",
                 "tabbar-h5",
                 "tabbar-pc",
-                "tokens"
+                "tokens",
+                "lazy-with-ref"
             ]
         },
         {
@@ -2423,7 +2450,8 @@
                 "list-parts",
                 "list-h5",
                 "list-pc",
-                "tokens"
+                "tokens",
+                "lazy-with-ref"
             ]
         },
         {
@@ -2542,7 +2570,8 @@
                 "table-parts",
                 "table-h5",
                 "table-pc",
-                "tokens"
+                "tokens",
+                "lazy-with-ref"
             ]
         },
         {

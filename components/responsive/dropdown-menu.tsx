@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Menu } from "@/components/h5/menu";
-import { PcMenu } from "@/components/pc/menu";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Menu = lazyWithRef(() => import("@/components/h5/menu").then((m) => ({ default: m.H5Menu })));
+const PcMenu = lazyWithRef(() => import("@/components/pc/menu").then((m) => ({ default: m.PcMenu })));
 import {
   MenuTriggerPath,
   type MenuPanelProps,
@@ -232,10 +234,14 @@ export const DropdownMenu = React.forwardRef<
     id,
   };
 
-  return mode === "mobile" ? (
-    <H5Menu ref={ref} {...panelProps} />
-  ) : (
-    <PcMenu ref={ref} {...panelProps} />
+  return (
+    <React.Suspense fallback={null}>
+      {mode === "mobile" ? (
+        <H5Menu ref={ref} {...panelProps} />
+      ) : (
+        <PcMenu ref={ref} {...panelProps} />
+      )}
+    </React.Suspense>
   );
 });
 

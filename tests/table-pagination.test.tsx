@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import * as React from 'react';
 import { Table, type TableColumn } from '@/components/responsive/table';
@@ -19,6 +19,16 @@ import { setViewport } from './setup';
  * 3. 越界夹紧（删光最后一页后当前页会失效）
  */
 
+// PcTable 经 React.lazy 异步加载，render 后首帧为 Suspense fallback（null），
+// 故统一用 load 等待根 slot 渲染后再做同步断言。
+async function load(node: React.ReactElement) {
+  const utils = rtlRender(node);
+  await waitFor(async () => {
+    expect(document.querySelector('[data-slot="table"]')).not.toBeNull();
+  });
+  return utils;
+}
+
 interface Row {
     id: string;
     name: string;
@@ -38,8 +48,8 @@ function namesInDom(): string[] {
     );
 }
 
-describe('分页纯函数', () => {
-    it('computePageCount：向上取整，空数据也是 1 页', () => {
+describe('分页纯函数', async () => {
+    it('computePageCount：向上取整，空数据也是 1 页', async () => {
         expect(computePageCount(25, 10)).toBe(3);
         expect(computePageCount(20, 10)).toBe(2);
         expect(computePageCount(21, 10)).toBe(3);
@@ -48,7 +58,7 @@ describe('分页纯函数', () => {
         expect(computePageCount(25, 0)).toBe(3);
     });
 
-    it('clampPage：夹到 [startPage, 末页]，非法值落回起始页', () => {
+    it('clampPage：夹到 [startPage, 末页]，非法值落回起始页', async () => {
         expect(clampPage(2, 3, 1)).toBe(2);
         expect(clampPage(99, 3, 1)).toBe(3);
         expect(clampPage(0, 3, 1)).toBe(1);
@@ -58,7 +68,7 @@ describe('分页纯函数', () => {
         expect(clampPage(Number.NaN, 3, 1)).toBe(1);
     });
 
-    it('sliceStartIndex：startPage=1 时第 1 页下标 0；=0 时第 0 页下标也是 0', () => {
+    it('sliceStartIndex：startPage=1 时第 1 页下标 0；=0 时第 0 页下标也是 0', async () => {
         expect(sliceStartIndex(1, 1, 10)).toBe(0);
         expect(sliceStartIndex(2, 1, 10)).toBe(10);
         // 后端从 0 开始：第 0 页就是第一批
@@ -66,7 +76,7 @@ describe('分页纯函数', () => {
         expect(sliceStartIndex(1, 0, 10)).toBe(10);
     });
 
-    it('buildPageItems：首尾恒显，中间省略号不可点', () => {
+    it('buildPageItems：首尾恒显，中间省略号不可点', async () => {
         expect(buildPageItems(1, 1, 1)).toEqual([1]);
         expect(buildPageItems(1, 3, 1)).toEqual([1, 2, 3]);
         // 10 页、第 5 页：1 … 4 5 6 … 10
@@ -86,18 +96,18 @@ describe('分页纯函数', () => {
     });
 });
 
-describe('Table 分页 · PC', () => {
+describe('Table 分页 · PC', async () => {
     beforeEach(() => {
         act(() => setViewport({ width: 1280, touch: false }));
     });
 
-    it('pagination 关闭时不渲染分页条', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('pagination 关闭时不渲染分页条', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         expect(document.querySelector('[data-slot="table-pagination"]')).toBeNull();
     });
 
-    it('开启后渲染分页条，默认显示总数与页码按钮', () => {
-        render(<Table columns={COLUMNS} data={DATA} pagination total={25} pageSize={10} />);
+    it('开启后渲染分页条，默认显示总数与页码按钮', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} pagination total={25} pageSize={10} />);
         expect(document.querySelector('[data-slot="table-pagination"]')).not.toBeNull();
         expect(screen.getByText('共 25 条')).toBeInTheDocument();
         // 25 条 / 每页 10 → 3 页
@@ -105,15 +115,15 @@ describe('Table 分页 · PC', () => {
         expect(pages).toHaveLength(3);
     });
 
-    it('showTotal=false 隐藏总条数', () => {
-        render(
+    it('showTotal=false 隐藏总条数', async () => {
+        await load(
             <Table columns={COLUMNS} data={DATA} pagination total={25} showTotal={false} />,
         );
         expect(screen.queryByText('共 25 条')).toBeNull();
     });
 
-    it('totalText 支持函数自定义', () => {
-        render(
+    it('totalText 支持函数自定义', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -127,9 +137,9 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- local vs remote ---------- */
 
-    it('remote 模式（默认）：data 是当页数据，组件不切片', () => {
+    it('remote 模式（默认）：data 是当页数据，组件不切片', async () => {
         // 只给了 3 行（当页），total 25 → 不该把 3 行切得更碎
-        render(
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA.slice(0, 3)}
@@ -142,8 +152,8 @@ describe('Table 分页 · PC', () => {
         expect(namesInDom()[0]).toContain('行 1');
     });
 
-    it('local 模式：data 是全量，组件按页切片', () => {
-        render(
+    it('local 模式：data 是全量，组件按页切片', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -158,8 +168,8 @@ describe('Table 分页 · PC', () => {
         expect(namesInDom()[9]).toContain('行 10');
     });
 
-    it('local 模式点下一页真的换数据（切片生效）', () => {
-        render(
+    it('local 模式点下一页真的换数据（切片生效）', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -179,8 +189,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 起始页 ---------- */
 
-    it('startPage=0：页码从 0 开始显示，切片算术同步', () => {
-        render(
+    it('startPage=0：页码从 0 开始显示，切片算术同步', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -200,8 +210,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 受控 / 非受控 ---------- */
 
-    it('非受控：defaultCurrent 指定初始页', () => {
-        render(
+    it('非受控：defaultCurrent 指定初始页', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -215,7 +225,7 @@ describe('Table 分页 · PC', () => {
         expect(namesInDom()[0]).toContain('行 11');
     });
 
-    it('受控 current：外部改值驱动切页', () => {
+    it('受控 current：外部改值驱动切页', async () => {
         function Controlled() {
             const [page, setPage] = React.useState(1);
             return (
@@ -235,15 +245,15 @@ describe('Table 分页 · PC', () => {
                 </>
             );
         }
-        render(<Controlled />);
+        await load(<Controlled />);
         expect(namesInDom()[0]).toContain('行 1');
         fireEvent.click(screen.getByText('去第 3 页'));
         expect(namesInDom()[0]).toContain('行 21');
     });
 
-    it('受控时点页码只通知业务，不自改页码', () => {
+    it('受控时点页码只通知业务，不自改页码', async () => {
         const onPageChange = vi.fn();
-        render(
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -262,8 +272,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 越界 ---------- */
 
-    it('页码越界夹紧：current 超出末页时落回末页', () => {
-        render(
+    it('页码越界夹紧：current 超出末页时落回末页', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -277,7 +287,7 @@ describe('Table 分页 · PC', () => {
         expect(namesInDom()).toHaveLength(5);
     });
 
-    it('total 变小导致当前页越界时自动夹回', () => {
+    it('total 变小导致当前页越界时自动夹回', async () => {
         function Shrink() {
             const [total, setTotal] = React.useState(25);
             return (
@@ -296,7 +306,7 @@ describe('Table 分页 · PC', () => {
                 </>
             );
         }
-        render(<Shrink />);
+        await load(<Shrink />);
         expect(screen.getByLabelText('第 3 页')).toHaveAttribute('aria-current', 'page');
         fireEvent.click(screen.getByText('删到只剩 3 条'));
         // 3 条 / 每页 10 → 只有 1 页，当前页夹到 1
@@ -305,8 +315,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 首尾禁用 ---------- */
 
-    it('首页时「上一页」禁用，末页时「下一页」禁用', () => {
-        render(
+    it('首页时「上一页」禁用，末页时「下一页」禁用', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -326,8 +336,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 跳页 ---------- */
 
-    it('跳页输入：回车切到指定页', () => {
-        render(
+    it('跳页输入：回车切到指定页', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -343,8 +353,8 @@ describe('Table 分页 · PC', () => {
         expect(namesInDom()[0]).toContain('行 21');
     });
 
-    it('跳页越界值被夹紧', () => {
-        render(
+    it('跳页越界值被夹紧', async () => {
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -362,14 +372,14 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 每页条数 ---------- */
 
-    it('给了 pageSizeOptions 才渲染每页条数下拉', () => {
-        const { unmount } = render(
+    it('给了 pageSizeOptions 才渲染每页条数下拉', async () => {
+        const { unmount } = await load(
             <Table columns={COLUMNS} data={DATA} pagination total={25} />,
         );
         expect(screen.queryByLabelText('每页条数')).toBeNull();
         unmount();
 
-        render(
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -381,9 +391,9 @@ describe('Table 分页 · PC', () => {
         expect(screen.getByLabelText('每页条数')).toBeInTheDocument();
     });
 
-    it('换每页条数回到起始页', () => {
+    it('换每页条数回到起始页', async () => {
         const onPageSizeChange = vi.fn();
-        render(
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -406,8 +416,8 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- 空数据 ---------- */
 
-    it('空数据时总页数是 1，翻页按钮全禁用', () => {
-        render(<Table columns={COLUMNS} data={[]} pagination total={0} />);
+    it('空数据时总页数是 1，翻页按钮全禁用', async () => {
+        await load(<Table columns={COLUMNS} data={[]} pagination total={0} />);
         expect(screen.getByText('共 0 条')).toBeInTheDocument();
         expect(screen.getByLabelText('上一页')).toBeDisabled();
         expect(screen.getByLabelText('下一页')).toBeDisabled();
@@ -415,9 +425,9 @@ describe('Table 分页 · PC', () => {
 
     /* ---------- H5 不渲染 ---------- */
 
-    it('H5 端接受 pagination 但不渲染分页条', () => {
+    it('H5 端接受 pagination 但不渲染分页条', async () => {
         act(() => setViewport({ width: 375, touch: true }));
-        render(<Table columns={COLUMNS} data={DATA} pagination total={25} />);
+        await load(<Table columns={COLUMNS} data={DATA} pagination total={25} />);
         expect(document.querySelector('[data-slot="table-pagination"]')).toBeNull();
         // 卡片仍然全量渲染（分页是 PC 能力）
         expect(document.querySelectorAll('[data-slot="table-card"]')).toHaveLength(25);

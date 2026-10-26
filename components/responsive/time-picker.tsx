@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5TimePicker } from "@/components/h5/time-picker";
-import { PcTimePicker } from "@/components/pc/time-picker";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5TimePicker = lazyWithRef(() => import("@/components/h5/time-picker").then((m) => ({ default: m.H5TimePicker })));
+const PcTimePicker = lazyWithRef(() => import("@/components/pc/time-picker").then((m) => ({ default: m.PcTimePicker })));
 import type { TimePanelProps } from "@/components/ui/time-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import {
@@ -195,10 +197,14 @@ export const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       id,
     };
 
-    return mode === "mobile" ? (
-      <H5TimePicker ref={ref} {...panelProps} />
-    ) : (
-      <PcTimePicker ref={ref} {...panelProps} />
+    return (
+      <React.Suspense fallback={null}>
+        {mode === "mobile" ? (
+          <H5TimePicker ref={ref} {...panelProps} />
+        ) : (
+          <PcTimePicker ref={ref} {...panelProps} />
+        )}
+      </React.Suspense>
     );
   },
 );

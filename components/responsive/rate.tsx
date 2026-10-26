@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Rate } from "@/components/h5/rate";
-import { PcRate } from "@/components/pc/rate";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Rate = lazyWithRef(() => import("@/components/h5/rate").then((m) => ({ default: m.H5Rate })));
+const PcRate = lazyWithRef(() => import("@/components/pc/rate").then((m) => ({ default: m.PcRate })));
 import type { RateRenderProps } from "@/components/ui/rate-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import { useRateValue } from "@/hooks/use-rate-state";
@@ -119,9 +121,13 @@ export const Rate = React.forwardRef<HTMLDivElement, RateProps>(function Rate(
         ariaLabel,
     };
 
-    return mode === "mobile" ? (
-        <H5Rate ref={ref} {...common} />
-    ) : (
-        <PcRate ref={ref} {...common} />
+    return (
+        <React.Suspense fallback={null}>
+            {mode === "mobile" ? (
+                <H5Rate ref={ref} {...common} />
+            ) : (
+                <PcRate ref={ref} {...common} />
+            )}
+        </React.Suspense>
     );
 });

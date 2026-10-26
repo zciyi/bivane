@@ -1,7 +1,15 @@
 import * as React from 'react';
-import { H5Select } from '@/components/h5/select';
-import { PcSelect } from '@/components/pc/select';
 import type { SelectPanelProps } from '@/components/ui/select-parts';
+import { lazyWithRef } from '@/lib/lazy-with-ref';
+
+// H5 / PC 两套实现拆成异步 chunk（架构 §6.3 包体策略）：PC 入口不打包 H5 弹层/手势
+// 代码，反之亦然。双模式 props 由分发层统一下发，懒加载不影响交互一致性。
+const H5Select = lazyWithRef(() =>
+  import('@/components/h5/select').then((m) => ({ default: m.H5Select })),
+);
+const PcSelect = lazyWithRef(() =>
+  import('@/components/pc/select').then((m) => ({ default: m.PcSelect })),
+);
 import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import {
   flattenOptions,
@@ -222,10 +230,14 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(function Sel
     id,
   };
 
-  return mode === 'mobile' ? (
-    <H5Select ref={ref} {...panelProps} />
-  ) : (
-    <PcSelect ref={ref} {...panelProps} />
+  return (
+    <React.Suspense fallback={null}>
+      {mode === 'mobile' ? (
+        <H5Select ref={ref} {...panelProps} />
+      ) : (
+        <PcSelect ref={ref} {...panelProps} />
+      )}
+    </React.Suspense>
   );
 });
 

@@ -1,8 +1,12 @@
 import * as React from 'react';
-import { H5Tabbar } from '@/components/h5/tabbar';
-import { PcTabbar, type PcTabbarVariant } from '@/components/pc/tabbar';
+import type { PcTabbarVariant } from '@/components/pc/tabbar';
 import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import { useTabbarState, type TabbarItem } from '@/hooks/use-tabbar-state';
+import { lazyWithRef } from '@/lib/lazy-with-ref';
+
+// H5 / PC 两套实现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Tabbar = lazyWithRef(() => import('@/components/h5/tabbar').then((m) => ({ default: m.H5Tabbar })));
+const PcTabbar = lazyWithRef(() => import('@/components/pc/tabbar').then((m) => ({ default: m.PcTabbar })));
 
 /**
  * Bivane Tabbar · 分发层（模式 C）
@@ -79,29 +83,33 @@ export const Tabbar = React.forwardRef<HTMLDivElement, TabbarProps>(function Tab
     [items, state],
   );
 
-  return mode === 'mobile' ? (
-    <H5Tabbar
-      ref={ref}
-      items={items}
-      active={state.active}
-      onSelect={select}
-      fixed={fixed}
-      placeholder={placeholder}
-      safeAreaInsetBottom={safeAreaInsetBottom}
-      border={border}
-      className={className}
-    />
-  ) : (
-    <PcTabbar
-      ref={ref}
-      items={items}
-      active={state.active}
-      onSelect={select}
-      variant={pcVariant}
-      fixed={fixed}
-      placeholder={placeholder}
-      border={border}
-      className={className}
-    />
+  return (
+    <React.Suspense fallback={null}>
+      {mode === 'mobile' ? (
+        <H5Tabbar
+          ref={ref}
+          items={items}
+          active={state.active}
+          onSelect={select}
+          fixed={fixed}
+          placeholder={placeholder}
+          safeAreaInsetBottom={safeAreaInsetBottom}
+          border={border}
+          className={className}
+        />
+      ) : (
+        <PcTabbar
+          ref={ref}
+          items={items}
+          active={state.active}
+          onSelect={select}
+          variant={pcVariant}
+          fixed={fixed}
+          placeholder={placeholder}
+          border={border}
+          className={className}
+        />
+      )}
+    </React.Suspense>
   );
 });

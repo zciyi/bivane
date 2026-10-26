@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Slider } from "@/components/h5/slider";
-import { PcSlider } from "@/components/pc/slider";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Slider = lazyWithRef(() => import("@/components/h5/slider").then((m) => ({ default: m.H5Slider })));
+const PcSlider = lazyWithRef(() => import("@/components/pc/slider").then((m) => ({ default: m.PcSlider })));
 import type { SliderRenderProps } from "@/components/ui/slider-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import { useSliderValue, type SliderValue } from "@/hooks/use-slider-state";
@@ -132,10 +134,14 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
             onDragEnd,
         };
 
-        return mode === "mobile" ? (
-            <H5Slider ref={ref} {...common} />
-        ) : (
-            <PcSlider ref={ref} {...common} />
+        return (
+            <React.Suspense fallback={null}>
+                {mode === "mobile" ? (
+                    <H5Slider ref={ref} {...common} />
+                ) : (
+                    <PcSlider ref={ref} {...common} />
+                )}
+            </React.Suspense>
         );
     },
 );

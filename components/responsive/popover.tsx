@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Popover } from "@/components/h5/popover";
-import { PcPopover } from "@/components/pc/popover";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Popover = lazyWithRef(() => import("@/components/h5/popover").then((m) => ({ default: m.H5Popover })));
+const PcPopover = lazyWithRef(() => import("@/components/pc/popover").then((m) => ({ default: m.PcPopover })));
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import type {
   PopoverAction,
@@ -119,10 +121,14 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
       children,
     };
 
-    return mode === "mobile" ? (
-      <H5Popover ref={ref} {...panelProps} />
-    ) : (
-      <PcPopover ref={ref} {...panelProps} />
+    return (
+      <React.Suspense fallback={null}>
+        {mode === "mobile" ? (
+          <H5Popover ref={ref} {...panelProps} />
+        ) : (
+          <PcPopover ref={ref} {...panelProps} />
+        )}
+      </React.Suspense>
     );
   },
 );

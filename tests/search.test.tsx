@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { Search } from '@/components/responsive/search';
 import {
     filterSuggestions,
@@ -17,6 +18,18 @@ import {
  *   - 历史：提交写历史、去重前置、可控
  *   - 键盘：PC ↑↓ 巡航 + Enter 选中激活项 + Esc 关闭
  */
+
+// H5Search / PcSearch 经 React.lazy 异步加载，render 后首帧为 Suspense fallback（null），
+// 故统一用 load 等待两端各自的根节点（H5 内联条 / PC 输入框）渲染后再做同步断言。
+async function load(node: ReactElement) {
+  const utils = rtlRender(node);
+  await waitFor(async () => {
+    expect(
+      document.querySelector('[data-slot="search"], input[data-slot="search-field"]'),
+    ).not.toBeNull();
+  });
+  return utils;
+}
 
 const HOT_WORDS = ['苹果', '香蕉', '橙子'];
 
@@ -52,21 +65,21 @@ function historyRows(): HTMLElement[] {
  * 纯函数
  * ------------------------------------------------------------------ */
 
-describe('use-search-state 纯函数', () => {
-    it('filterSuggestions：空关键词返回全部（热词态），有关键词按子串过滤', () => {
+describe('use-search-state 纯函数', async () => {
+    it('filterSuggestions：空关键词返回全部（热词态），有关键词按子串过滤', async () => {
         expect(filterSuggestions(HOT_WORDS, '')).toEqual(HOT_WORDS);
         expect(filterSuggestions(HOT_WORDS, '苹')).toEqual(['苹果']);
         expect(filterSuggestions(HOT_WORDS, 'zzz')).toEqual([]);
     });
 
-    it('pushHistory：去重前置、忽略空词、截断到上限', () => {
+    it('pushHistory：去重前置、忽略空词、截断到上限', async () => {
         expect(pushHistory([], 'a')).toEqual(['a']);
         expect(pushHistory(['a', 'b'], 'b')).toEqual(['b', 'a']);
         expect(pushHistory(['a'], '   ')).toEqual(['a']);
         expect(pushHistory(['a', 'b', 'c'], 'd', 3)).toEqual(['d', 'a', 'b']);
     });
 
-    it('removeHistoryItem / nextSuggestionIndex', () => {
+    it('removeHistoryItem / nextSuggestionIndex', async () => {
         expect(removeHistoryItem(['a', 'b'], 'a')).toEqual(['b']);
         expect(nextSuggestionIndex(0, -1, 1)).toBe(-1);
         expect(nextSuggestionIndex(3, -1, 1)).toBe(0); // ↓ 从无到第一
@@ -79,9 +92,9 @@ describe('use-search-state 纯函数', () => {
  * H5
  * ------------------------------------------------------------------ */
 
-describe('h5 mode', () => {
-    it('内联搜索条为只读，聚焦才展开全屏搜索页', () => {
-        render(<Search forceMode="mobile" suggestions={HOT_WORDS} />);
+describe('h5 mode', async () => {
+    it('内联搜索条为只读，聚焦才展开全屏搜索页', async () => {
+        await load(<Search forceMode="mobile" suggestions={HOT_WORDS} />);
 
         // 未展开：没有全屏页
         expect(fullInput()).toBeNull();
@@ -93,7 +106,7 @@ describe('h5 mode', () => {
 
     it('无关键词且有历史时展示历史区，点历史即提交并收起', async () => {
         const onSearch = vi.fn();
-        render(
+        await load(
             <Search
                 forceMode="mobile"
                 onSearch={onSearch}
@@ -111,8 +124,8 @@ describe('h5 mode', () => {
         await waitFor(() => expect(fullInput()).toBeNull());
     });
 
-    it('有关键词时切到建议列表；无历史则空关键词直接给建议', () => {
-        render(<Search forceMode="mobile" suggestions={HOT_WORDS} history={['西瓜']} />);
+    it('有关键词时切到建议列表；无历史则空关键词直接给建议', async () => {
+        await load(<Search forceMode="mobile" suggestions={HOT_WORDS} history={['西瓜']} />);
         fireEvent.focus(inlineInput());
 
         // 空关键词 + 有历史 → 历史区
@@ -129,7 +142,7 @@ describe('h5 mode', () => {
 
     it('返回键退出且不提交', async () => {
         const onSearch = vi.fn();
-        render(<Search forceMode="mobile" onSearch={onSearch} suggestions={HOT_WORDS} />);
+        await load(<Search forceMode="mobile" onSearch={onSearch} suggestions={HOT_WORDS} />);
         fireEvent.focus(inlineInput());
         expect(fullInput()).not.toBeNull();
 
@@ -138,10 +151,10 @@ describe('h5 mode', () => {
         expect(onSearch).not.toHaveBeenCalled();
     });
 
-    it('提交写历史：受控历史被去重前置', () => {
+    it('提交写历史：受控历史被去重前置', async () => {
         const onHistoryChange = vi.fn();
         const onSearch = vi.fn();
-        render(
+        await load(
             <Search
                 forceMode="mobile"
                 history={['西瓜']}
@@ -162,9 +175,9 @@ describe('h5 mode', () => {
  * PC
  * ------------------------------------------------------------------ */
 
-describe('pc mode', () => {
-    it('内联输入框聚焦（有热词）浮出建议浮层，不出现全屏页/历史', () => {
-        render(<Search forceMode="desktop" suggestions={HOT_WORDS} history={['西瓜']} />);
+describe('pc mode', async () => {
+    it('内联输入框聚焦（有热词）浮出建议浮层，不出现全屏页/历史', async () => {
+        await load(<Search forceMode="desktop" suggestions={HOT_WORDS} history={['西瓜']} />);
 
         expect(panel()).toBeNull();
         fireEvent.focus(pcInput());
@@ -176,9 +189,9 @@ describe('pc mode', () => {
         expect(fullInput()).toBeNull();
     });
 
-    it('输入关键词过滤建议；↑↓ 巡航、Enter 选中激活项', () => {
+    it('输入关键词过滤建议；↑↓ 巡航、Enter 选中激活项', async () => {
         const onSearch = vi.fn();
-        render(<Search forceMode="desktop" suggestions={HOT_WORDS} onSearch={onSearch} />);
+        await load(<Search forceMode="desktop" suggestions={HOT_WORDS} onSearch={onSearch} />);
 
         fireEvent.focus(pcInput());
         fireEvent.change(pcInput(), { target: { value: '' } });
@@ -194,8 +207,8 @@ describe('pc mode', () => {
         expect(panel()).toBeNull();
     });
 
-    it('Esc 关闭浮层', () => {
-        render(<Search forceMode="desktop" suggestions={HOT_WORDS} />);
+    it('Esc 关闭浮层', async () => {
+        await load(<Search forceMode="desktop" suggestions={HOT_WORDS} />);
         fireEvent.focus(pcInput());
         expect(panel()).not.toBeNull();
 
@@ -203,8 +216,8 @@ describe('pc mode', () => {
         expect(panel()).toBeNull();
     });
 
-    it('空关键词且无热词时不浮出空壳浮层', () => {
-        render(<Search forceMode="desktop" />);
+    it('空关键词且无热词时不浮出空壳浮层', async () => {
+        await load(<Search forceMode="desktop" />);
         fireEvent.focus(pcInput());
         expect(panel()).toBeNull();
 
@@ -215,7 +228,7 @@ describe('pc mode', () => {
 
     it('异步建议源：debounce=0 时按关键词请求并渲染', async () => {
         const onFetch = vi.fn((kw: string) => [`远程-${kw}`]);
-        render(<Search forceMode="desktop" debounce={0} onFetchSuggestions={onFetch} />);
+        await load(<Search forceMode="desktop" debounce={0} onFetchSuggestions={onFetch} />);
 
         fireEvent.focus(pcInput());
         fireEvent.change(pcInput(), { target: { value: 'abc' } });

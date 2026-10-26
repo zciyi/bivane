@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { List } from '@/components/responsive/list';
 import {
     computePullDistance,
@@ -17,6 +17,16 @@ import { setViewport } from './setup';
  * 两端共享同一份「数据获取状态机」（三态全受控）。
  */
 
+// H5List / PcList 经 React.lazy 异步加载，render 后首帧为 Suspense fallback（null），
+// 故统一用 load 等待根 slot 渲染后再做同步断言。
+async function load(node: ReactElement) {
+  const utils = render(node);
+  await waitFor(async () => {
+    expect(document.querySelector('[data-slot="list"]')).not.toBeNull();
+  });
+  return utils;
+}
+
 const DATA = [
     { id: '1', name: '订单 1' },
     { id: '2', name: '订单 2' },
@@ -26,7 +36,7 @@ const DATA = [
 const renderItem = (item: unknown) => <span>{(item as { name: string }).name}</span>;
 
 describe('use-list-state 纯函数', () => {
-    it('resolveListStatus：error 压过 loading，loading 压过 finished', () => {
+    it('resolveListStatus：error 压过 loading，loading 压过 finished', async () => {
         expect(resolveListStatus({})).toBe('idle');
         expect(resolveListStatus({ loading: true })).toBe('loading');
         expect(resolveListStatus({ finished: true })).toBe('finished');
@@ -36,7 +46,7 @@ describe('use-list-state 纯函数', () => {
         expect(resolveListStatus({ loading: true, finished: true })).toBe('loading');
     });
 
-    it('isNearBottom：内容未渲染时永不误判触底', () => {
+    it('isNearBottom：内容未渲染时永不误判触底', async () => {
         // scrollHeight 为 0（jsdom 不做布局）→ 不触发
         expect(
             isNearBottom({ scrollTop: 0, clientHeight: 100, scrollHeight: 0, threshold: 80 }),
@@ -51,7 +61,7 @@ describe('use-list-state 纯函数', () => {
         ).toBe(false);
     });
 
-    it('resolvePullStatus：位移到阈值以上才是 ready', () => {
+    it('resolvePullStatus：位移到阈值以上才是 ready', async () => {
         expect(resolvePullStatus({ distance: 0, threshold: 64 })).toBe('idle');
         expect(resolvePullStatus({ distance: 30, threshold: 64 })).toBe('pulling');
         expect(resolvePullStatus({ distance: 64, threshold: 64 })).toBe('ready');
@@ -59,7 +69,7 @@ describe('use-list-state 纯函数', () => {
         expect(resolvePullStatus({ distance: 10, threshold: 64, loading: true })).toBe('loading');
     });
 
-    it('computePullDistance：阻尼 0.5 且有上限', () => {
+    it('computePullDistance：阻尼 0.5 且有上限', async () => {
         expect(computePullDistance(0, 96)).toBe(0);
         expect(computePullDistance(-10, 96)).toBe(0);
         // 手指拉 100px → 内容跟 50px（阻尼 0.5）
@@ -74,53 +84,53 @@ describe('List · H5', () => {
         act(() => setViewport({ width: 375, touch: true }));
     });
 
-    it('渲染 H5 形态：data-mode="h5"', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('渲染 H5 形态：data-mode="h5"', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(document.querySelector('[data-slot="list"]')?.getAttribute('data-mode')).toBe(
             'h5',
         );
     });
 
-    it('渲染全部列表项', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('渲染全部列表项', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(screen.getByText('订单 1')).toBeInTheDocument();
         expect(screen.getByText('订单 3')).toBeInTheDocument();
     });
 
-    it('受控 loading 时显示「加载中…」状态区', () => {
-        render(<List data={DATA} renderItem={renderItem} loading />);
+    it('受控 loading 时显示「加载中…」状态区', async () => {
+        await load(<List data={DATA} renderItem={renderItem} loading />);
         expect(document.querySelector('[data-slot="list-status"]')).not.toBeNull();
         expect(screen.getByText('加载中…')).toBeInTheDocument();
     });
 
-    it('受控 finished 时显示「没有更多了」', () => {
-        render(<List data={DATA} renderItem={renderItem} finished />);
+    it('受控 finished 时显示「没有更多了」', async () => {
+        await load(<List data={DATA} renderItem={renderItem} finished />);
         expect(screen.getByText('没有更多了')).toBeInTheDocument();
     });
 
-    it('受控 error 时显示错误文案 + 可点重试', () => {
+    it('受控 error 时显示错误文案 + 可点重试', async () => {
         const onRetry = vi.fn();
-        render(<List data={DATA} renderItem={renderItem} error onRetry={onRetry} />);
+        await load(<List data={DATA} renderItem={renderItem} error onRetry={onRetry} />);
         expect(screen.getByText('加载失败')).toBeInTheDocument();
         fireEvent.click(screen.getByText('重试'));
         expect(onRetry).toHaveBeenCalledTimes(1);
     });
 
-    it('idle 时不渲染状态区', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('idle 时不渲染状态区', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(document.querySelector('[data-slot="list-status"]')).toBeNull();
     });
 
-    it('点击列表项回调 onItemClick', () => {
+    it('点击列表项回调 onItemClick', async () => {
         const onItemClick = vi.fn();
-        render(<List data={DATA} renderItem={renderItem} onItemClick={onItemClick} />);
+        await load(<List data={DATA} renderItem={renderItem} onItemClick={onItemClick} />);
         fireEvent.click(screen.getByText('订单 2'));
         expect(onItemClick).toHaveBeenCalledWith(DATA[1], 1);
     });
 
-    it('下拉手势：拉过阈值后松手触发 onRefresh', () => {
+    it('下拉手势：拉过阈值后松手触发 onRefresh', async () => {
         const onRefresh = vi.fn();
-        render(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
+        await load(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
         const scroll = document.querySelector('[data-slot="list-scroll"]') as HTMLElement;
 
         fireEvent.pointerDown(scroll, { clientY: 0, pointerType: 'touch' });
@@ -133,9 +143,9 @@ describe('List · H5', () => {
         expect(onRefresh).toHaveBeenCalledTimes(1);
     });
 
-    it('下拉未过阈值就松手不触发刷新', () => {
+    it('下拉未过阈值就松手不触发刷新', async () => {
         const onRefresh = vi.fn();
-        render(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
+        await load(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
         const scroll = document.querySelector('[data-slot="list-scroll"]') as HTMLElement;
 
         fireEvent.pointerDown(scroll, { clientY: 0, pointerType: 'touch' });
@@ -148,7 +158,7 @@ describe('List · H5', () => {
         expect(onRefresh).not.toHaveBeenCalled();
     });
 
-    it('loading 期间不重复触发 onLoad（守卫）', () => {
+    it('loading 期间不重复触发 onLoad（守卫）', async () => {
         const onLoad = vi.fn();
         function Controlled() {
             const [loading, setLoading] = useState(false);
@@ -161,7 +171,7 @@ describe('List · H5', () => {
                 </>
             );
         }
-        render(<Controlled />);
+        await load(<Controlled />);
         const scroll = document.querySelector('[data-slot="list-scroll"]') as HTMLElement;
         // jsdom 里 scrollHeight 恒 0，isNearBottom 恒 false → 用哨兵路径验证
         // 直接触发滚动事件不应报错，且不产生请求
@@ -175,34 +185,34 @@ describe('List · PC', () => {
         act(() => setViewport({ width: 1280, touch: false }));
     });
 
-    it('渲染 PC 形态：data-mode="pc"', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('渲染 PC 形态：data-mode="pc"', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(document.querySelector('[data-slot="list"]')?.getAttribute('data-mode')).toBe(
             'pc',
         );
     });
 
-    it('PC 用自己的槽名（list-pc-item），不复用 H5 的槽名', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('PC 用自己的槽名（list-pc-item），不复用 H5 的槽名', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(document.querySelector('[data-slot="list-pc-item"]')).not.toBeNull();
         expect(document.querySelector('[data-slot="list-item"]')).toBeNull();
     });
 
-    it('顶部「刷新」按钮触发 onRefresh（H5 下拉刷新的等价交互）', () => {
+    it('顶部「刷新」按钮触发 onRefresh（H5 下拉刷新的等价交互）', async () => {
         const onRefresh = vi.fn();
-        render(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
+        await load(<List data={DATA} renderItem={renderItem} onRefresh={onRefresh} />);
         fireEvent.click(screen.getByText('刷新'));
         expect(onRefresh).toHaveBeenCalledTimes(1);
     });
 
-    it('不传 onRefresh 时不渲染刷新按钮', () => {
-        render(<List data={DATA} renderItem={renderItem} />);
+    it('不传 onRefresh 时不渲染刷新按钮', async () => {
+        await load(<List data={DATA} renderItem={renderItem} />);
         expect(document.querySelector('[data-slot="list-pc-refresh"]')).toBeNull();
     });
 
-    it('虚拟滚动：给 virtual + itemHeight 时走窗口化并标注 data-virtual', () => {
+    it('虚拟滚动：给 virtual + itemHeight 时走窗口化并标注 data-virtual', async () => {
         const many = Array.from({ length: 200 }, (_, i) => ({ id: String(i), name: `行 ${i}` }));
-        render(
+        await load(
             <List
                 data={many}
                 renderItem={renderItem}
@@ -218,9 +228,9 @@ describe('List · PC', () => {
         expect(rendered.length).toBeLessThan(200);
     });
 
-    it('未给 itemHeight 时虚拟滚动不启用（退化为全量渲染）', () => {
+    it('未给 itemHeight 时虚拟滚动不启用（退化为全量渲染）', async () => {
         const many = Array.from({ length: 200 }, (_, i) => ({ id: String(i), name: `行 ${i}` }));
-        render(<List data={many} renderItem={renderItem} virtual />);
+        await load(<List data={many} renderItem={renderItem} virtual />);
         expect(
             document.querySelector('[data-slot="list"]')?.getAttribute('data-virtual'),
         ).toBeNull();

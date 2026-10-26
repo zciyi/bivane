@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { H5Search } from '@/components/h5/search';
-import { PcSearch } from '@/components/pc/search';
 import type { SearchShape, SearchViewProps } from '@/components/ui/search-parts';
+import { lazyWithRef } from '@/lib/lazy-with-ref';
+
+// H5 / PC 两套实现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Search = lazyWithRef(() => import('@/components/h5/search').then((m) => ({ default: m.H5Search })));
+const PcSearch = lazyWithRef(() => import('@/components/pc/search').then((m) => ({ default: m.PcSearch })));
 import { useDeviceMode, type DeviceMode } from '@/hooks/use-device-mode';
 import {
   SEARCH_HISTORY_LIMIT,
@@ -183,10 +186,14 @@ export const Search = React.forwardRef<HTMLDivElement, SearchProps>(function Sea
     className,
   };
 
-  return mode === 'mobile' ? (
-    <H5Search ref={ref} {...viewProps} />
-  ) : (
-    <PcSearch ref={ref} {...viewProps} />
+  return (
+    <React.Suspense fallback={null}>
+      {mode === 'mobile' ? (
+        <H5Search ref={ref} {...viewProps} />
+      ) : (
+        <PcSearch ref={ref} {...viewProps} />
+      )}
+    </React.Suspense>
   );
 });
 

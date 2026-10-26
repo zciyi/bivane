@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Calendar } from "@/components/h5/calendar";
-import { PcCalendar } from "@/components/pc/calendar";
+import { lazyWithRef } from "@/lib/lazy-with-ref";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）
+const H5Calendar = lazyWithRef(() => import("@/components/h5/calendar").then((m) => ({ default: m.H5Calendar })));
+const PcCalendar = lazyWithRef(() => import("@/components/pc/calendar").then((m) => ({ default: m.PcCalendar })));
 import type {
     CalendarFormatter,
     CalendarOverRangePayload,
@@ -208,10 +210,14 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
             className,
         };
 
-        return isMobile ? (
-            <H5Calendar ref={ref} {...panelProps} />
-        ) : (
-            <PcCalendar ref={ref} {...panelProps} />
+        return (
+            <React.Suspense fallback={null}>
+                {isMobile ? (
+                    <H5Calendar ref={ref} {...panelProps} />
+                ) : (
+                    <PcCalendar ref={ref} {...panelProps} />
+                )}
+            </React.Suspense>
         );
     },
 );

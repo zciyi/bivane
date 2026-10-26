@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Table, type TableColumn } from '@/components/responsive/table';
 import {
     compareSortValues,
@@ -17,6 +17,16 @@ import { setViewport } from './setup';
  * PC 标准表格（排序 / 列固定 / 列筛选 / 行选择）。
  * 两端消费同一份 columns，排序方向切换规则共享。
  */
+
+// H5Table / PcTable 经 React.lazy 异步加载，render 后首帧为 Suspense fallback（null），
+// 故统一用 load 等待根 slot 渲染后再做同步断言。
+async function load(node: ReactElement) {
+  const utils = rtlRender(node);
+  await waitFor(async () => {
+    expect(document.querySelector('[data-slot="table"]')).not.toBeNull();
+  });
+  return utils;
+}
 
 interface Row {
     id: string;
@@ -37,8 +47,8 @@ const COLUMNS: TableColumn[] = [
     { key: 'status', title: '状态', h5Role: 'detail', filterable: true, filters: ['paid', 'pending'] },
 ];
 
-describe('use-table-state 纯函数', () => {
-    it('nextSortOrder：asc → desc → 取消', () => {
+describe('use-table-state 纯函数', async () => {
+    it('nextSortOrder：asc → desc → 取消', async () => {
         expect(nextSortOrder(undefined, 'a')).toEqual({ key: 'a', order: 'asc' });
         expect(nextSortOrder({ key: 'a', order: 'asc' }, 'a')).toEqual({ key: 'a', order: 'desc' });
         // 第三次点击取消排序
@@ -50,14 +60,14 @@ describe('use-table-state 纯函数', () => {
         });
     });
 
-    it('compareSortValues：数字按数值比，混合按字符串比', () => {
+    it('compareSortValues：数字按数值比，混合按字符串比', async () => {
         expect(compareSortValues(1, 2)).toBeLessThan(0);
         expect(compareSortValues(2, 1)).toBeGreaterThan(0);
         expect(compareSortValues(1, 1)).toBe(0);
         expect(compareSortValues('a', 'b')).toBeLessThan(0);
     });
 
-    it('sortData：按列排序且不改写传入的 data 引用', () => {
+    it('sortData：按列排序且不改写传入的 data 引用', async () => {
         const source = [...DATA];
         const sorted = sortData(source, COLUMNS, { key: 'amount', order: 'asc' });
         expect((sorted[0] as Row).amount).toBe(100);
@@ -69,31 +79,31 @@ describe('use-table-state 纯函数', () => {
         expect(source[0].amount).toBe(300);
     });
 
-    it('sortData：不可排序列不参与排序', () => {
+    it('sortData：不可排序列不参与排序', async () => {
         const sorted = sortData(DATA, COLUMNS, { key: 'status', order: 'asc' });
         expect(sorted[0]).toBe(DATA[0]);
     });
 
-    it('filterData：只按有筛选值的列过滤', () => {
+    it('filterData：只按有筛选值的列过滤', async () => {
         const filtered = filterData(DATA, COLUMNS, { status: ['paid'] });
         expect(filtered).toHaveLength(2);
         // 未筛的列不参与
         expect(filterData(DATA, COLUMNS, {})).toHaveLength(3);
     });
 
-    it('resolveRowKey：优先 id，其次下标', () => {
+    it('resolveRowKey：优先 id，其次下标', async () => {
         expect(resolveRowKey({ id: 'x' }, 3)).toBe('x');
         expect(resolveRowKey({ name: 'y' }, 3)).toBe('3');
     });
 });
 
-describe('Table · H5', () => {
+describe('Table · H5', async () => {
     beforeEach(() => {
         act(() => setViewport({ width: 375, touch: true }));
     });
 
-    it('渲染 H5 形态：卡片而非表格', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('渲染 H5 形态：卡片而非表格', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         expect(document.querySelector('[data-slot="table"]')?.getAttribute('data-mode')).toBe(
             'h5',
         );
@@ -102,8 +112,8 @@ describe('Table · H5', () => {
         expect(document.querySelector('table')).toBeNull();
     });
 
-    it('title 角色直出、detail 角色收进展开区', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('title 角色直出、detail 角色收进展开区', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         const card = document.querySelector('[data-slot="table-card"]') as HTMLElement;
         // 标题区
         expect(card.querySelector('[data-slot="table-card-title"]')?.textContent).toContain(
@@ -118,20 +128,20 @@ describe('Table · H5', () => {
         ).toContain('paid');
     });
 
-    it('meta 角色直出在卡片主体（不需展开）', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('meta 角色直出在卡片主体（不需展开）', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         const card = document.querySelector('[data-slot="table-card"]') as HTMLElement;
         expect(card.querySelector('[data-slot="table-card-meta"]')?.textContent).toContain('300');
     });
 
-    it('空数据显示空态文案', () => {
-        render(<Table columns={COLUMNS} data={[]} emptyText="没有订单" />);
+    it('空数据显示空态文案', async () => {
+        await load(<Table columns={COLUMNS} data={[]} emptyText="没有订单" />);
         expect(screen.getByText('没有订单')).toBeInTheDocument();
     });
 
-    it('字段标签可点排序（与 PC 同一套方向规则）', () => {
+    it('字段标签可点排序（与 PC 同一套方向规则）', async () => {
         const onSortChange = vi.fn();
-        render(
+        await load(
             <Table
                 columns={COLUMNS}
                 data={DATA}
@@ -149,8 +159,8 @@ describe('Table · H5', () => {
         expect(onSortChange).toHaveBeenCalledWith({ key: 'amount', order: 'desc' });
     });
 
-    it('同一字段名在一张卡里只出现一次（标签即排序入口，不另起排序条）', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('同一字段名在一张卡里只出现一次（标签即排序入口，不另起排序条）', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         const card = document.querySelector('[data-slot="table-card"]') as HTMLElement;
         // 「金额」是 meta 区的字段（标签 + 值），在整张卡里只该出现一次
         const occurrences = (card.textContent?.match(/金额/g) ?? []).length;
@@ -160,13 +170,13 @@ describe('Table · H5', () => {
     });
 });
 
-describe('Table · PC', () => {
+describe('Table · PC', async () => {
     beforeEach(() => {
         act(() => setViewport({ width: 1280, touch: false }));
     });
 
-    it('渲染 PC 形态：真表格 + 表头', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('渲染 PC 形态：真表格 + 表头', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         expect(document.querySelector('[data-slot="table"]')?.getAttribute('data-mode')).toBe(
             'pc',
         );
@@ -174,7 +184,7 @@ describe('Table · PC', () => {
         expect(document.querySelectorAll('[data-slot="table-pc-head"] th').length).toBe(3);
     });
 
-    it('点表头排序：asc → desc → 取消，aria-sort 同步', () => {
+    it('点表头排序：asc → desc → 取消，aria-sort 同步', async () => {
         function Controlled() {
             // null = 受控且当前无排序（第三态），与 undefined（非受控）区分
             const [sort, setSort] = useState<{ key: string; order: 'asc' | 'desc' } | null>(
@@ -182,7 +192,7 @@ describe('Table · PC', () => {
             );
             return <Table columns={COLUMNS} data={DATA} sort={sort} onSortChange={setSort} />;
         }
-        render(<Controlled />);
+        await load(<Controlled />);
         const amountTh = document.querySelector(
             '[data-slot="table-pc-cell"][data-column="amount"]',
         ) as HTMLElement;
@@ -199,14 +209,14 @@ describe('Table · PC', () => {
         expect(amountTh.getAttribute('aria-sort')).toBeNull();
     });
 
-    it('排序真的改变行顺序', () => {
-        render(<Table columns={COLUMNS} data={DATA} defaultSort={{ key: 'amount', order: 'asc' }} />);
+    it('排序真的改变行顺序', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} defaultSort={{ key: 'amount', order: 'asc' }} />);
         const firstRow = document.querySelector('[data-slot="table-pc-row"]') as HTMLElement;
         expect(firstRow.textContent).toContain('订单乙');
     });
 
-    it('列筛选：选中筛选项后只留匹配行', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('列筛选：选中筛选项后只留匹配行', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         const statusTh = document.querySelector(
             '[data-slot="table-pc-cell"][data-column="status"]',
         ) as HTMLElement;
@@ -225,9 +235,9 @@ describe('Table · PC', () => {
         expect(document.querySelectorAll('[data-slot="table-pc-row"]')).toHaveLength(2);
     });
 
-    it('行选择：行首 checkbox 切换选中，全选按钮同步', () => {
+    it('行选择：行首 checkbox 切换选中，全选按钮同步', async () => {
         const onSelectionChange = vi.fn();
-        render(
+        await load(
             <Table columns={COLUMNS} data={DATA} onSelectionChange={onSelectionChange} />,
         );
         const selectButtons = document.querySelectorAll(
@@ -244,17 +254,17 @@ describe('Table · PC', () => {
         expect(onSelectionChange).toHaveBeenCalledWith(['1', '2', '3']);
     });
 
-    it('未传 onSelectionChange 时不渲染选择列', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('未传 onSelectionChange 时不渲染选择列', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         expect(document.querySelector('[role="checkbox"]')).toBeNull();
     });
 
-    it('列固定：fixed 列走 position: sticky', () => {
+    it('列固定：fixed 列走 position: sticky', async () => {
         const fixedColumns: TableColumn[] = [
             { key: 'name', title: '名称', fixed: 'left', width: 120 },
             { key: 'amount', title: '金额' },
         ];
-        render(<Table columns={fixedColumns} data={DATA} />);
+        await load(<Table columns={fixedColumns} data={DATA} />);
         const nameTh = document.querySelector(
             '[data-slot="table-pc-cell"][data-column="name"]',
         ) as HTMLElement;
@@ -262,13 +272,13 @@ describe('Table · PC', () => {
         expect(nameTh.style.left).toBe('0px');
     });
 
-    it('PC 不渲染 H5 的卡片槽名', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('PC 不渲染 H5 的卡片槽名', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         expect(document.querySelector('[data-slot="table-card"]')).toBeNull();
     });
 
-    it('PC 单元格只渲染值（表头就是标签，不重复渲染）', () => {
-        render(<Table columns={COLUMNS} data={DATA} />);
+    it('PC 单元格只渲染值（表头就是标签，不重复渲染）', async () => {
+        await load(<Table columns={COLUMNS} data={DATA} />);
         const firstCell = document.querySelector(
             '[data-slot="table-pc-row"] [data-slot="table-pc-cell"]',
         ) as HTMLElement;

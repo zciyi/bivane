@@ -1,6 +1,8 @@
 import * as React from "react";
-import { H5Uploader } from "@/components/h5/uploader";
-import { PcUploader } from "@/components/pc/uploader";
+// H5 / PC 两套呈现拆成异步 chunk（架构 §6.3 包体策略）；
+// 两端实现是普通函数组件（不转发 ref），用原生 React.lazy 即可
+const H5Uploader = React.lazy(() => import("@/components/h5/uploader").then((m) => ({ default: m.H5Uploader })));
+const PcUploader = React.lazy(() => import("@/components/pc/uploader").then((m) => ({ default: m.PcUploader })));
 import type { UploaderHandle, UploaderRenderProps } from "@/components/ui/uploader-parts";
 import { useDeviceMode, type DeviceMode } from "@/hooks/use-device-mode";
 import { useUploader, type UploaderAfterRead, type UploaderFileItem } from "@/hooks/use-uploader-state";
@@ -173,10 +175,14 @@ export const Uploader = React.forwardRef<UploaderHandle, UploaderProps>(
             openPickerRef,
         };
 
-        return mode === "mobile" ? (
-            <H5Uploader {...common} />
-        ) : (
-            <PcUploader {...common} />
+        return (
+            <React.Suspense fallback={null}>
+                {mode === "mobile" ? (
+                    <H5Uploader {...common} />
+                ) : (
+                    <PcUploader {...common} />
+                )}
+            </React.Suspense>
         );
     },
 );
