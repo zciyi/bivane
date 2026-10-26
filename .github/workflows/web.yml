@@ -1,9 +1,14 @@
 name: Deploy Bivane website
 
-# 部署通过手动触发（workflow_dispatch）。
-# 前置：仓库 Settings → Pages → Source 必须设为 "GitHub Actions"。
-# 触发：Actions → Deploy Bivane website → Run workflow（分支选 master）。
+# 触发方式：
+#  - push 到 master（官网改动）自动重新部署
+#  - push 到 registry-pages（registry: publish r/ 自动发布）也自动重新部署
+#  - 也可在 Actions 页手动 Run workflow
+# 始终从 master 构建官网，并从 registry-pages 取最新 r/ 打进站点根 /r/。
+# 前置（一次性）：仓库 Settings → Pages → Source 设为 "GitHub Actions"。
 on:
+  push:
+    branches: [master, registry-pages]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +25,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 固定 checkout master：官网源码始终来自 master，与触发分支无关
       - uses: actions/checkout@v4
+        with:
+          ref: master
       - uses: actions/setup-node@v4
         with:
           node-version: 22
