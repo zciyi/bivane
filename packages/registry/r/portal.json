@@ -4,9 +4,7 @@
   "type": "registry:lib",
   "title": "Portal 容器",
   "description": "弹层统一挂载点。注意：portal 内容脱离 data-mode 作用域，弹层根元素必须自带 data-mode。",
-  "dependencies": [
-    "react-dom"
-  ],
+  "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [],
   "files": [

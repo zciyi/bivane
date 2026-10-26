@@ -16,8 +16,8 @@
                 }
             ],
             "dependencies": [
-                "clsx",
-                "tailwind-merge"
+                "clsx@2.1.1",
+                "tailwind-merge@3.7.0"
             ]
         },
         {
@@ -32,9 +32,7 @@
                     "target": "lib/portal.tsx"
                 }
             ],
-            "dependencies": [
-                "react-dom"
-            ]
+            "dependencies": []
         },
         {
             "name": "imperative-host",
@@ -48,9 +46,7 @@
                     "target": "lib/imperative-host.tsx"
                 }
             ],
-            "dependencies": [
-                "react-dom"
-            ]
+            "dependencies": []
         },
         {
             "name": "tokens",
@@ -264,7 +260,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "class-variance-authority"
+                "class-variance-authority@0.7.1"
             ]
         },
         {
@@ -443,7 +439,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "class-variance-authority"
+                "class-variance-authority@0.7.1"
             ]
         },
         {
@@ -528,7 +524,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-dialog"
+                "@radix-ui/react-dialog@1.1.23"
             ]
         },
         {
@@ -711,7 +707,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -810,7 +806,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -907,7 +903,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-dropdown-menu"
+                "@radix-ui/react-dropdown-menu@2.1.24"
             ]
         },
         {
@@ -1020,8 +1016,8 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover",
-                "react-day-picker@^10.0.1"
+                "@radix-ui/react-popover@1.1.23",
+                "react-day-picker@10.0.1"
             ]
         },
         {
@@ -1121,7 +1117,7 @@
                 "button"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -1226,7 +1222,7 @@
                 "use-date-value"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -1325,7 +1321,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -1423,7 +1419,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -1526,7 +1522,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "react-day-picker@^10.0.1"
+                "react-day-picker@10.0.1"
             ]
         },
         {
@@ -1683,7 +1679,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {
@@ -1704,7 +1700,7 @@
                 "tokens"
             ],
             "dependencies": [
-                "@radix-ui/react-popover"
+                "@radix-ui/react-popover@1.1.23"
             ]
         },
         {

@@ -5,7 +5,7 @@
   "title": "TimePicker（PC 实现）",
   "description": "Radix Popover 锚定浮层 + 可点击列表面板（listbox）：点选即生效、键盘方向键巡航、Home/End 跳边界、Esc 关闭，区间模式复用同一条端点切换条。",
   "dependencies": [
-    "@radix-ui/react-popover"
+    "@radix-ui/react-popover@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

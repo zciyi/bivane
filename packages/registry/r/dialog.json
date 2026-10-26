@@ -5,7 +5,7 @@
   "title": "Dialog 对话框",
   "description": "模式 B + 双轨 API：H5 底部抽屉 / PC Radix 居中模态；同时导出 DialogHost、showDialog、showConfirmDialog。",
   "dependencies": [
-    "@radix-ui/react-dialog"
+    "@radix-ui/react-dialog@1.1.23"
   ],
   "devDependencies": [],
   "registryDependencies": [

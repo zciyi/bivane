@@ -5,7 +5,7 @@
   "title": "Tag",
   "description": "对齐 Vant Tag：type/size/plain/round/mark/closeable。",
   "dependencies": [
-    "class-variance-authority"
+    "class-variance-authority@0.7.1"
   ],
   "devDependencies": [],
   "registryDependencies": [
