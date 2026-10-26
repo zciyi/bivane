@@ -15,6 +15,8 @@ import { defineConfig } from 'vite';
  */
 export default defineConfig({
     root: fileURLToPath(new URL('.', import.meta.url)),
+    // 部署在官网同站下的 /docs/ 子路径，资源必须带此前缀，否则会与官网根冲突 404
+    base: '/bivane/docs/',
     plugins: [react(), tailwindcss()],
     resolve: {
         alias: {

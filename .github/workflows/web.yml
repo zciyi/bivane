@@ -4,7 +4,8 @@ name: Deploy Bivane website
 #  - push 到 master（官网改动）自动重新部署
 #  - push 到 registry-pages（registry: publish r/ 自动发布）也自动重新部署
 #  - 也可在 Actions 页手动 Run workflow
-# 始终从 master 构建官网，并从 registry-pages 取最新 r/ 打进站点根 /r/。
+# 始终从 master 构建：官网（/）+ 文档参考站（/docs/），并从 registry-pages 取最新 r/ 打进站点根 /r/。
+# 一个站点、三种内容共存：/ 官网、/docs/ 组件参考、/r/ shadcn registry。
 # 前置（一次性）：仓库 Settings → Pages → Source 设为 "GitHub Actions"。
 on:
   push:
@@ -42,6 +43,14 @@ jobs:
           git archive origin/registry-pages r | tar -x
           mkdir -p apps/web/dist/r
           cp -r r/* apps/web/dist/r/
+      # 构建文档参考站并合进站点 /docs/（apps/docs vite base 已设为 /bivane/docs/）
+      - name: Build docs site
+        run: |
+          npm run docs:props
+          npm run docs:registry
+          npm run docs:examples
+          npm run docs:build
+          cp -r apps/docs/dist apps/web/dist/docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist
