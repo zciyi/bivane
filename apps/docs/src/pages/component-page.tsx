@@ -98,6 +98,44 @@ export function ComponentPage({
         };
     }, [domId, entry.slug, highlightKey]);
 
+    // 「装完在自己的项目里这样引」面板要给出**可运行的示例**，
+    // 不能只放 import —— 示例代码从 example-code.generated.json 取首个，
+    // 与上方演示卡片的「查看代码」同源，不会漂移。
+    // 包成 `Demo` 组件（setup 是 hook/常量声明，放函数体内；code 是 JSX
+    // 片段，可能含多个兄弟节点，用 <>…</> 包裹后 return）。
+    const firstExample = examples[0] ? exampleCode[examples[0].id] : undefined;
+    const usageCode =
+        firstExample && (firstExample.setup || firstExample.code)
+            ? (() => {
+                  const importLine = `import { ${entry.name} } from '${entry.importPath}';`;
+                  const setup = (firstExample.setup || '')
+                      .replace(/^\n+|\n+$/g, '')
+                      .split('\n')
+                      .map((l) => (l ? `  ${l}` : l))
+                      .join('\n');
+                  const code = (firstExample.code || '')
+                      .replace(/^\n+|\n+$/g, '')
+                      .split('\n')
+                      .map((l) => (l ? `    ${l}` : l))
+                      .join('\n');
+                  return [
+                      importLine,
+                      '',
+                      '// 以下示例与上方演示同源（已去掉文档站布局壳；用到的常量/回调按你的项目补全）',
+                      'export function Demo() {',
+                      setup,
+                      '  return (',
+                      '    <>',
+                      code,
+                      '    </>',
+                      '  );',
+                      '}',
+                  ]
+                      .filter((l) => l !== '')
+                      .join('\n');
+              })()
+            : null;
+
     const anchors: Anchor[] = [
         ...(examples.length
             ? [
@@ -243,6 +281,19 @@ export function ComponentPage({
                                     title="tsx"
                                 />
                             </div>
+                        </div>
+                    )}
+
+                    {usageCode && (
+                        <div className="mb-bv-lg">
+                            <h3 className="mb-bv-xs text-docs-h3 font-bv-bold">
+                                完整示例
+                            </h3>
+                            <CodeBlock
+                                code={usageCode}
+                                lang="tsx"
+                                title="tsx"
+                            />
                         </div>
                     )}
 
