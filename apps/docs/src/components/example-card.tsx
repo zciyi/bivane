@@ -19,6 +19,10 @@ export interface ExampleCode {
     setup: string;
     /** 示例的 JSX（已剥掉验证台的布局壳） */
     code: string;
+    /** 示例引用到的模块级常量 / 类型（可空） */
+    consts?: string;
+    /** 示例引用到的 import 语句（可空） */
+    imports?: string;
 }
 
 export function ExampleCard({
@@ -35,7 +39,9 @@ export function ExampleCard({
     children: React.ReactNode;
 }) {
     const [showCode, setShowCode] = useState(false);
-    const text = [code?.setup, code?.code].filter(Boolean).join('\n\n');
+    const text = [code?.imports, code?.consts, code?.setup, code?.code]
+        .filter(Boolean)
+        .join('\n\n');
     const hasCode = Boolean(text.trim());
 
     return (

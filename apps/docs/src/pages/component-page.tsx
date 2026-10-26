@@ -98,16 +98,23 @@ export function ComponentPage({
         };
     }, [domId, entry.slug, highlightKey]);
 
-    // 「装完在自己的项目里这样引」面板要给出**可运行的示例**，
-    // 不能只放 import —— 示例代码从 example-code.generated.json 取首个，
-    // 与上方演示卡片的「查看代码」同源，不会漂移。
-    // 包成 `Demo` 组件（setup 是 hook/常量声明，放函数体内；code 是 JSX
+    // 「完整示例」面板要给出**可运行的示例**，不能只放 import ——
+    // 示例代码从 example-code.generated.json 取首个，与上方演示卡片的
+    // 「查看代码」同源，不会漂移。常量 / import 也一并带出（由
+    // scripts/extract-examples.mjs 按引用关系自动抓取），读者抄走即可跑。
+    // 包成 `Demo` 组件（consts / setup 是声明，放函数体内；code 是 JSX
     // 片段，可能含多个兄弟节点，用 <>…</> 包裹后 return）。
     const firstExample = examples[0] ? exampleCode[examples[0].id] : undefined;
     const usageCode =
         firstExample && (firstExample.setup || firstExample.code)
             ? (() => {
-                  const importLine = `import { ${entry.name} } from '${entry.importPath}';`;
+                  const imports = (firstExample.imports || '')
+                      .replace(/^\n+|\n+$/g, '');
+                  const consts = (firstExample.consts || '')
+                      .replace(/^\n+|\n+$/g, '')
+                      .split('\n')
+                      .map((l) => (l ? `  ${l}` : l))
+                      .join('\n');
                   const setup = (firstExample.setup || '')
                       .replace(/^\n+|\n+$/g, '')
                       .split('\n')
@@ -118,21 +125,22 @@ export function ComponentPage({
                       .split('\n')
                       .map((l) => (l ? `    ${l}` : l))
                       .join('\n');
-                  return [
-                      importLine,
-                      '',
-                      '// 以下示例与上方演示同源（已去掉文档站布局壳；用到的常量/回调按你的项目补全）',
-                      'export function Demo() {',
-                      setup,
-                      '  return (',
-                      '    <>',
-                      code,
-                      '    </>',
-                      '  );',
-                      '}',
-                  ]
-                      .filter((l) => l !== '')
-                      .join('\n');
+
+                  const lines = [];
+                  if (imports) lines.push(imports);
+                  lines.push(
+                      '// 以下示例与上方演示同源（已去掉文档站布局壳，可直接复制运行）',
+                  );
+                  lines.push('export function Demo() {');
+                  if (consts) lines.push(consts);
+                  if (setup) lines.push(setup);
+                  lines.push('  return (');
+                  lines.push('    <>');
+                  if (code) lines.push(code);
+                  lines.push('    </>');
+                  lines.push('  );');
+                  lines.push('}');
+                  return lines.join('\n');
               })()
             : null;
 

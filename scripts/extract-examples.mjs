@@ -80,6 +80,51 @@ function dedent(text) {
     return lines.map((l) => l.slice(min)).join('\n');
 }
 
+/** 收集一条 import 声明导出的绑定名（default / 命名 / 命名空间） */
+function collectImportNames(node) {
+    const names = [];
+    const clause = node.importClause;
+    if (!clause) return names;
+    if (clause.name) names.push(clause.name.text);
+    const named = clause.namedBindings;
+    if (named) {
+        if (ts.isNamedImports(named)) {
+            for (const el of named.elements) names.push(el.name.text);
+        } else if (ts.isNamespaceImport(named)) {
+            names.push(named.name.text);
+        }
+    }
+    return names;
+}
+
+/** 一个节点是不是「模块级值/类型声明」（它的名字可能被示例引用） */
+function isTopLevelDecl(node) {
+    return (
+        ts.isVariableStatement(node) ||
+        ts.isFunctionDeclaration(node) ||
+        ts.isTypeAliasDeclaration(node) ||
+        ts.isInterfaceDeclaration(node) ||
+        ts.isClassDeclaration(node) ||
+        ts.isEnumDeclaration(node)
+    );
+}
+
+/** 取声明节点导出的名字（一条 const a=1, b=2 会拿到 a、b） */
+function declNames(node, sf) {
+    if (ts.isVariableStatement(node)) {
+        return node.declarationList.declarations.map((d) => d.name.getText(sf));
+    }
+    const name = node.name?.text;
+    return name ? [name] : [];
+}
+
+/** 扫描一段源码里出现的所有标识符（粗略，但够用来判断「某个顶层声明被引用」） */
+function collectIdentifiers(text) {
+    const ids = new Set();
+    for (const m of text.matchAll(/[A-Za-z_$][A-Za-z0-9_$]*/g)) ids.add(m[0]);
+    return ids;
+}
+
 export function extractExamples() {
     const files = readdirSync(DEMOS).filter((f) => f.endsWith('.tsx'));
     const paths = files.map((f) => join(DEMOS, f));
@@ -92,7 +137,7 @@ export function extractExamples() {
         noEmit: true,
     });
 
-    /** @type {Record<string, {file: string, setup: string, code: string}>} */
+    /** @type {Record<string, {file: string, setup: string, code: string, consts: string, imports: string}>} */
     const result = {};
 
     for (const path of paths) {
@@ -100,6 +145,39 @@ export function extractExamples() {
         if (!sf) continue;
         const src = readFileSync(path, 'utf8');
         const file = relative(ROOT, path).replace(/\\/g, '/');
+
+        // ── 预扫整个文件，收集「模块级 import」与「模块级声明」 ──
+        // 示例里写死的 PAYMENT_OPTIONS 这类常量都挂在模块级，函数体内抓不到，
+        // 必须从这个表里按引用关系捞回来，否则文档示例自顾不全（读者抄走跑不起来）。
+        /** @type {{names:string[], text:string}[]} */
+        const topImports = [];
+        /** @type {{names:string[], text:string}[]} */
+        const topDecls = [];
+        sf.forEachChild((node) => {
+            if (ts.isImportDeclaration(node)) {
+                topImports.push({
+                    names: collectImportNames(node),
+                    text: src.slice(node.getStart(sf), node.getEnd()),
+                });
+            } else if (isTopLevelDecl(node)) {
+                topDecls.push({
+                    names: declNames(node, sf),
+                    text: src.slice(node.getStart(sf), node.getEnd()),
+                });
+            }
+        });
+
+        // 示例引用到的标识符 → 命中即视为「需要这个顶层声明 / import」
+        const referenced = (text) => {
+            const ids = collectIdentifiers(text);
+            const declHits = topDecls.filter((d) =>
+                d.names.some((n) => ids.has(n)),
+            );
+            const importHits = topImports.filter((imp) =>
+                imp.names.some((n) => ids.has(n)),
+            );
+            return { ids, declHits, importHits };
+        };
 
         sf.forEachChild((node) => {
             if (!ts.isFunctionDeclaration(node)) return;
@@ -151,7 +229,39 @@ export function extractExamples() {
                 .replace(/^\(|\)$/g, '')
                 .trim();
 
-            result[name] = { file, setup, code };
+            // ③ consts：示例引用到的「模块级声明」，做传递闭包
+            //    （某个常量又引用另一个模块级常量时一并捞回）
+            const { ids, declHits, importHits } = referenced(
+                `${setup}\n${code}`,
+            );
+            const needed = new Set(
+                declHits.flatMap((d) => d.names),
+            );
+            let changed = true;
+            while (changed) {
+                changed = false;
+                for (const d of topDecls) {
+                    if (!d.names.some((n) => needed.has(n))) continue;
+                    for (const n of d.names) needed.add(n);
+                    for (const id of collectIdentifiers(d.text)) {
+                        if (!needed.has(id)) {
+                            needed.add(id);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+            const consts = topDecls
+                .filter((d) => d.names.some((n) => needed.has(n)))
+                .map((d) => dedent(d.text))
+                .join('\n\n');
+
+            // ④ imports：示例直接引用到的 import 语句（含 React 命名空间等）
+            const imports = importHits
+                .map((imp) => imp.text)
+                .join('\n');
+
+            result[name] = { file, setup, code, consts, imports };
         });
     }
 
