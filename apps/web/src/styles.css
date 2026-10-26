@@ -1,0 +1,134 @@
+@import 'tailwindcss';
+@import '../../../packages/tokens/styles/vant.css';
+@import '../../../packages/tokens/styles/vant-dark.css';
+@import '../../../packages/tokens/styles/vant-ocean.css';
+@import '../../../packages/tokens/styles/vant-grape.css';
+@import '../../../packages/tokens/styles/modes.css';
+@import '../../../packages/tokens/styles/utilities.css';
+@import '../../../packages/tokens/styles/theme.css';
+
+/**
+ * 官网深浅主题开关：class 挂在 <html> 上（与文档站同做法）。
+ * portal 容器挂在 body 下，挂在根 div 不管用，所以 Tailwind 默认的 dark:
+ * 变体在这里无意义，重新绑到 .bv-theme-dark 上，dark: 工具类才能跟主题走。
+ */
+@custom-variant dark (&:where(.bv-theme-dark, .bv-theme-dark *));
+
+/**
+ * 官网 chrome 专属字阶 / 阴影 / 圆角。
+ * 与组件 token（--text-bv-* / --radius-bv-*）分开：组件内部尺寸永远用 bv 那套，
+ * 这里是页面外壳尺寸。阴影用字面量（不跟 token），深浅切换只换颜色不换抬升感。
+ */
+@theme {
+    --text-docs-display: 34px;
+    --text-docs-display--line-height: 42px;
+    --text-docs-h1: 24px;
+    --text-docs-h1--line-height: 32px;
+    --text-docs-h2: 20px;
+    --text-docs-h2--line-height: 28px;
+    --text-docs-lead: 15px;
+    --text-docs-lead--line-height: 24px;
+
+    --shadow-docs-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.06);
+    --shadow-docs-card-hover: 0 2px 4px rgb(0 0 0 / 0.05), 0 12px 32px rgb(0 0 0 / 0.1);
+    --shadow-docs-float: 0 24px 64px rgb(0 0 0 / 0.22), 0 2px 8px rgb(0 0 0 / 0.08);
+    --shadow-docs-header: 0 1px 3px rgb(0 0 0 / 0.05);
+
+    --radius-docs-lg: 12px;
+    --radius-docs-xl: 16px;
+
+    /* 官网阅读节奏比组件库松一档：只放大 md/lg/xl，不动 xs/sm/base */
+    --spacing-bv-md: 20px;
+    --spacing-bv-lg: 30px;
+    --spacing-bv-xl: 40px;
+}
+
+/**
+ * Tailwind 扫描范围：组件源码在仓库根，不在本应用目录，必须显式 @source 指过去。
+ * 同时排除非源码目录（与根 index.css 同理）。
+ */
+@source '../../../components';
+@source '../../../hooks';
+@source '../../../lib';
+@source '../../../demos';
+@source './';
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        color: var(--bv-text);
+        background:
+            radial-gradient(
+                960px 360px at 50% -120px,
+                color-mix(in srgb, var(--bv-primary) 8%, transparent),
+                transparent 70%
+            ),
+            var(--bv-background);
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--bv-primary) 24%, transparent);
+    }
+
+    /* 锚点跳转时给固定顶栏留白，避免标题被遮住 */
+    section[id] {
+        scroll-margin-top: 80px;
+    }
+}
+
+@layer components {
+    /* chrome 控件焦点环：刻意不做全局 :focus-visible，演示区组件的焦点环由组件自己定 */
+    .web-focus:focus-visible {
+        outline: 2px solid var(--bv-primary);
+        outline-offset: 2px;
+    }
+
+    .web-kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        padding: 1px 5px;
+        border: 1px solid var(--bv-border);
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        background: var(--bv-surface);
+        color: var(--bv-text-2);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 10px;
+        line-height: 14px;
+    }
+
+    /* 首页英雄区：主色晕染 + 纸面 */
+    .web-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(
+                720px 320px at 88% -10%,
+                color-mix(in srgb, var(--bv-primary) 18%, transparent),
+                transparent 68%
+            ),
+            radial-gradient(
+                520px 260px at 8% 110%,
+                color-mix(in srgb, var(--bv-primary) 10%, transparent),
+                transparent 70%
+            ),
+            linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--bv-primary) 4%, var(--bv-surface)),
+                var(--bv-surface)
+            );
+    }
+
+    /* 安装命令代码块 */
+    .web-code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 20px;
+    }
+}

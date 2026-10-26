@@ -1,0 +1,49 @@
+name: Deploy Bivane website
+
+# 部署通过手动触发（workflow_dispatch）。
+# 前置：仓库 Settings → Pages → Source 必须设为 "GitHub Actions"。
+# 触发：Actions → Deploy Bivane website → Run workflow（分支选 master）。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只跑一个部署，避免并发覆盖
+concurrency:
+  group: pages-web
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run web:build
+      # 把线上最新发布的 registry 一并打进站点根 /r/，保持 shadcn registry 可访问
+      - name: Bundle registry into site
+        run: |
+          git fetch origin registry-pages
+          git archive origin/registry-pages r | tar -x
+          mkdir -p apps/web/dist/r
+          cp -r r/* apps/web/dist/r/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

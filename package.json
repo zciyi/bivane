@@ -25,7 +25,10 @@
     "docs:props": "node scripts/extract-props.mjs",
     "docs:registry": "node scripts/build-docs-registry.mjs",
     "docs:examples": "node scripts/extract-examples.mjs",
-    "bench:snapshot": "node scripts/bench-snapshot.mjs"
+    "bench:snapshot": "node scripts/bench-snapshot.mjs",
+    "web:dev": "vite --config apps/web/vite.config.ts",
+    "web:build": "vite build --config apps/web/vite.config.ts",
+    "web:preview": "vite preview --config apps/web/vite.config.ts --port 5172"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

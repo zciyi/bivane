@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zciyi.github.io/bivane/sitemap.xml
