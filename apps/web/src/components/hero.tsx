@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { DualFrame } from './device-frame';
 import { Select } from '@/components/responsive/select';
+import { DatePicker } from '@/components/responsive/date-picker';
 import type { SelectItem } from '@/hooks/use-select-state';
 import { Button } from '@/components/ui/button';
 import { Tag } from '@/components/ui/tag';
-import { showConfirmDialog } from '@/components/responsive/dialog';
+import { showConfirmDialog, showDialog } from '@/components/responsive/dialog';
 
 const CITY_OPTIONS: SelectItem[] = [
     { label: '北京', value: 'bj' },
@@ -124,10 +125,56 @@ export function Hero() {
                             >
                                 体验 Dialog
                             </Button>
+                            <Button
+                                type="primary"
+                                plain
+                                onClick={() =>
+                                    showDialog({
+                                        title: '体验 Select',
+                                        confirmText: '关闭',
+                                        children: (
+                                            <div className="flex w-full flex-col gap-bv-md py-bv-xs text-left">
+                                                <p className="text-bv-sm text-bv-text-2">
+                                                    同一个 &lt;Select&gt;：窄屏弹底部列表、宽屏出锚定浮层
+                                                    ——props 完全一致，差异只在交互。
+                                                </p>
+                                                <Select
+                                                    ariaLabel="城市"
+                                                    placeholder="请选择城市"
+                                                    options={CITY_OPTIONS}
+                                                />
+                                            </div>
+                                        ),
+                                    })
+                                }
+                            >
+                                体验 Select
+                            </Button>
+                            <Button
+                                type="primary"
+                                plain
+                                onClick={() =>
+                                    showDialog({
+                                        title: '体验 DatePicker',
+                                        confirmText: '关闭',
+                                        children: (
+                                            <div className="flex w-full flex-col gap-bv-md py-bv-xs text-left">
+                                                <p className="text-bv-sm text-bv-text-2">
+                                                    同一个 &lt;DatePicker&gt;：窄屏弹三列滚轮、宽屏出月历面板
+                                                    ——props 完全一致，差异只在交互。
+                                                </p>
+                                                <DatePicker ariaLabel="日期" placeholder="请选择日期" />
+                                            </div>
+                                        ),
+                                    })
+                                }
+                            >
+                                体验 Date-Picker
+                            </Button>
                         </div>
                     </div>
 
-                    <DualFrame h5={<HeroSelectDemo />} pc={<HeroSelectDemo />} />
+                    <DualFrame stack h5={<HeroSelectDemo />} pc={<HeroSelectDemo />} />
                 </div>
 
                 <p className="mt-bv-md text-center text-bv-xs text-bv-text-2">

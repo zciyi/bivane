@@ -19,6 +19,8 @@ export interface DialogOptions {
   description?: React.ReactNode;
   /** 自定义主体，优先于 message / description */
   content?: React.ReactNode;
+  /** 自定义主体（React 节点），与 Dialog 组件 children 同义且优先 */
+  children?: React.ReactNode;
   /** 自定义底部，覆盖默认按钮区 */
   footer?: React.ReactNode;
   showConfirmButton?: boolean;

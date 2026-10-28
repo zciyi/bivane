@@ -41,16 +41,25 @@ export function DeviceFrame({
     );
 }
 
-/** H5 与 PC 并排的演示区 */
+/** H5 与 PC 演示区：默认宽屏并排；`stack` 时两帧上下各占一行 */
 export function DualFrame({
     h5,
     pc,
+    stack = false,
 }: {
     h5: React.ReactNode;
     pc: React.ReactNode;
+    /** 两个演示帧是否上下堆叠（默认宽屏并排） */
+    stack?: boolean;
 }) {
     return (
-        <div className="grid grid-cols-1 gap-bv-lg md:grid-cols-[390px_minmax(0,1fr)] md:items-start">
+        <div
+            className={
+                stack
+                    ? 'grid grid-cols-1 gap-bv-lg'
+                    : 'grid grid-cols-1 gap-bv-lg md:grid-cols-[390px_minmax(0,1fr)] md:items-start'
+            }
+        >
             <DeviceFrame mode="mobile" widthClass="w-full md:w-[390px]" label="H5 · 390px">
                 {h5}
             </DeviceFrame>
