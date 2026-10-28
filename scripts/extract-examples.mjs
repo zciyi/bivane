@@ -12,14 +12,20 @@
  * 留着会让读者抄到一段自己项目里不存在的代码。
  *
  * 产出：apps/docs/src/example-code.generated.json
- *   { "ButtonExample1": { "setup": "…", "code": "…" }, … }
+ *   { "ButtonExample1": { "setup": "…", "code": "…", "consts": "…", "imports": "…" }, … }
+ *
+ * 一条硬要求：**读者抄走就能编译**。所以
+ *   - 示例用到的常量 / 类型（也在别的示例文件里的话）按引用闭包捞回来；
+ *   - `import … from "./table-shared"` 这种 demo 内部依赖**内联成源码**，
+ *     不输出读者解析不了的相对路径；
+ *   - import 按「实际用到」裁剪，不带只在注释里被提到的名字。
  *
  * 用法：
  *   node scripts/extract-examples.mjs
  *   node scripts/extract-examples.mjs --stdout
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -34,28 +40,34 @@ const OUT = join(ROOT, 'apps/docs/src/example-code.generated.json');
  * 做法：**按源码区间做字符串切片**（而不是 AST 重新打印）：
  * TS printer 会把 JSX 属性压成一行、丢掉手写时的换行 ——
  * 而这些代码正是要展示给读者抄的，必须保持原来的可读排版。
+ *
+ * 根节点（示例最外层的那个壳）连标签一起去掉，内容靠 dedent 归位；
+ * **嵌套的壳换成 Fragment** —— 直接删标签会把
+ * `cond ? (<CellGroup/>) : (<Row>{…}</Row>)` 的分支掏空成 `({…})`，
+ * 抽出来的代码编译不过（Calendar 示例就踩过这个）。
  */
-function stripShell(src, start, end) {
-    const region = src.slice(start, end);
+function stripShell(src, start, end, rootTag) {
+    let region = src.slice(start, end);
+
+    if (rootTag) {
+        region = region
+            .replace(new RegExp(`^(\\s*)<${rootTag}\\b[^>]*>`), '')
+            .replace(new RegExp(`</${rootTag}>\\s*$`), '');
+    }
+
+    region = region
+        .replace(/<(?:Block|Row)\b[^>]*?\/>/g, '<></>')
+        .replace(/<(?:Block|Row)\b[^>]*>/g, '<>')
+        .replace(/<\/(?:Block|Row)>/g, '</>');
+
     const lines = region.split('\n');
     const out = [];
-
     for (const line of lines) {
-        const trimmed = line.trim();
-        // 独占一行的壳标签 → **整行删掉**（连同它的缩进）
-        // 只删标签文本的话，这一行会变成空行，
-        // 而里面的内容仍带着原来的深层缩进 → 展示出来的代码是歪的。
-        if (/^<\/?(Block|Row)\b[^>]*\/?>$/.test(trimmed)) continue;
-        // 行内出现的壳标签（罕见）→ 只删标签本身
-        if (/<\/?(Block|Row)\b/.test(trimmed)) {
-            out.push(
-                line
-                    .replace(/<\/?(Block|Row)\b[^>]*?\/?>/g, '')
-                    .replace(/\s+$/, ''),
-            );
+        if (!line.trim()) {
+            out.push('');
             continue;
         }
-        out.push(line);
+        out.push(line.replace(/\s+$/, ''));
     }
 
     // 连续空行压成一个
@@ -65,6 +77,11 @@ function stripShell(src, start, end) {
             return !(i > 0 && !arr[i - 1].trim());
         })
         .join('\n');
+}
+
+/** 去掉 `export` 修饰符 —— 这些声明会被粘进文档示例的 `Demo()` 函数体内，不能带 export */
+function stripExport(text) {
+    return text.replace(/^export\s+(default\s+)?/, '');
 }
 
 /** 去掉公共缩进 */
@@ -78,6 +95,26 @@ function dedent(text) {
     }
     if (!isFinite(min)) min = 0;
     return lines.map((l) => l.slice(min)).join('\n');
+}
+
+/**
+ * 按「实际用到」重建一行 import。
+ *
+ * 为什么不直接抄原文：`import { Checkbox, CheckboxGroup }` 里可能只有一个真被用到，
+ * 整行抄走会在读者那边变成 noUnusedLocals 报错；这个只被注释提到过的名字
+ * （`// 上限只约束新增，与 CheckboxGroup max 语义一致`）就是典型来源。
+ * 全都没用到 → 返回 null，整行丢掉。
+ */
+function renderImport(imp, used) {
+    const parts = [];
+    if (imp.defaultName && used.has(imp.defaultName)) parts.push(imp.defaultName);
+    if (imp.namespaceName && used.has(imp.namespaceName)) {
+        parts.push(`* as ${imp.namespaceName}`);
+    }
+    const named = (imp.named || []).filter((el) => used.has(el.name));
+    if (named.length) parts.push(`{ ${named.map((el) => el.text).join(', ')} }`);
+    if (!parts.length) return null;
+    return `import ${imp.typeOnly ? 'type ' : ''}${parts.join(', ')} from '${imp.spec}';`;
 }
 
 /** 收集一条 import 声明导出的绑定名（default / 命名 / 命名空间） */
@@ -120,8 +157,15 @@ function declNames(node, sf) {
 
 /** 扫描一段源码里出现的所有标识符（粗略，但够用来判断「某个顶层声明被引用」） */
 function collectIdentifiers(text) {
+    // 先把注释与字符串抹掉：示例里常有 `// 与 CheckboxGroup max 语义一致` 这种
+    // 顺带一提的注释，直接扫原文会把没用到的 import 也带进示例代码里。
+    const clean = text
+        .replace(/\/\*[\s\S]*?\*\//g, ' ')
+        .replace(/\/\/[^\n]*/g, ' ')
+        .replace(/"(?:[^"\\\n]|\\.)*"/g, '""')
+        .replace(/'(?:[^'\\\n]|\\.)*'/g, "''");
     const ids = new Set();
-    for (const m of text.matchAll(/[A-Za-z_$][A-Za-z0-9_$]*/g)) ids.add(m[0]);
+    for (const m of clean.matchAll(/[A-Za-z_$][A-Za-z0-9_$]*/g)) ids.add(m[0]);
     return ids;
 }
 
@@ -140,44 +184,91 @@ export function extractExamples() {
     /** @type {Record<string, {file: string, setup: string, code: string, consts: string, imports: string}>} */
     const result = {};
 
+    /** 模块解析缓存：同一个文件被多个示例引用时只解析一次 */
+    const moduleCache = new Map();
+
+    /** 解析 demo 内部的相对引用（'./table-shared'）到 demos/ 下的真实文件 */
+    function resolveInternal(spec, fromPath) {
+        if (!spec.startsWith('.')) return null;
+        const base = resolve(dirname(fromPath), spec);
+        for (const candidate of [
+            `${base}.tsx`,
+            `${base}.ts`,
+            join(base, 'index.tsx'),
+            join(base, 'index.ts'),
+        ]) {
+            if (existsSync(candidate)) return candidate;
+        }
+        return null;
+    }
+
+    /**
+     * 一个文件的「模块级 import / 声明」清单。
+     *
+     * 示例里写死的 PAYMENT_OPTIONS 这类常量挂在模块级，函数体内抓不到；
+     * 有些还挂在**同目录的共享 demo 文件**里（./table-shared、./choice）——
+     * 后者读者项目里根本不存在，原样输出一条 import 等于给了一段跑不起来的代码，
+     * 所以要把 `internal` 标记出来，由调用方**递归进去内联源码**。
+     */
+    function moduleOf(path) {
+        const hit = moduleCache.get(path);
+        if (hit) return hit;
+        const sf = program.getSourceFile(path);
+        if (!sf) {
+            const empty = { imports: [], decls: [] };
+            moduleCache.set(path, empty);
+            return empty;
+        }
+        const src = readFileSync(path, 'utf8');
+        /** @type {any[]} */
+        const imports = [];
+        /** @type {{names:string[], text:string, index:number}[]} */
+        const decls = [];
+        sf.forEachChild((node) => {
+            if (ts.isImportDeclaration(node)) {
+                const spec = node.moduleSpecifier
+                    .getText(sf)
+                    .replace(/^['"]|['"]$/g, '');
+                const clause = node.importClause;
+                const bindings = clause?.namedBindings;
+                imports.push({
+                    names: collectImportNames(node),
+                    text: src.slice(node.getStart(sf), node.getEnd()),
+                    index: node.getStart(sf),
+                    spec,
+                    internal: resolveInternal(spec, path),
+                    typeOnly: Boolean(clause?.isTypeOnly),
+                    defaultName: clause?.name?.text ?? null,
+                    namespaceName:
+                        bindings && ts.isNamespaceImport(bindings)
+                            ? bindings.name.text
+                            : null,
+                    named:
+                        bindings && ts.isNamedImports(bindings)
+                            ? bindings.elements.map((el) => ({
+                                  name: el.name.text,
+                                  text: el.getText(sf),
+                              }))
+                            : [],
+                });
+            } else if (isTopLevelDecl(node)) {
+                decls.push({
+                    names: declNames(node, sf),
+                    text: src.slice(node.getStart(sf), node.getEnd()),
+                    index: node.getStart(sf),
+                });
+            }
+        });
+        const mod = { imports, decls };
+        moduleCache.set(path, mod);
+        return mod;
+    }
+
     for (const path of paths) {
         const sf = program.getSourceFile(path);
         if (!sf) continue;
         const src = readFileSync(path, 'utf8');
         const file = relative(ROOT, path).replace(/\\/g, '/');
-
-        // ── 预扫整个文件，收集「模块级 import」与「模块级声明」 ──
-        // 示例里写死的 PAYMENT_OPTIONS 这类常量都挂在模块级，函数体内抓不到，
-        // 必须从这个表里按引用关系捞回来，否则文档示例自顾不全（读者抄走跑不起来）。
-        /** @type {{names:string[], text:string}[]} */
-        const topImports = [];
-        /** @type {{names:string[], text:string}[]} */
-        const topDecls = [];
-        sf.forEachChild((node) => {
-            if (ts.isImportDeclaration(node)) {
-                topImports.push({
-                    names: collectImportNames(node),
-                    text: src.slice(node.getStart(sf), node.getEnd()),
-                });
-            } else if (isTopLevelDecl(node)) {
-                topDecls.push({
-                    names: declNames(node, sf),
-                    text: src.slice(node.getStart(sf), node.getEnd()),
-                });
-            }
-        });
-
-        // 示例引用到的标识符 → 命中即视为「需要这个顶层声明 / import」
-        const referenced = (text) => {
-            const ids = collectIdentifiers(text);
-            const declHits = topDecls.filter((d) =>
-                d.names.some((n) => ids.has(n)),
-            );
-            const importHits = topImports.filter((imp) =>
-                imp.names.some((n) => ids.has(n)),
-            );
-            return { ids, declHits, importHits };
-        };
 
         sf.forEachChild((node) => {
             if (!ts.isFunctionDeclaration(node)) return;
@@ -224,44 +315,92 @@ export function extractExamples() {
                     blockNode
                         ? blockNode.getEnd()
                         : ret.expression.getEnd(),
+                    blockNode ? 'Block' : null,
                 ),
             )
                 .replace(/^\(|\)$/g, '')
                 .trim();
 
-            // ③ consts：示例引用到的「模块级声明」，做传递闭包
-            //    （某个常量又引用另一个模块级常量时一并捞回）
-            const { ids, declHits, importHits } = referenced(
-                `${setup}\n${code}`,
-            );
-            const needed = new Set(
-                declHits.flatMap((d) => d.names),
-            );
-            let changed = true;
-            while (changed) {
-                changed = false;
-                for (const d of topDecls) {
-                    if (!d.names.some((n) => needed.has(n))) continue;
-                    for (const n of d.names) needed.add(n);
-                    for (const id of collectIdentifiers(d.text)) {
-                        if (!needed.has(id)) {
-                            needed.add(id);
-                            changed = true;
-                        }
-                    }
+            // ③ consts / ④ imports：按引用做**跨文件**传递闭包
+            //
+            //    三种落点：
+            //      顶层声明       → 收下源码，继续追它自己的依赖
+            //      demo 内部相对 import（./table-shared）→ 递归进去内联同名声明
+            //      库 import      → 输出这行 import（读者抄走能直接跑）
+            const wantDecls = new Map();
+            const wantImports = new Map();
+            const seen = new Set();
+            const queue = [];
+            const pushIds = (f, text) => {
+                for (const id of collectIdentifiers(text)) queue.push({ f, id });
+            };
+            pushIds(path, `${setup}\n${code}`);
+
+            while (queue.length) {
+                const { f, id } = queue.shift();
+                const key = `${f}::${id}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                const mod = moduleOf(f);
+                const decl = mod.decls.find((d) => d.names.includes(id));
+                if (decl) {
+                    wantDecls.set(key, {
+                        file: f,
+                        index: decl.index,
+                        text: decl.text,
+                    });
+                    pushIds(f, decl.text);
+                    continue;
+                }
+                const imp = mod.imports.find((i) => i.names.includes(id));
+                if (!imp) continue; // 文件内局部变量 / 全局，不带
+                if (imp.internal) {
+                    queue.push({ f: imp.internal, id });
+                    continue;
+                }
+                // 同一个模块被两层文件各 import 一次（`import * as React` 与
+                // `import type * as React`）时只留一条，否则示例里 React 重复声明
+                const impKey = `${imp.spec}|${[...imp.names].sort().join(',')}`;
+                if (!wantImports.has(impKey)) {
+                    wantImports.set(impKey, {
+                        file: f,
+                        index: imp.index,
+                        imp,
+                    });
                 }
             }
-            const consts = topDecls
-                .filter((d) => d.names.some((n) => needed.has(n)))
-                .map((d) => dedent(d.text))
+
+            // 带 props 的示例（Switch 的两张卡片靠父组件传入联动状态）：
+            // 文档面板要把形参一并带上，否则抽出来的代码里挂着一对找不到的标识符
+            const params = node.parameters.length
+                ? src.slice(node.name.getEnd(), node.body.getStart(sf)).trim()
+                : '';
+
+            // 别的文件的声明在前（共享模块 → 本文件），读起来先有依赖后有使用方
+            const consts = [...wantDecls.values()]
+                .sort(
+                    (a, b) =>
+                        (a.file === path ? 1 : 0) - (b.file === path ? 1 : 0) ||
+                        a.index - b.index,
+                )
+                .map((d) => stripExport(dedent(d.text)))
                 .join('\n\n');
 
-            // ④ imports：示例直接引用到的 import 语句（含 React 命名空间等）
-            const imports = importHits
-                .map((imp) => imp.text)
+            // import 反过来：本文件（react / 组件库）在前，共享模块自己的 type 在后；
+            // 顺手按「实际用到」裁剪 —— 读者抄走的代码里多一条没用的 import，
+            // 走 noUnusedLocals 的项目会直接报错。
+            const usedIds = collectIdentifiers(`${consts}\n${setup}\n${code}\n${params}`);
+            const imports = [...wantImports.values()]
+                .sort(
+                    (a, b) =>
+                        (a.file === path ? 0 : 1) - (b.file === path ? 0 : 1) ||
+                        a.index - b.index,
+                )
+                .map((i) => renderImport(i.imp, usedIds))
+                .filter(Boolean)
                 .join('\n');
 
-            result[name] = { file, setup, code, consts, imports };
+            result[name] = { file, setup, code, consts, imports, params };
         });
     }
 
