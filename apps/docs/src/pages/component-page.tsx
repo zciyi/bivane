@@ -131,7 +131,7 @@ export function ComponentPage({
                   lines.push(
                       '// 以下示例与上方演示同源（已去掉文档站布局壳，可直接复制运行）',
                   );
-                  lines.push('export function Demo() {');
+                  lines.push(`export function Demo${firstExample.params || '()'} {`);
                   if (consts) lines.push(consts);
                   if (setup) lines.push(setup);
                   lines.push('  return (');

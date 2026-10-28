@@ -23,6 +23,8 @@ export interface ExampleCode {
     consts?: string;
     /** 示例引用到的 import 语句（可空） */
     imports?: string;
+    /** 示例组件的形参（少数示例靠父组件传 props，如 Switch 的联动开关） */
+    params?: string;
 }
 
 export function ExampleCard({

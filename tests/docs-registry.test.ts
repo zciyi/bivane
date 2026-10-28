@@ -242,6 +242,34 @@ describe('文档站 · 示例清单', () => {
             ).not.toMatch(/<\/?(Block|Row)\b/);
         }
     });
+
+    it('示例代码不 import demo 内部文件，且用到的组件都带上了', () => {
+        // 读者没有 demos/table-shared.tsx 这种文件 —— 共享数据必须内联成源码，
+        // 而不是甩一条 `import … from "./table-shared"`（抄走直接报错）。
+        const code = JSON.parse(
+            readFileSync(join(DOCS, 'src/example-code.generated.json'), 'utf8'),
+        ) as Record<
+            string,
+            { imports?: string; consts?: string; setup?: string; code: string }
+        >;
+
+        for (const [name, v] of Object.entries(code)) {
+            expect(
+                v.imports || '',
+                `${name} 的示例代码还在 import demo 内部文件`,
+            ).not.toMatch(/from\s+['"]\.{1,2}\//);
+        }
+
+        // 表格示例：数据内联后，渲染它用到的 React / Table / cn 一个都不能少
+        const table = code.TableExample1;
+        for (const dep of ["react", "@/components/responsive/table", "@/lib/utils"]) {
+            expect(
+                table.imports,
+                `TableExample1 少了 ${dep} 的 import —— 读者抄走跑不起来`,
+            ).toContain(dep);
+        }
+        expect(table.consts).toContain('DEMO_TABLE_COLUMNS');
+    });
 });
 
 describe('文档站 · 生成清单覆盖全部目录条目', () => {
